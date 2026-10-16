@@ -114,7 +114,7 @@ export const course = {
 - 데모 초기화는 두 번 눌러야 실행된다 (첫 번째: "한 번 더 누르면 모두 지워져요")
 - 영상 재생·실습 파일은 준비 중. 유료 본문은 서버 권한 검증 전까지 사이트에 올리지 않는다 (열린 차시도 제목·길이만 표시)
 - 제작 예정 강의는 "제작 예정 강의예요" 안내. 결과물 완성 체크는 다시 누르면 취소된다
-### 내 강의실·서버 데모 수강 기록 (src/lib/myClassroom.js) — 화면·구조 완료, 서버 연결 대기
+### 내 강의실·서버 데모 수강 기록 (src/lib/myClassroom.js) — 구현 완료
 - 로그인: 카카오(Supabase Auth OAuth). Google 로그인은 추가하지 않는다
 - 서버: 세시드(project_1021)와 같은 Supabase 프로젝트·카카오 앱을 함께 쓴다 (무료 한도로 임시). 회원이 공유되고, 카카오 동의 화면에는 세시드 앱 이름이 보인다. 한클래스 테이블은 `demo_` 이름으로 구분한다
 - 설정: `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (.env.local / 저장소 Variables). 공개용 키만. 없으면 서버 기능을 끄고 '서버 연결 준비 중' 표시
@@ -139,8 +139,8 @@ export const course = {
 
 - unique(user_id, course_id)로 중복 신청 방지. 저장은 이미 있으면 건너뛴다
 - RLS: 로그인한 본인만 조회·추가. 수정·삭제 정책 없음. anon 권한 없음
-- 정의: `supabase/migrations/20261016000000_demo_enrollments.sql` (원격 DB에는 아직 적용하지 않음)
-- `demo_outcomes`(user_id, course_id, completed_at): unique(user_id, course_id). RLS: 본인만 조회·추가·삭제, 추가는 본인이 데모 수강 신청한 강의일 때만. 수정 정책 없음. 정의: `supabase/migrations/20261016000100_demo_outcomes.sql` (원격 미적용)
+- 정의: `supabase/migrations/20261016000000_demo_enrollments.sql` (세시드 프로젝트에 적용, 2026-10-16)
+- `demo_outcomes`(user_id, course_id, completed_at): unique(user_id, course_id). RLS: 본인만 조회·추가·삭제, 추가는 본인이 데모 수강 신청한 강의일 때만. 수정 정책 없음. 정의: `supabase/migrations/20261016000100_demo_outcomes.sql` (세시드 프로젝트에 적용, 2026-10-16)
 ### 서류 도우미
 - 입력: 직무, 기업, 자소서 질문, 내 경험 → 프롬프트 조합 → [복사] [Gemini 열기]
 - Gemini API·키를 쓰지 않는다. 입력 내용은 브라우저 밖으로 보내지 않는다 (사용자가 직접 붙여넣음)
