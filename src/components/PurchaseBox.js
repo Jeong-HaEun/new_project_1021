@@ -5,7 +5,6 @@ import { icon } from '../lib/icons.js';
 import { formatPrice } from '../lib/price.js';
 import { getCourseBadge } from '../lib/enrollment.js';
 import { addCourseToCart, CART_CHANGE_EVENT, getCourseAddStatus } from '../lib/cartStore.js';
-import { SoonButton } from './ComingSoon.js';
 import { showToast } from './Toast.js';
 
 // 담을 수 없는 이유별 버튼 문구
@@ -35,13 +34,13 @@ function CartAction(course, compact) {
   return el('button', { type: 'button', className: 'button button--ghost', disabled: '', text: BLOCKED_LABELS[status] ?? '담을 수 없음' });
 }
 
-// 바로 구매 버튼 — 살 수 있으면 주문 확인(order.html?id=…), 구매했으면 [수강하기·준비 중], 그 밖에는 비활성
+// 바로 구매 버튼 — 살 수 있으면 주문 확인(order.html?id=…), 구매했으면 수강 화면(learn.html?id=…), 그 밖에는 비활성
 function BuyAction(course) {
   const status = getCourseAddStatus(course);
   if (status === 'ok' || status === 'in-cart') {
     return el('a', { href: `order.html?id=${course.id}`, className: 'button button--primary', text: '바로 구매' });
   }
-  if (status === 'owned') return SoonButton({ label: '수강하기', className: 'button button--primary' });
+  if (status === 'owned') return el('a', { href: `learn.html?id=${course.id}`, className: 'button button--primary', text: '수강하기' });
   return el('button', { type: 'button', className: 'button button--primary', disabled: '', text: BLOCKED_LABELS[status] ?? '구매할 수 없음' });
 }
 

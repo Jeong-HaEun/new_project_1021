@@ -4,11 +4,11 @@ import { icon } from '../lib/icons.js';
 import { assetUrl } from '../lib/paths.js';
 import { formatPrice } from '../lib/price.js';
 import { PAYMENT_METHODS, SKIP_REASONS } from '../lib/order.js';
-import { SoonButton } from './ComingSoon.js';
 
 export const DEMO_PAYMENT_NOTE = '데모 결제입니다. 실제로 결제되지 않습니다.';
 
-export function OrderItem(course) {
+// learnLink: 완료 화면에서 [수강하기] 링크를 붙인다
+export function OrderItem(course, { learnLink = false } = {}) {
   return el('li', { className: 'cart-item order-item' }, [
     el('a', { href: `course.html?id=${course.id}`, className: 'cart-item__thumb' }, [
       el('img', { src: assetUrl(course.thumbnail), alt: `${course.title} 임시 이미지`, width: '640', height: '400' }),
@@ -18,6 +18,9 @@ export function OrderItem(course) {
       el('p', { className: 'cart-item__outcome', text: `결과물 · ${course.outcome}` }),
       el('strong', { className: 'price', text: formatPrice(course.price) }),
     ]),
+    learnLink
+      ? el('a', { href: `learn.html?id=${course.id}`, className: 'button button--primary order-item__learn', text: '수강하기' })
+      : null,
   ]);
 }
 
@@ -57,12 +60,10 @@ export function OrderComplete(courses) {
     el('span', { className: 'order-complete__icon' }, [icon('check', 32)]),
     el('h2', { className: 'order-complete__title', tabindex: '-1', text: '데모 주문이 끝났어요' }),
     el('p', { className: 'text-muted', text: '실제로 결제되지 않았어요. 구매 기록은 이 브라우저에만 남아요.' }),
-    el('ul', { className: 'cart-list' }, courses.map(OrderItem)),
+    el('ul', { className: 'cart-list' }, courses.map((course) => OrderItem(course, { learnLink: true }))),
     el('p', { className: 'order-complete__total' }, [el('span', { text: '합계 ' }), el('strong', { className: 'price', text: formatPrice(total) })]),
     el('div', { className: 'order-complete__actions' }, [
-      SoonButton({ label: '수강하기', className: 'button button--primary' }),
       el('a', { href: 'courses.html', className: 'button button--ghost', text: '강의 더 둘러보기' }),
     ]),
-    el('p', { className: 'order-note', text: '수강 화면은 준비 중이에요.' }),
   ]);
 }

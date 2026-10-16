@@ -1,0 +1,112 @@
+/* 수강 화면 — 상태 안내, 차시, 결과물 완성 체크, 데모 초기화 */
+.learn-body {
+  display: grid;
+  gap: var(--space-card-gap);
+  max-width: 760px;
+}
+
+.learn-status {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 14px 16px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-subtle);
+  font-weight: 700;
+}
+
+.learn-status--owned {
+  background: var(--color-success-soft);
+  color: var(--color-success-strong);
+}
+
+.learn-status__count {
+  font-size: var(--text-small);
+  font-weight: 400;
+}
+
+.learn-section {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.learn-section__title {
+  font-size: var(--text-card-title);
+  font-weight: 700;
+}
+
+/* 좁은 화면: 차시 제목 아래로 상태를 내린다 */
+.learn-lesson {
+  flex-wrap: wrap;
+}
+
+.learn-lesson .lesson__title {
+  min-width: 0;
+  flex-basis: calc(100% - 40px);
+}
+
+.learn-lesson .lesson__meta {
+  margin-left: 38px;
+  gap: 10px;
+}
+
+.learn-lesson__open,
+.learn-lesson__locked {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.learn-lesson--locked {
+  background: var(--color-surface-subtle);
+}
+
+.learn-lesson .soon-button {
+  padding: 4px 6px;
+  font-size: var(--text-small);
+}
+
+.learn-note {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.learn-section .outcome-box {
+  margin: 0;
+}
+
+.outcome-toggle {
+  justify-self: start;
+}
+
+.demo-reset {
+  background: var(--color-surface-subtle);
+}
+
+.demo-reset__button {
+  justify-self: start;
+}
+
+.demo-reset__button[data-armed='true'] {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+@media (min-width: 768px) {
+  .learn-lesson {
+    flex-wrap: nowrap;
+  }
+
+  .learn-lesson .lesson__title {
+    flex-basis: auto;
+  }
+
+  .learn-lesson .lesson__meta {
+    margin-left: 0;
+  }
+}
