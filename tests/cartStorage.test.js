@@ -2,11 +2,16 @@
 import { describe, it, expect } from 'vitest';
 import {
   CART_KEY,
+  OUTCOMES_KEY,
   PURCHASES_KEY,
   createSafeStorage,
   loadCart,
+  loadOutcomes,
   loadPurchases,
+  resetDemoData,
   saveCart,
+  saveOutcomes,
+  savePurchases,
 } from '../src/lib/cartStorage.js';
 
 const courses = [
@@ -119,5 +124,36 @@ describe('createSafeStorage — localStorage를 못 쓸 때', () => {
   it('isPersistent로 실제 저장 여부를 알려준다', () => {
     expect(createSafeStorage(() => fakeStorage()).isPersistent()).toBe(true);
     expect(createSafeStorage(() => brokenStorage).isPersistent()).toBe(false);
+  });
+});
+
+describe('구매 기록·결과물 체크 저장 (데모 구매용)', () => {
+  const purchase = { courseId: 't001', purchasedAt: '2026-10-16T00:00:00.000Z' };
+
+  it('OUTCOMES_KEY는 SPEC.md와 같다', () => {
+    expect(OUTCOMES_KEY).toBe('hanclass.outcomes.v1');
+  });
+
+  it('저장한 구매 기록을 그대로 불러온다', () => {
+    const storage = createSafeStorage(() => fakeStorage());
+    savePurchases(storage, [purchase]);
+    expect(loadPurchases(storage, courses)).toEqual([purchase]);
+  });
+
+  it('결과물 체크는 구매한 강의만 불러온다', () => {
+    const storage = createSafeStorage(() => fakeStorage());
+    saveOutcomes(storage, ['t001', 't002']);
+    expect(loadOutcomes(storage, courses, [purchase])).toEqual(['t001']);
+  });
+
+  it('데모 초기화: 장바구니·구매 기록·결과물 체크를 모두 비운다', () => {
+    const storage = createSafeStorage(() => fakeStorage());
+    saveCart(storage, ['t002']);
+    savePurchases(storage, [purchase]);
+    saveOutcomes(storage, ['t001']);
+    resetDemoData(storage);
+    expect(loadCart(storage, courses, [])).toEqual([]);
+    expect(loadPurchases(storage, courses)).toEqual([]);
+    expect(loadOutcomes(storage, courses, [])).toEqual([]);
   });
 });
