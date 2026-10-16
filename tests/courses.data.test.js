@@ -55,3 +55,14 @@ describe('강의 데이터', () => {
     });
   });
 });
+
+// 실제 강좌 데이터 검토 — red가 있으면 테스트 실패 (yellow는 npm run review 보고서에서 확인)
+describe('강좌 검토 (courseReview)', () => {
+  it('실제 강좌 중 red(맞지 않음)가 없다', async () => {
+    const { reviewCourses } = await import('../src/lib/courseReview.js');
+    const reds = reviewCourses(COURSES, CATEGORIES)
+      .filter((result) => result.level === 'red')
+      .map((result) => `${result.courseId}: ${result.issues.filter((i) => i.level === 'red').map((i) => i.message).join(' / ')}`);
+    expect(reds, '자세한 내용과 해결 방안은 npm run review로 확인').toEqual([]);
+  });
+});

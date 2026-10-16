@@ -107,3 +107,25 @@ describe('cleanCart — 저장된 값 정리', () => {
     expect(cleanCart(['t001', 't004', 't003'], courses, purchases)).toEqual(['t001']);
   });
 });
+
+describe('모집 기간 — 마감·모집 예정 강좌는 담을 수 없다', () => {
+  const now = new Date('2026-10-16T12:00:00+09:00');
+  const closed = { id: 't101', status: 'open', price: 1000, enrollment: { endDate: '2026-10-10' } };
+  const upcoming = { id: 't102', status: 'open', price: 1000, enrollment: { startDate: '2026-11-01' } };
+  const running = { id: 't103', status: 'open', price: 1000, enrollment: { startDate: '2026-10-01', endDate: '2026-10-31' } };
+
+  it('마감은 closed, 모집 예정은 upcoming, 모집중은 ok', () => {
+    expect(getAddStatus([], closed, [], now)).toBe('closed');
+    expect(getAddStatus([], upcoming, [], now)).toBe('upcoming');
+    expect(getAddStatus([], running, [], now)).toBe('ok');
+  });
+
+  it('마감·모집 예정 강좌는 담기지 않고, 저장된 장바구니에서도 빠진다', () => {
+    expect(addToCart([], closed, [], now)).toEqual([]);
+    expect(cleanCart(['t101', 't102', 't103'], [closed, upcoming, running], [], now)).toEqual(['t103']);
+  });
+
+  it('이미 구매한 강좌는 마감돼도 owned (수강은 계속 가능)', () => {
+    expect(getAddStatus([], closed, [{ courseId: 't101', purchasedAt: '2026-10-01T00:00:00.000Z' }], now)).toBe('owned');
+  });
+});

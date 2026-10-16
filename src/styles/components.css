@@ -80,6 +80,22 @@
   color: var(--color-surface);
 }
 
+/* 모집 상태 신호등 — 초록 모집중 / 노랑 모집 예정 / 빨강 모집 마감 */
+.badge--green {
+  background: var(--color-success-soft);
+  color: var(--color-success-strong);
+}
+
+.badge--yellow {
+  background: var(--color-warning-soft);
+  color: var(--color-warning-strong);
+}
+
+.badge--red {
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+}
+
 .badge--preview {
   background: var(--color-success-soft);
   color: var(--color-success-strong);

@@ -36,3 +36,6 @@ docs/design/
 
 # Claude Code 개인 설정 (각자 컴퓨터용)
 .claude/settings.local.json
+
+# 강좌 검토 보고서·기록 (npm run review가 만듦, 로컬 확인용)
+reports/

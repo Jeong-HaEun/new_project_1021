@@ -3,9 +3,12 @@ import { el } from '../lib/dom.js';
 import { assetUrl } from '../lib/paths.js';
 import { formatPrice } from '../lib/price.js';
 import { getCategoryName, totalMinutes } from '../lib/courseQuery.js';
+import { getCourseBadge } from '../lib/enrollment.js';
 
+// 상태 배지 — 제작 예정 / 모집중(초록) / 모집 예정(노랑) / 모집 마감(빨강). 상시 모집은 표시 없음
 export function StatusBadge(course) {
-  return course.status === 'planned' ? el('span', { className: 'badge badge--planned', text: '제작 예정' }) : null;
+  const badge = getCourseBadge(course);
+  return badge ? el('span', { className: `badge badge--${badge.tone}`, text: badge.label }) : null;
 }
 
 export function CourseCard(course, categories) {

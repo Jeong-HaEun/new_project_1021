@@ -5,6 +5,7 @@ import { assetUrl } from '../lib/paths.js';
 import { formatPrice } from '../lib/price.js';
 import { getCategoryName, totalMinutes } from '../lib/courseQuery.js';
 import { StatusBadge } from './CourseCard.js';
+import { formatEnrollmentPeriod, getCourseBadge } from '../lib/enrollment.js';
 import { SoonButton } from './ComingSoon.js';
 
 const section = (title, children) =>
@@ -59,6 +60,7 @@ export function DetailBody(course) {
     section('구매 전 확인해 주세요', [
       el('dl', { className: 'info-list' }, [
         ['완성 결과물', course.outcome],
+        ['모집 기간', formatEnrollmentPeriod(course.enrollment)],
         ['추가 도구 비용', course.extraCost],
         ['수강 기간', course.accessPeriod],
         ['환불 규정', course.refundPolicy],
@@ -69,15 +71,17 @@ export function DetailBody(course) {
 
 // 가격·구매 영역 — 넓은 화면은 오른쪽 고정 상자, 모바일은 하단 바
 export function PurchaseBox(course, { compact = false } = {}) {
-  const isPlanned = course.status === 'planned';
+  // 제작 예정·모집 예정·모집 마감이면 버튼에 그 상태를, 아니면 '바로 구매'를 보여준다
+  const badge = getCourseBadge(course);
+  const blocked = badge && badge.tone !== 'green' ? badge.label : null;
   return el('div', { className: compact ? 'purchase-bar' : 'purchase-box' }, [
     el('div', { className: 'purchase__price' }, [
       el('strong', { className: 'price', text: formatPrice(course.price) }),
-      el('span', { className: 'text-muted', text: isPlanned ? '제작 예정 · 구독 없이 한 강' : '구독 없이 한 강' }),
+      el('span', { className: 'text-muted', text: blocked ? `${blocked} · 구독 없이 한 강` : '구독 없이 한 강' }),
     ]),
     el('div', { className: 'purchase__actions' }, [
       SoonButton({ label: '장바구니', iconNode: icon('cart', 18), className: 'button button--ghost' }),
-      SoonButton({ label: isPlanned ? '제작 예정' : '바로 구매', className: 'button button--primary' }),
+      SoonButton({ label: blocked ?? '바로 구매', className: 'button button--primary' }),
     ]),
     compact ? null : el('p', { className: 'purchase__note', text: '장바구니·구매 기능은 준비 중이에요. 실제 결제는 이루어지지 않는 데모 사이트입니다.' }),
   ]);

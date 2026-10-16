@@ -9,6 +9,8 @@ export const course = {
   summary: '거래처 코드 하나로 주문 내역에 담당자 정보를 한 번에 붙입니다.',
   category: 'excel',
   price: 1000,
+  // 모집 기간 예시 (YYYY-MM-DD, 한국 날짜, 양 끝 포함). 지우면 상시 모집
+  enrollment: { startDate: '2026-10-01', endDate: '2026-12-31' },
   instructorId: INSTRUCTOR_ID,
   outcome: '두 표를 합친 완성 파일 1개',
   learn: [

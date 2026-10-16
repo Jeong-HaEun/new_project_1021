@@ -2,6 +2,7 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { BANNED_PHRASES } from '../src/data/policy.js';
 
 const ROOT = join(import.meta.dirname, '..');
 
@@ -17,9 +18,6 @@ const htmlFiles = readdirSync(ROOT).filter((name) => name.endsWith('.html')).map
 const sourceFiles = listFiles(join(ROOT, 'src'), ['.js', '.css']);
 const read = (path) => readFileSync(path, 'utf8');
 const short = (path) => path.replace(ROOT, '');
-
-// 과장·금지 표현 — 필요하면 여기에 추가
-const BANNED_PHRASES = ['합격 보장', '100% 취업', '취업 보장', '100% 환불'];
 
 describe('모든 HTML 페이지', () => {
   it.each(htmlFiles.map(short))('%s: noindex·lang·viewport가 있다', (name) => {
@@ -48,8 +46,8 @@ describe('소스 파일', () => {
     expect(offenders.map(short)).toEqual([]);
   });
 
-  it('과장 표현이 없다', () => {
-    const offenders = [...sourceFiles, ...htmlFiles].filter((path) =>
+  it('과장 표현이 없다 (금지 표현 목록 파일 policy.js는 제외)', () => {
+    const offenders = [...sourceFiles, ...htmlFiles].filter((path) => !path.endsWith('policy.js')).filter((path) =>
       BANNED_PHRASES.some((phrase) => read(path).includes(phrase)),
     );
     expect(offenders.map(short)).toEqual([]);

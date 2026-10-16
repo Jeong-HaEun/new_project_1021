@@ -117,3 +117,14 @@ describe('결과물 완성 체크', () => {
     expect(cleanOutcomes('t001', courses, [owned('t001')])).toEqual([]);
   });
 });
+
+describe('모집 기간 — 마감·모집 예정 강좌는 살 수 없다', () => {
+  const now = new Date('2026-10-16T12:00:00+09:00');
+  const closed = { id: 't201', status: 'open', price: 1000, lessons: [], enrollment: { endDate: '2026-10-10' } };
+
+  it('바로 구매·장바구니 결제 모두 막힌다', () => {
+    const state = { cart: ['t201'], purchases: [] };
+    expect(buyNow(state, closed, NOW, now)).toEqual(state);
+    expect(checkoutCart(state, [closed], NOW, now)).toEqual({ cart: [], purchases: [], added: [] });
+  });
+});

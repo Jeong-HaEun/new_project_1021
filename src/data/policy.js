@@ -9,3 +9,6 @@ export const REFUND_POLICY =
 // 가격 범위 (원) — 데이터 검사 테스트에서 사용
 export const PRICE_MIN = 1000;
 export const PRICE_MAX = 2000;
+
+// 과장·금지 표현 — 강좌 검토(courseReview.js)와 사이트 규칙 테스트에서 함께 사용
+export const BANNED_PHRASES = ['합격 보장', '100% 취업', '취업 보장', '100% 환불'];

@@ -23,6 +23,8 @@
   --color-success-soft: #d1fae5;
   --color-success-strong: #047857;
   --color-info-soft: #e0efff;
+  --color-warning-soft: #fef3c7;
+  --color-warning-strong: #92400e;
 
   /* 선 */
   --color-line: #e2e8f0;
