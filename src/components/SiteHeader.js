@@ -17,6 +17,7 @@ export function SiteHeader({ active }) {
       ]),
       el('nav', { className: 'site-nav', 'aria-label': '주요 메뉴' }, [
         navLink('courses.html', '강의 찾기', 'courses'),
+        navLink('report.html', '광고 보고서', 'report'),
         SoonButton({ label: '서류 도우미', className: 'site-nav__soon' }),
         SoonButton({ label: '커뮤니티', className: 'site-nav__soon' }),
       ]),

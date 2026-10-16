@@ -163,6 +163,24 @@
     font-weight: 600;
   }
 
+  /* 메뉴 글자는 한 줄로 (768px에서 메뉴 4개가 두 줄로 꺾이지 않게) */
+  .site-nav__link,
+  .site-nav .soon-button {
+    white-space: nowrap;
+  }
+}
+
+/* 768~1079px: 메뉴 4개가 헤더 폭을 넘지 않게 간격을 줄인다 */
+@media (min-width: 768px) and (max-width: 1079px) {
+  .site-nav {
+    gap: 2px;
+  }
+
+  .site-nav__link,
+  .site-nav .soon-button {
+    padding: 8px 6px;
+  }
+
   .site-nav__link:hover,
   .site-nav__link[aria-current='page'] {
     color: var(--color-primary);

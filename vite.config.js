@@ -17,7 +17,15 @@ export default defineConfig({
         order: 'order.html',
         learn: 'learn.html',
         myclass: 'myclass.html',
+        report: 'report.html',
       },
+    },
+  },
+  // 개발 서버: /new_project_oct/ 를 로컬 Adporter(5176)로 넘겨 배포처럼 같은 주소에서 열리게 한다 (로그인 공유 확인용)
+  // Adporter는 `npx vite --port 5176 --base /new_project_oct/` 로 켠다
+  server: {
+    proxy: {
+      '/new_project_oct': { target: 'http://localhost:5176', changeOrigin: true, ws: true },
     },
   },
   test: {

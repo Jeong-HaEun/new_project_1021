@@ -21,10 +21,10 @@ export async function onAuthChange(callback) {
   });
 }
 
-// 카카오 로그인 화면으로 이동 → 끝나면 Supabase를 거쳐 내 강의실로 돌아온다
-export async function signInWithKakao() {
+// 카카오 로그인 화면으로 이동 → 끝나면 Supabase를 거쳐 returnPage로 돌아온다 (Redirect URLs에 등록된 페이지만)
+export async function signInWithKakao(returnPage = 'myclass.html') {
   const client = await getServerClient();
-  const redirectTo = new URL('./myclass.html', window.location.href).href;
+  const redirectTo = new URL(`./${returnPage}`, window.location.href).href;
   const { error } = await client.auth.signInWithOAuth({ provider: 'kakao', options: { redirectTo } });
   if (error) throw error;
 }

@@ -2,7 +2,7 @@ import { el } from '../lib/dom.js';
 import { pageUrl } from '../lib/paths.js';
 import { REPORT_EXAMPLE } from '../data/learningPath.js';
 
-// 외부 Adporter와 연결한다. 가상 수치는 설명용이며 실제 계정 데이터가 아니다.
+// 한클래스 안의 보고서 페이지(report.html)로 연결한다. 가상 수치는 설명용이며 실제 계정 데이터가 아니다.
 export function ReportExample({ compact = false } = {}) {
   const example = REPORT_EXAMPLE;
   return el('section', { className: 'section report-example', 'aria-label': '광고 보고서 실습 예시' }, [
@@ -12,16 +12,15 @@ export function ReportExample({ compact = false } = {}) {
       el('p', { className: 'text-muted', text: example.description }),
       el('div', { className: 'report-example__actions' }, [
         el('a', {
-          href: example.url, target: '_blank', rel: 'noopener noreferrer',
-          className: 'button button--primary', text: '광고 보고서 열기 ↗',
-          'aria-label': '광고 보고서 열기, 새 창, 별도 로그인 필요', 'data-analytics': 'report-example-open',
+          href: example.url, className: 'button button--primary', text: '광고 보고서 열기',
+          'data-analytics': 'report-example-open',
         }),
         compact ? null : el('a', {
           href: pageUrl('course.html', { id: example.courseId }), className: 'button button--ghost',
           text: '연결된 실습 강의 보기', 'data-course-id': example.courseId, 'data-placement': 'report-example',
         }),
       ]),
-      el('p', { className: 'report-example__note text-muted', text: '보고서는 별도 계정 로그인이 필요해요. 한클래스 로그인과는 연동되지 않으며, 연결된 강의는 제작 예정입니다.' }),
+      el('p', { className: 'report-example__note text-muted', text: '한클래스 카카오 계정으로 로그인하면 내 보고서가 열려요. 보고서는 PC에서만 이용할 수 있어요. 연결된 강의는 제작 예정입니다.' }),
     ]),
     el('div', { className: 'report-example__preview' }, [
       el('p', { className: 'report-example__preview-label', text: '화면 구성 예시 · 가상 수치' }),

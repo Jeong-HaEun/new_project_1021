@@ -8,7 +8,7 @@ export const LEARNING_PATH = [
 
 export const REPORT_EXAMPLE = {
   courseId: 'c003',
-  url: 'https://Jeong-HaEun.github.io/new_project_oct/',
+  url: 'report.html', // 한클래스 안의 보고서 페이지 (Adporter를 끼워 넣음)
   title: '숫자를 읽고, 다음 행동을 설명하는 마케터로',
   description: '광고 데이터를 정리한 뒤에는 해석이 필요해요. 매체별 지표와 기간별 변화를 살펴보고, 내 언어로 결론을 써보는 연습을 준비하고 있어요.',
   metrics: [
