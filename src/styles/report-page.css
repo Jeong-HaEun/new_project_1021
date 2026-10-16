@@ -6,7 +6,8 @@
 }
 
 @media (min-width: 768px) {
-  .report-mobile-notice {
+  /* .empty-state(display:flex)보다 우선하도록 두 클래스로 지정 (빌드 후 CSS 순서가 바뀌어도 숨김 유지) */
+  .empty-state.report-mobile-notice {
     display: none;
   }
 

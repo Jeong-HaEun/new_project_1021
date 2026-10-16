@@ -168,18 +168,6 @@
   .site-nav .soon-button {
     white-space: nowrap;
   }
-}
-
-/* 768~1079px: 메뉴 4개가 헤더 폭을 넘지 않게 간격을 줄인다 */
-@media (min-width: 768px) and (max-width: 1079px) {
-  .site-nav {
-    gap: 2px;
-  }
-
-  .site-nav__link,
-  .site-nav .soon-button {
-    padding: 8px 6px;
-  }
 
   .site-nav__link:hover,
   .site-nav__link[aria-current='page'] {
@@ -192,5 +180,17 @@
 
   .page {
     padding-top: 32px;
+  }
+}
+
+/* 768~1079px: 메뉴 4개가 헤더 폭을 넘지 않게 간격을 줄인다 */
+@media (min-width: 768px) and (max-width: 1079px) {
+  .site-nav {
+    gap: 2px;
+  }
+
+  .site-nav__link,
+  .site-nav .soon-button {
+    padding: 8px 6px;
   }
 }
