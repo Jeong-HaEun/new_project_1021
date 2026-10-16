@@ -30,3 +30,6 @@ dist-ssr
 
 # 작업 요청 메모 (커밋하지 않음)
 prompt.md
+
+# 디자인 시안 스크린샷 — 실존 기업명·가상 멘토가 들어 있어 로컬에서만 참고 (DESIGN.md 참고)
+docs/design/
