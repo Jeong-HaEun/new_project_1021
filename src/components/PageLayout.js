@@ -17,14 +17,15 @@ import { VisitNotice } from './VisitNotice.js';
 
 // syncAccount: 로그인한 계정의 데모 수강 기록을 읽어 수강 상태에 반영 (내 강의실은 직접 읽으므로 false)
 // pageType: 방문 통계의 페이지 종류 (기본은 active. 상세·주문처럼 메뉴와 다른 페이지는 따로 넘긴다)
-export function renderPage({ active, title, content, bottomBar = null, syncAccount = true, pageType = active ?? 'other' }) {
+// lead: 본문 폭 밖, 헤더 바로 아래에 꽉 차게 넣을 요소 (메인 A안의 큰 이미지)
+export function renderPage({ active, title, content, bottomBar = null, syncAccount = true, pageType = active ?? 'other', lead = null }) {
   document.title = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 
   const main = el('main', { id: 'main', className: 'page' }, [...[].concat(content), VisitNotice()]);
   const bottom = el('div', { className: 'bottom-stack' }, [bottomBar, DemoNotice(), BottomNav({ active })]);
   if (bottomBar) document.body.classList.add('has-bottom-bar');
 
-  document.querySelector('#app').replaceChildren(SiteHeader({ active }), main, bottom);
+  document.querySelector('#app').replaceChildren(...[SiteHeader({ active }), lead, main, bottom].filter(Boolean));
   document.body.dataset.pageType = pageType;
   initAnalytics(pageType);
   if (syncAccount) syncAccountEnrollments();

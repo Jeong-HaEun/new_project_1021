@@ -24,6 +24,9 @@ page_view는 GA4 config가 자동으로 한 번 보낸다(정리한 page_locatio
 | demo_begin_checkout | 주문 화면 첫 표시 (한 번) | item_count, order_mode(cart/direct) |
 | demo_order_complete | 데모 주문 완료 | item_count, order_mode, payment_method |
 
+메인 A/B 실험: experiment_home_exposure · experiment_course_open · experiment_classes_view (규칙은 SPEC.md '메인 A/B'). 시연(?ab_preview)과 시연한 탭은 GA4를 불러오지 않는다.
+GA4 보고서에서 안별로 나누려면 관리 → 맞춤 정의에 이벤트 범위 측정기준(experiment_id, variant, mode, source)을 등록해야 한다.
+
 허용 항목 목록은 `EVENT_PARAMS`(analytics.js)가 기준이며, 그 밖의 항목은 보내지 않는다 (tests/analytics.test.js).
 
 ## 코드의 연결 지점

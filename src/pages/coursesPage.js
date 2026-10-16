@@ -8,6 +8,7 @@ import { renderPage } from '../components/PageLayout.js';
 import { CourseGrid } from '../components/CourseCard.js';
 import { SearchForm } from '../components/SearchForm.js';
 import { track } from '../lib/analytics.js';
+import { browserStorage, setPendingCourse } from '../lib/experimentTracking.js';
 import '../styles/courses.css';
 
 // 화면 상태 — 주소에서 처음 값을 읽는다
@@ -89,3 +90,10 @@ renderPage({
 });
 
 track('view_item_list', { item_list_id: 'courses', result_count: update() });
+
+// 메인 A/B: 메인에서 검색해 목록을 거쳐 상세로 가도 같은 탭이면 첫 도달 1회 기록 (source=course_list)
+function handleCourseLinkClick(event) {
+  const link = event.target.closest('a[data-course-id]');
+  if (link) setPendingCourse(browserStorage('sessionStorage'), { courseId: link.dataset.courseId, source: 'course_list' });
+}
+document.addEventListener('click', handleCourseLinkClick, true);

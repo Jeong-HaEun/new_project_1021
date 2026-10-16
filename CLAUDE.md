@@ -12,7 +12,8 @@
 - 추천 순서: 마케팅 기획 → 엑셀 정리 → 광고 보고서 → PPT 전달. 묶음 상품·필수 수강 아님.
 - 광고 보고서: 헤더 [광고 보고서] → report.html. 별도 저장소 Adporter(new_project_oct)를 한클래스 틀 안에 끼워 넣는다(iframe). 같은 Supabase·카카오 계정이라 한클래스 로그인으로 열린다. 로그인은 한클래스가 맡는다.
 - 보고서 섹션의 숫자는 설명용 가상 수치. 실제 계정의 데이터로 표현하지 않는다.
-- 이미지는 `public/images/courses/`의 교체 가능한 임시 SVG. 목록은 IMAGES.md.
+- 이미지는 `public/images/courses/`의 교체 가능한 임시 SVG, 메인 A안 배경 `public/images/home/hero-art.webp`. 목록은 IMAGES.md.
+- 메인 A/B(감성형 vs 정보형): 50:50 배정·탭 세션 측정 진행 중(스위치 HOME_EXPERIMENT_ACTIVE). 시연 ?ab_preview=A/B는 측정 제외. 결과를 성과로 단정하지 않는다 (SPEC.md)
 - 미구현 메뉴(내 강의실·서류 도우미·커뮤니티)·영상 재생·실습 파일은 준비 중임을 표시한다.
 - 결제는 데모만: 결제수단 이름만 고르고 구매 기록을 남긴다. 실제 결제·카드정보 입력칸 금지.
 

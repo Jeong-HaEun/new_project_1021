@@ -28,6 +28,12 @@ describe('shouldLoadAnalytics — GA4를 불러올지', () => {
     expect(shouldLoadAnalytics('G-TEST123', 'https://jeong-haeun.github.io/new_project_1021-copy/')).toBe(false);
   });
 
+  it('A/B 시연 주소(?ab_preview)이거나 시연 중인 탭이면 불러오지 않는다 (시연 데이터는 측정 제외)', () => {
+    expect(shouldLoadAnalytics('G-TEST123', `${site}?ab_preview=A`)).toBe(false);
+    expect(shouldLoadAnalytics('G-TEST123', 'https://jeong-haeun.github.io/new_project_1021/course.html?id=c002', { previewSession: true })).toBe(false);
+    expect(shouldLoadAnalytics('G-TEST123', 'http://localhost:5174/new_project_1021/?ga_debug=1&ab_preview=B')).toBe(false);
+  });
+
   it('G- 형식이 아니면 불러오지 않는다', () => {
     expect(shouldLoadAnalytics('UA-1234', site)).toBe(false);
   });
@@ -73,5 +79,15 @@ describe('데모 주문 이벤트는 실제 구매 이벤트와 분리', () => {
       expect(EVENT_PARAMS).toHaveProperty(name);
       expect(EVENT_PARAMS[name]).not.toContain('value');
     });
+  });
+});
+
+describe('메인 A/B 실험 이벤트 — 허용 항목만', () => {
+  it('노출·상세 도달·강의 구역 도달 이벤트가 등록돼 있고 변형·실험 id 외 개인정보는 버린다', () => {
+    expect(pickParams('experiment_home_exposure', { experiment_id: 'x', variant: 'A', mode: 'experiment', placement: 'home', email: 'a@b.c' }))
+      .toEqual({ experiment_id: 'x', variant: 'A', mode: 'experiment', placement: 'home' });
+    expect(pickParams('experiment_course_open', { experiment_id: 'x', variant: 'B', mode: 'experiment', placement: 'course', course_id: 'c002', source: 'home_card' }))
+      .toEqual({ experiment_id: 'x', variant: 'B', mode: 'experiment', placement: 'course', course_id: 'c002', source: 'home_card' });
+    expect(pickParams('experiment_classes_view', { experiment_id: 'x', variant: 'A' })).toEqual({ experiment_id: 'x', variant: 'A' });
   });
 });

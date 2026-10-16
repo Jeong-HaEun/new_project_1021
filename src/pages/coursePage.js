@@ -10,6 +10,7 @@ import { DetailBody, DetailHero } from '../components/CourseDetail.js';
 import { PurchaseBox } from '../components/PurchaseBox.js';
 import { ReportExample } from '../components/ReportExample.js';
 import { track } from '../lib/analytics.js';
+import { browserStorage, consumeCourseOpen } from '../lib/experimentTracking.js';
 import '../styles/learning.css';
 import '../styles/courses.css';
 import '../styles/detail.css';
@@ -43,6 +44,9 @@ if (course) {
     bottomBar: PurchaseBox(course, { compact: true }),
   });
   track('view_item', { item_id: course.id, item_category: course.category, price: course.price, currency: 'KRW' });
+  // 메인 A/B 주 지표: 메인 노출 뒤 클릭한 강의의 상세에 처음 도달 (탭당 1회, 노출 없으면 null)
+  const experimentOpen = consumeCourseOpen(browserStorage('sessionStorage'), course.id);
+  if (experimentOpen) track('experiment_course_open', experimentOpen);
 } else {
   renderPage({ active: 'courses', pageType: 'course-not-found', title: '강의를 찾을 수 없어요', content: [BackLink(), NotFound()] });
 }

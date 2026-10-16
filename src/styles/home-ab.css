@@ -1,0 +1,157 @@
+/* 메인 A/B 윗부분 — A 감성 몰입형(.home-hero) / B 정보 탐색형(.home-intro) / 시연 띠(.ab-preview) */
+
+/* ── 시연 띠 (?ab_preview 일 때만) ── */
+.ab-preview {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px max(var(--space-page), calc((100% - var(--content-max)) / 2 + var(--space-page)));
+  background: var(--color-surface-subtle);
+  font-size: 12px;
+}
+
+.ab-preview__label {
+  font-weight: 700;
+}
+
+.ab-preview__links {
+  display: flex;
+  gap: 4px;
+}
+
+.ab-preview__link {
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text-muted);
+}
+
+.ab-preview__link[aria-current='page'] {
+  background: var(--color-text);
+  color: var(--color-surface);
+}
+
+/* ── A·B 공통 글자 ── */
+.home-top__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--text-small);
+  font-weight: 600;
+}
+
+.home-top__eyebrow::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.home-top__title {
+  margin-top: 14px;
+  font-size: 34px;
+  font-weight: 800;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.home-top__desc {
+  margin-top: 12px;
+}
+
+.home-top__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.home-top__cta {
+  gap: 20px;
+  min-height: 48px;
+  padding: 0 20px;
+  background: var(--color-text);
+  color: var(--color-surface);
+}
+
+.home-top__price {
+  display: grid;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.home-discovery {
+  margin-top: 8px;
+}
+
+.home-kicker {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-text-muted);
+}
+
+/* ── B 정보 탐색형: 짧은 소개 ── */
+/* 좁은 화면은 "지금 필요한 실무," / "한 강씩." 두 줄, 넓은 화면은 한 줄 */
+.home-intro .home-top__title span {
+  display: block;
+}
+
+.home-intro .home-top__desc {
+  color: var(--color-text-muted);
+}
+
+/* [강의 둘러보기]로 이동했을 때 고정 헤더에 가리지 않게 */
+#classes {
+  scroll-margin-top: calc(var(--header-height) + 16px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* ── B 좁은 화면: 강의 카드를 가로형으로 촘촘하게 (첫 강의의 제목·결과물·가격이 첫 화면에) ── */
+@media (max-width: 767px) {
+  [data-home-variant='B'] .home-courses .course-card__link {
+    flex-direction: row;
+  }
+
+  [data-home-variant='B'] .home-courses .course-card__thumb {
+    flex: none;
+    width: 96px;
+    aspect-ratio: auto;
+  }
+
+  [data-home-variant='B'] .home-courses .course-card__thumb .badge {
+    top: 6px;
+    left: 6px;
+  }
+
+  [data-home-variant='B'] .home-courses .course-card__body {
+    padding: 12px;
+    gap: 6px;
+  }
+}
+
+@media (min-width: 768px) {
+  .home-top__title {
+    font-size: 40px;
+  }
+
+  .home-intro .home-top__title span {
+    display: inline;
+  }
+
+  /* B 넓은 화면: 제목·설명 왼쪽, 버튼 오른쪽 한 줄 */
+  .home-intro {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: end;
+    gap: 24px;
+  }
+}

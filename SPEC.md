@@ -147,6 +147,24 @@ export const course = {
 - 입력: 직무, 기업, 자소서 질문, 내 경험 → 프롬프트 조합 → [복사] [Gemini 열기]
 - Gemini API·키를 쓰지 않는다. 입력 내용은 브라우저 밖으로 보내지 않는다 (사용자가 직접 붙여넣음)
 
+## 메인 A/B — 감성 몰입형(A) vs 정보 탐색형(B) — src/lib/homeExperiment.js, experimentTracking.js
+- 기준 문서: `planning/home-ab-v2` 브랜치의 claude-development-brief.md. 이전 '카드 제목 vs 결과물' 실험은 대체됨
+- 실험 id `hc_home_strategy_v1`. 스위치 `HOME_EXPERIMENT_ACTIVE`(지금 켬). 끄면 모두 B + 실험 이벤트 중지. 화면 버전이 바뀌면 새 id
+- 배정: 첫 화면 전에 50:50 무작위 → localStorage `hanclass.experiments.v1`({실험id: 'A'|'B'})에 저장, 같은 브라우저는 같은 안. 못 쓰면 sessionStorage, 둘 다 못 쓰면 B + 측정 제외. 저장값이 깨지면 새로 배정. 브라우저 단위라 사람·계정·여러 기기의 동일성은 보장하지 않는다
+- 시연: `index.html?ab_preview=A` / `?ab_preview=B` → 맨 위에 '기획 시연 · 측정 제외' 띠와 A/B 전환 링크
+- 시연 주소와, 시연 뒤 같은 탭에서 이동한 페이지는 GA4를 불러오지 않는다 (sessionStorage `hanclass.abPreview`)
+- A: 헤더 아래 꽉 찬 이미지(`images/home/hero-art.webp`, 장식 alt="") 위에 대표 문구·설명·[강의 둘러보기]·가격. 그 아래 '어떤 실무가 필요한가요?'
+- B: 이미지 없이 짧은 소개 → 검색 → 강의. 큰 이미지를 요청하지 않는다. 좁은 화면은 강의 카드를 가로형으로
+- 두 안 공통: 대표 문구·설명·가격·강의 6개·검색·분야·상세 주소, 아래 구역 순서(검색 → 강의 → 분야 → 추천 순서 → 보고서 → 약속 → 준비 중 기능)
+- [강의 둘러보기]는 강의 구역(#classes)으로 이동
+- 시연은 저장된 배정을 덮어쓰지 않는다
+- 측정 (집계 단위 = 탭 세션, sessionStorage `hanclass.homeExpContext.v1`. GA4 기본 세션과 다름)
+  - 주 지표 = 상세 도달 탭 세션 수 ÷ 메인 노출 탭 세션 수
+  - `experiment_home_exposure`: 화면이 1초 연속 보일 때 탭당 1회 (이미지 로드는 조건 아님)
+  - `experiment_course_open`: 노출 뒤 메인 카드(home_card)·추천 순서(home_path)·목록(course_list)에서 누른 강의의 상세에 처음 도달했을 때 탭당 1회. 메인 노출 없는 상세 직접 진입·주소 입력은 제외
+  - 보조 `experiment_classes_view`: 강의 구역이 화면에 나타남, 탭당 1회. 검색 제출·보고서 열기는 기존 이벤트
+  - 속성: experiment_id, variant, mode, placement (+ course_id, source). 통계적 승자·효과는 주장하지 않는다
+
 ## 메인 개선 · 마케터 취업 준비 동선
 
 - 기존 6개 강의와 검색·필터·상세 계약은 유지한다.

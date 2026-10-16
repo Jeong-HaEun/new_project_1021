@@ -11,3 +11,4 @@
 | public/images/courses/c004.svg | 16:10 | PPT 강의 썸네일 | 임시 |
 | public/images/courses/c005.svg | 16:10 | 마케팅 기초 강의 썸네일 | 임시 |
 | public/images/courses/c006.svg | 16:10 | AI 실습 강의 썸네일 | 임시 |
+| public/images/home/hero-art.webp | 3:2 (1536×1024) | 메인 A안(감성 몰입형) 배경. 장식 이미지(alt=""), 문구는 HTML로 올림 | AI로 새로 제작한 독립 이미지 (planning/home-ab-v2) |

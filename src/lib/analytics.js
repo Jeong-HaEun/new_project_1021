@@ -2,6 +2,8 @@
 // 측정 ID(VITE_GA4_ID)가 있을 때만 동작한다. 허용한 항목만 보내고 검색어 원문·이메일·입력 내용은 보내지 않는다
 // 데모 주문은 실제 결제가 아니므로 GA4 표준 구매 이벤트 대신 demo_ 이벤트로 따로 보낸다 (가짜 매출 방지)
 
+import { isPreviewSession } from './homeExperiment.js';
+
 export const GA_ID = import.meta.env.VITE_GA4_ID ?? '';
 
 // 이벤트별 허용 항목 — 여기에 없는 이벤트·항목은 보내지 않는다
@@ -15,6 +17,10 @@ export const EVENT_PARAMS = {
   demo_add_to_cart: ['item_id', 'item_category', 'price'],
   demo_begin_checkout: ['item_count', 'order_mode'],
   demo_order_complete: ['item_count', 'order_mode', 'payment_method'],
+  // 메인 A/B (experimentTracking.js) — 탭 세션 기준
+  experiment_home_exposure: ['experiment_id', 'variant', 'mode', 'placement'],
+  experiment_course_open: ['experiment_id', 'variant', 'mode', 'placement', 'course_id', 'source'],
+  experiment_classes_view: ['experiment_id', 'variant', 'mode', 'placement'],
 };
 
 // 주소에서 지울 값: 검색어, 로그인 결과(code·토큰·오류)
@@ -25,9 +31,11 @@ const SITE_HOST = 'jeong-haeun.github.io';
 const SITE_PATH = '/new_project_1021/';
 
 // 불러올지: 측정 ID가 G- 형식이고, 한클래스 배포 주소일 때만. 내 컴퓨터(localhost)는 ?ga_debug=1 일 때만 (확인용)
-export function shouldLoadAnalytics(id, href) {
+// A/B 시연 주소(?ab_preview)와 시연 중인 탭(previewSession)은 측정하지 않는다 (시연 데이터 제외)
+export function shouldLoadAnalytics(id, href, { previewSession = false } = {}) {
   if (!/^G-[A-Z0-9]+$/.test(id)) return false;
   const url = new URL(href);
+  if (previewSession || url.searchParams.has('ab_preview')) return false;
   if (['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) return url.searchParams.get('ga_debug') === '1';
   return url.hostname === SITE_HOST && url.pathname.startsWith(SITE_PATH);
 }
@@ -51,7 +59,7 @@ let loaded = false;
 
 // 페이지마다 한 번 (PageLayout.renderPage). page_type: 페이지 종류(home, courses, course …)
 export function initAnalytics(pageType) {
-  if (loaded || !shouldLoadAnalytics(GA_ID, window.location.href)) return;
+  if (loaded || !shouldLoadAnalytics(GA_ID, window.location.href, { previewSession: isPreviewSession() })) return;
   loaded = true;
   window.dataLayer = window.dataLayer || [];
   window.gtag = function gtag() {

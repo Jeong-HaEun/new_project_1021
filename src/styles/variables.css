@@ -58,6 +58,14 @@
   /* 진한 선 (비활성 표시 점 등) */
   --color-line-strong: #cbd5e1;
 
+  /* 메인 A안(감성 몰입형) 큰 이미지 위 글자 — 이미지가 늦게 떠도 읽히도록 바탕색을 깐다 */
+  --color-hero-bg: #164e89;
+  --color-hero-text: #ffffff;
+  --color-hero-text-soft: #e8edf4;
+  --color-hero-accent: #f3cd73;
+  --color-hero-overlay: rgba(8, 36, 73, 0.4);
+  --color-hero-overlay-strong: rgba(8, 36, 73, 0.75);
+
   /* 카카오 로그인 버튼 — 카카오 디자인 가이드 색 */
   --color-kakao: #fee500;
   --color-kakao-hover: #fada0a;

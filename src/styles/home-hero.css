@@ -1,0 +1,83 @@
+/* 메인 A안(감성 몰입형) — 헤더 아래 꽉 찬 이미지와 그 위 글자. 공통 글자 규칙은 home-ab.css */
+
+/* ── A 감성 몰입형: 헤더 아래 꽉 찬 이미지 ── */
+.home-hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  min-height: 560px;
+  background: var(--color-hero-bg);
+  color: var(--color-hero-text);
+}
+
+.home-hero__art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 64% center;
+}
+
+/* 글자 뒤 어둡게 — 좁은 화면은 이미지 위에 글자가 겹치므로 더 진하게 */
+.home-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--color-hero-overlay-strong), var(--color-hero-overlay) 70%, transparent);
+}
+
+.home-hero__inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 48px var(--space-page);
+}
+
+.home-hero .home-top__eyebrow::before {
+  background: var(--color-hero-accent);
+}
+
+.home-hero .home-top__title span {
+  display: block;
+}
+
+.home-hero .home-top__desc,
+.home-hero .home-top__price {
+  color: var(--color-hero-text-soft);
+}
+
+.home-hero .home-top__cta {
+  background: var(--color-hero-text);
+  color: var(--color-hero-bg);
+}
+
+.home-hero__caption {
+  display: grid;
+  gap: 2px;
+  margin-top: 32px;
+  font-size: 11px;
+  color: var(--color-hero-accent);
+}
+
+@media (min-width: 768px) {
+  .home-hero {
+    min-height: 620px;
+  }
+
+  .home-hero__art {
+    object-position: center 47%;
+  }
+
+  .home-hero::after {
+    background: linear-gradient(90deg, var(--color-hero-overlay), transparent 75%);
+  }
+
+  .home-hero .home-top__title {
+    font-size: 64px;
+    line-height: 1.17;
+  }
+}
