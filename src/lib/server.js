@@ -1,4 +1,4 @@
-// 서버(Supabase) 연결 — 한클래스 전용 프로젝트. 설정값이 없으면 서버 기능을 끈다 ('서버 연결 준비 중' 표시)
+// 서버(Supabase) 연결 — 지금은 세시드와 같은 프로젝트를 함께 쓴다 (SPEC.md 5절). 설정값이 없으면 서버 기능을 끈다 ('서버 연결 준비 중' 표시)
 // 값은 .env.local(로컬)과 GitHub 저장소 Variables(배포)에서 읽는다. .env.example 참고
 // 공개용(publishable) 키만 쓴다. 이 키는 브라우저에 보여도 되고, 실제 보호는 DB의 RLS 정책이 맡는다
 // ⚠ service_role·secret 키는 브라우저 코드·저장소에 절대 넣지 않는다 (tests/serverRules.test.js에서 검사)
