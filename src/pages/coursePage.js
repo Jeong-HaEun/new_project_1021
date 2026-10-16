@@ -7,6 +7,8 @@ import { COURSES } from '../data/courses/index.js';
 import { CATEGORIES } from '../data/categories.js';
 import { renderPage } from '../components/PageLayout.js';
 import { DetailBody, DetailHero, PurchaseBox } from '../components/CourseDetail.js';
+import { ReportExample } from '../components/ReportExample.js';
+import '../styles/learning.css';
 import '../styles/courses.css';
 import '../styles/detail.css';
 import '../styles/purchase.css';
@@ -32,6 +34,7 @@ if (course) {
     content: [
       BackLink(),
       DetailHero(course, CATEGORIES),
+      ...(course.id === 'c003' ? [ReportExample({ compact: true })] : []),
       el('div', { className: 'detail-layout' }, [DetailBody(course), el('aside', {}, [PurchaseBox(course)])]),
     ],
     bottomBar: PurchaseBox(course, { compact: true }),

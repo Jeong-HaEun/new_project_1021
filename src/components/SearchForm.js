@@ -26,7 +26,7 @@ export function SearchForm({ value = '', onSearch = null } = {}) {
 
   input.addEventListener('input', handleInput);
 
-  return el('form', { className: 'search-form', action: 'courses.html', method: 'get', role: 'search', onSubmit: handleSubmit }, [
+  return el('form', { className: 'search-form', action: 'courses.html', method: 'get', role: 'search', 'data-analytics': 'course-search', onSubmit: handleSubmit }, [
     icon('search', 20),
     input,
     el('button', { type: 'submit', className: 'button button--primary search-form__button', text: '검색' }),

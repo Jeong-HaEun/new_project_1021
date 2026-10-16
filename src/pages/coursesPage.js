@@ -44,6 +44,7 @@ function renderChips() {
         type: 'button',
         className: 'chip',
         text: tab.name,
+        'data-category-id': tab.id,
         'aria-pressed': String(state.category === tab.id),
         onClick: () => handleCategoryClick(tab.id),
       }),
