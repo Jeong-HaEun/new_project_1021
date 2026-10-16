@@ -4,6 +4,21 @@
   margin-top: 20px;
 }
 
+/* 서류 도우미 소개 카드 */
+.home-helper {
+  display: grid;
+  gap: 12px;
+  justify-items: start;
+  padding: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.home-helper__icon {
+  color: var(--color-primary);
+}
+
 /* 분야 타일 — 모바일 2열 → 넓은 화면 3열·6열 */
 .category-grid {
   display: grid;

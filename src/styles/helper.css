@@ -1,0 +1,142 @@
+/* 서류 도우미 — 탭, 입력 칸, 결과 상자 */
+.helper-body {
+  display: grid;
+  gap: 16px;
+  max-width: 760px;
+}
+
+.helper-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.helper-tab {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.helper-tab[aria-selected='true'] {
+  border-color: var(--color-text);
+  background: var(--color-text);
+  color: var(--color-surface);
+}
+
+.helper-panel {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.helper-intro {
+  font-weight: 600;
+}
+
+.helper-form {
+  display: grid;
+  gap: 12px;
+}
+
+.helper-field {
+  display: grid;
+  gap: 6px;
+}
+
+.helper-field__label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-small);
+  font-weight: 700;
+}
+
+.helper-field__req,
+.helper-field__opt {
+  padding: 1px 6px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.helper-field__req {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+}
+
+.helper-field__opt {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+}
+
+.helper-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line-strong);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  font: inherit;
+  line-height: 1.6;
+  resize: vertical;
+}
+
+.helper-quota {
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--color-info);
+}
+
+.helper-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.helper-privacy {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.helper-notice {
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-subtle);
+  font-size: var(--text-small);
+}
+
+.helper-notice--error {
+  background: var(--color-warning-soft);
+  color: var(--color-warning-strong);
+  font-weight: 600;
+}
+
+.helper-result {
+  display: grid;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--color-line);
+}
+
+.helper-result__title {
+  font-size: var(--text-card-title);
+  font-weight: 700;
+}
+
+/* AI 답변·프롬프트 — 줄바꿈을 그대로 보여 준다 */
+.helper-result__text {
+  padding: 14px;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-subtle);
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}

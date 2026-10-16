@@ -19,6 +19,7 @@ export default defineConfig({
         myclass: 'myclass.html',
         report: 'report.html',
         privacy: 'privacy.html',
+        helper: 'helper.html',
       },
     },
   },

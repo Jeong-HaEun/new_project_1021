@@ -21,6 +21,11 @@ export const EVENT_PARAMS = {
   experiment_home_exposure: ['experiment_id', 'variant', 'mode', 'placement'],
   experiment_course_open: ['experiment_id', 'variant', 'mode', 'placement', 'course_id', 'source'],
   experiment_classes_view: ['experiment_id', 'variant', 'mode', 'placement'],
+  // 서류 도우미 — 어떤 길잡이인지와 결과만 (입력 내용은 보내지 않는다)
+  helper_tab_select: ['helper_mode'],
+  helper_generate: ['helper_mode', 'result'],
+  helper_copy: ['helper_mode'],
+  helper_open_ai: ['helper_mode'],
 };
 
 // 주소에서 지울 값: 검색어, 로그인 결과(code·토큰·오류)

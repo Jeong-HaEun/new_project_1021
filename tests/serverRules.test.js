@@ -79,3 +79,49 @@ describe('demo_outcomes — 본인이 신청한 강의만 완성 체크', () => 
     expect(sql).toMatch(/unique \(user_id, course_id\)/);
   });
 });
+
+describe('doc_helper_usage — 서류 도우미 하루 사용 횟수 (입력 내용은 저장하지 않음)', () => {
+  const sql = read('supabase/migrations/20261016000200_doc_helper_usage.sql').toLowerCase();
+
+  it('횟수만 저장하고 입력 내용 칸이 없다', () => {
+    expect(sql).toMatch(/create table public\.doc_helper_usage/);
+    expect(sql).not.toMatch(/letter|question|prompt|content/);
+  });
+
+  it('RLS를 켜고 브라우저(anon·authenticated)는 직접 읽거나 쓰지 못한다', () => {
+    expect(sql).toContain('alter table public.doc_helper_usage enable row level security');
+    expect(sql).toContain('revoke all on public.doc_helper_usage from anon, authenticated');
+    expect(sql).not.toMatch(/create policy/);
+  });
+
+  it('횟수 차감·환불 함수는 서버 함수(service_role)만 부를 수 있다', () => {
+    expect(sql).toMatch(/revoke all on function public\.consume_doc_helper_quota\(uuid, integer\) from public, anon, authenticated/);
+    expect(sql).toMatch(/grant execute on function public\.consume_doc_helper_quota\(uuid, integer\) to service_role/);
+    expect(sql).toMatch(/revoke all on function public\.refund_doc_helper_quota\(uuid\) from public, anon, authenticated/);
+  });
+
+  it('하루 기준은 한국 날짜', () => {
+    expect(sql).toContain("asia/seoul");
+  });
+});
+
+describe('서류 도우미 서버 함수 — 비밀키는 서버 환경변수로만', () => {
+  const fn = read('supabase/functions/doc-helper/index.ts');
+
+  it('OpenAI 키를 코드에 쓰지 않고 환경변수에서 읽는다', () => {
+    expect(fn).toContain("Deno.env.get('OPENAI_API_KEY')");
+    expect(fn).not.toMatch(/sk-[A-Za-z0-9]{10,}/);
+  });
+
+  it('로그인 확인 뒤에만 GPT를 부른다 (getUser가 OpenAI 호출보다 먼저)', () => {
+    expect(fn.indexOf('auth.getUser')).toBeGreaterThan(-1);
+    // 요청 처리(Deno.serve) 안에서 로그인 확인 → 횟수 차감 → GPT 호출 순서
+    const handler = fn.slice(fn.indexOf('Deno.serve('));
+    expect(handler.indexOf('auth.getUser')).toBeLessThan(handler.indexOf('consume_doc_helper_quota'));
+    expect(handler.indexOf('consume_doc_helper_quota')).toBeLessThan(handler.indexOf('await askGpt('));
+  });
+
+  it('입력 내용을 로그로 남기지 않는다', () => {
+    expect(fn).not.toMatch(/console\.log\([^)]*(fields|body|letter|question)/);
+  });
+});

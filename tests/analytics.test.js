@@ -91,3 +91,13 @@ describe('메인 A/B 실험 이벤트 — 허용 항목만', () => {
     expect(pickParams('experiment_classes_view', { experiment_id: 'x', variant: 'A' })).toEqual({ experiment_id: 'x', variant: 'A' });
   });
 });
+
+describe('서류 도우미 이벤트 — 어떤 길잡이인지·결과만 (입력 내용 제외)', () => {
+  it('허용 항목만 남기고 입력 원문은 버린다', () => {
+    expect(pickParams('helper_generate', { helper_mode: 'interview', result: 'ok', letter: '내 자소서', job: '마케터' }))
+      .toEqual({ helper_mode: 'interview', result: 'ok' });
+    expect(pickParams('helper_tab_select', { helper_mode: 'edit' })).toEqual({ helper_mode: 'edit' });
+    expect(pickParams('helper_copy', { helper_mode: 'edit', text: '복사한 글' })).toEqual({ helper_mode: 'edit' });
+    expect(pickParams('helper_open_ai', { helper_mode: 'edit' })).toEqual({ helper_mode: 'edit' });
+  });
+});

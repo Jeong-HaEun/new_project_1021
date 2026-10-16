@@ -78,10 +78,20 @@ function Promises() {
 
 // 아직 만들지 않은 기능 — 후속 작업 목록(CLAUDE.md)과 같은 내용
 const UPCOMING = [
-  { iconName: 'wand', title: '서류 도우미', text: '직무·기업·질문·경험을 넣으면 자소서용 요청문을 만들어 드려요.' },
-  { iconName: 'book', title: '내 강의실', text: '카카오 로그인 후 데모 수강 신청한 강의를 계정에 모아 봐요. 서버 연결을 준비하고 있어요.' },
   { iconName: 'chat', title: '커뮤니티', text: '만든 결과물을 나누고 질문할 수 있어요.' },
 ];
+
+// 서류 도우미 소개 — 모바일은 헤더 메뉴가 없어서 메인에서 들어가게 한다 (A·B 공통)
+function HelperPromo() {
+  return el('section', { className: 'section home-helper' }, [
+    el('span', { className: 'home-helper__icon' }, [icon('wand')]),
+    el('div', {}, [
+      el('h2', { className: 'section__title', text: '서류 도우미' }),
+      el('p', { className: 'text-muted', text: '자소서 문항 분석·면접 예상 질문을 AI가 바로 알려 드려요. 첨삭은 내 AI에 붙여 넣을 질문을 만들어 드려요.' }),
+    ]),
+    el('a', { href: 'helper.html', className: 'button button--primary', text: '서류 도우미 열기' }),
+  ]);
+}
 
 function Upcoming() {
   return el('section', { className: 'section' }, [
@@ -122,6 +132,7 @@ renderPage({
     CourseSection(),
     CategoryGrid(),
     LearningPath(),
+    HelperPromo(),
     ReportExample(),
     Promises(),
     Upcoming(),

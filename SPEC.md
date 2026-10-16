@@ -81,7 +81,7 @@ export const course = {
 - 상세의 [바로 구매] → order.html?id=… (장바구니를 거치지 않음). 구매한 강의는 [수강하기 · 준비 중]
 - 구매한 강의의 [수강하기] → learn.html?id=…
 - 하단 탭 [내 강의실]·헤더 사람 아이콘 → myclass.html
-- 미구현 기능(영상 재생·실습 파일, 서류 도우미, 커뮤니티)은 '준비 중' 표시, 클릭해도 이동하지 않음
+- 미구현 기능(영상 재생·실습 파일, 커뮤니티)은 '준비 중' 표시, 클릭해도 이동하지 않음
 
 ## 4. 검색·분야 필터
 - 검색 대상: 제목, 한 줄 설명, 결과물, 태그, 분야 이름
@@ -143,9 +143,21 @@ export const course = {
 - RLS: 로그인한 본인만 조회·추가. 수정·삭제 정책 없음. anon 권한 없음
 - 정의: `supabase/migrations/20261016000000_demo_enrollments.sql` (세시드 프로젝트에 적용, 2026-10-16)
 - `demo_outcomes`(user_id, course_id, completed_at): unique(user_id, course_id). RLS: 본인만 조회·추가·삭제, 추가는 본인이 데모 수강 신청한 강의일 때만. 수정 정책 없음. 정의: `supabase/migrations/20261016000100_demo_outcomes.sql` (세시드 프로젝트에 적용, 2026-10-16)
-### 서류 도우미
-- 입력: 직무, 기업, 자소서 질문, 내 경험 → 프롬프트 조합 → [복사] [Gemini 열기]
-- Gemini API·키를 쓰지 않는다. 입력 내용은 브라우저 밖으로 보내지 않는다 (사용자가 직접 붙여넣음)
+### 서류 도우미 (helper.html?mode=…, supabase/functions/doc-helper, _shared/docHelperRules.js) — 구현 완료, 서버 함수 배포 대기
+| 길잡이 | 입력 (필수*) | 결과 | 방식 |
+|---|---|---|---|
+| 자소서 길잡이 `cover_letter` | 직무*, 기업, 자소서 문항*, 공고·인재상 | 문항 의도, 인사 담당자가 보려는 지원자 모습·경험, 피할 점, 스스로 볼 질문 | 운영자 GPT가 바로 답함 |
+| 면접 길잡이 `interview` | 직무*, 기업, 자소서*, 자격증·경험 등 | 예상 질문(꼬리·직무·태도)과 묻는 이유·답변 방향 | 운영자 GPT가 바로 답함 |
+| 자소서 첨삭 길잡이 `edit` | 문항*, 자소서*, 직무, 글자 수 | 내 AI에 붙여 넣을 첨삭 프롬프트 + [복사] [ChatGPT 열기] | 브라우저에서만, 서버로 보내지 않음 |
+
+- GPT 길잡이: 카카오 로그인한 사람만, 1인 하루 3회(한국 날짜, 두 길잡이 합산). GPT 실패 시 횟수 환불
+- 실습 기간 스위치: 서버 Secrets `DOC_HELPER_ENABLED=true`일 때만, `DOC_HELPER_UNTIL`(YYYY-MM-DD)이 있으면 그날까지. 꺼지면 "실습 기간이 끝나" 안내, 첨삭 길잡이는 계속
+- 비밀값은 Supabase Edge Function Secrets에만: `OPENAI_API_KEY`, `OPENAI_MODEL`. 브라우저·저장소에 넣지 않는다
+- GPT 지시문은 서버에서만 만든다. 브라우저는 정해진 칸 값만 보낸다(모르는 모드·칸 거절, 칸별 글자 수 제한). 입력은 <입력> 자료로 감싸 지시로 쓰이지 않게 한다
+- 지시문 규칙: 입력한 사실만, 경험·수치 지어내기 금지(예시는 '예시' 표시), 회사 정보 추측 금지, 합격·취업 보장 표현 금지
+- 저장: 입력 내용은 서버에 저장·로그하지 않는다. `doc_helper_usage`에 사람·날짜별 횟수만 (RLS로 브라우저 접근 불가, 서버 함수만). 브라우저는 이 탭에만 임시 저장(sessionStorage), [모두 지우기]
+- 측정: helper_tab_select·helper_generate(결과)·helper_copy·helper_open_ai — 길잡이 이름과 결과만, 입력 원문 없음
+- 메뉴: 헤더 [서류 도우미], 메인 '서류 도우미' 카드(모바일 진입)
 
 ## 메인 A/B — 감성 몰입형(A) vs 정보 탐색형(B) — src/lib/homeExperiment.js, experimentTracking.js
 - 기준 문서: `planning/home-ab-v2` 브랜치의 claude-development-brief.md. 이전 '카드 제목 vs 결과물' 실험은 대체됨
