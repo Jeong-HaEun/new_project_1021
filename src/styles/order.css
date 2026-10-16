@@ -1,0 +1,167 @@
+/* 주문 확인 (데모) — 주문 강의, 구매 전 확인, 결제수단, 완료 화면 */
+.order-main {
+  display: grid;
+  gap: var(--space-card-gap);
+}
+
+.order-section,
+.order-methods {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+/* legend는 기본으로 테두리 위에 걸쳐 그려진다 → float로 일반 제목처럼 상자 안에 둔다 */
+.order-methods legend {
+  float: left;
+  width: 100%;
+}
+
+.order-section__title {
+  padding: 0;
+  font-size: var(--text-card-title);
+  font-weight: 700;
+}
+
+.order-item {
+  grid-template-columns: 96px 1fr;
+  padding: 0;
+  border: 0;
+}
+
+.order-skipped {
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  background: var(--color-warning-soft);
+  color: var(--color-warning-strong);
+  font-size: var(--text-small);
+}
+
+.order-skipped ul {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  list-style: disc;
+}
+
+.order-policy {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  font-size: var(--text-small);
+}
+
+.order-policy dt {
+  font-weight: 700;
+}
+
+.order-policy dd {
+  margin: 0 0 8px;
+  color: var(--color-text-muted);
+}
+
+/* 결제수단 — 글자만 있는 선택지. 누르기 쉽게 줄 전체를 클릭 영역으로 */
+.order-method {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.order-method:has(input:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+  font-weight: 700;
+}
+
+.order-method:has(input:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.order-method input {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--color-primary);
+}
+
+.order-note {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.order-error:empty {
+  display: none;
+}
+
+.order-error {
+  font-size: var(--text-small);
+  font-weight: 700;
+  color: var(--color-warning-strong);
+}
+
+.order-demo-note {
+  padding: 8px 10px;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-subtle);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* 완료 화면 */
+.order-complete {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  max-width: 560px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.order-complete .cart-list {
+  width: 100%;
+  text-align: left;
+}
+
+.order-complete .order-item {
+  padding: 14px;
+  border: 1px solid var(--color-line);
+}
+
+.order-complete__icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--color-success-soft);
+  color: var(--color-success-strong);
+}
+
+.order-complete__title {
+  font-size: var(--text-section-title);
+  font-weight: 800;
+}
+
+.order-complete__title:focus {
+  outline: none;
+}
+
+.order-complete__total .price {
+  font-size: 20px;
+}
+
+.order-complete__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+}

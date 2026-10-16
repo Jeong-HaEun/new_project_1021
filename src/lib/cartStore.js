@@ -2,7 +2,8 @@
 // 장바구니가 바뀌면 CART_CHANGE_EVENT를 보내 헤더 개수·상세 버튼·장바구니 페이지가 함께 갱신된다
 import { COURSES } from '../data/courses/index.js';
 import { addToCart, getAddStatus, removeFromCart } from './cart.js';
-import { CART_KEY, createSafeStorage, loadCart, loadPurchases, saveCart } from './cartStorage.js';
+import { CART_KEY, createSafeStorage, loadCart, loadPurchases, PURCHASES_KEY, saveCart, savePurchases } from './cartStorage.js';
+import { placeDemoOrder } from './order.js';
 
 export const CART_CHANGE_EVENT = 'hanclass:cart-change';
 
@@ -39,6 +40,17 @@ export function removeCourseFromCart(courseId) {
   notify();
 }
 
+// 데모 결제 — 구매 기록·장바구니를 저장하고 이번에 새로 산 강의 id를 돌려준다 (실제 결제 없음)
+export function completeDemoOrder(draft, methodId) {
+  const result = placeDemoOrder(readCartState(), draft, methodId, new Date().toISOString());
+  if (result.added.length > 0) {
+    savePurchases(storage, result.purchases);
+    saveCart(storage, result.cart);
+    notify();
+  }
+  return result.added;
+}
+
 // 브라우저를 닫아도 장바구니가 남는지 (사생활 보호 모드 등에서는 false)
 export function isCartPersistent() {
   return storage.isPersistent();
@@ -46,5 +58,5 @@ export function isCartPersistent() {
 
 // 다른 탭에서 장바구니를 바꿔도 이 탭에 반영
 window.addEventListener('storage', (event) => {
-  if (event.key === CART_KEY) notify();
+  if (event.key === CART_KEY || event.key === PURCHASES_KEY) notify();
 });

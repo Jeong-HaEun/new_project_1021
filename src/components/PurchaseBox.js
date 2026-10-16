@@ -35,17 +35,23 @@ function CartAction(course, compact) {
   return el('button', { type: 'button', className: 'button button--ghost', disabled: '', text: BLOCKED_LABELS[status] ?? '담을 수 없음' });
 }
 
+// 바로 구매 버튼 — 살 수 있으면 주문 확인(order.html?id=…), 구매했으면 [수강하기·준비 중], 그 밖에는 비활성
+function BuyAction(course) {
+  const status = getCourseAddStatus(course);
+  if (status === 'ok' || status === 'in-cart') {
+    return el('a', { href: `order.html?id=${course.id}`, className: 'button button--primary', text: '바로 구매' });
+  }
+  if (status === 'owned') return SoonButton({ label: '수강하기', className: 'button button--primary' });
+  return el('button', { type: 'button', className: 'button button--primary', disabled: '', text: BLOCKED_LABELS[status] ?? '구매할 수 없음' });
+}
+
 export function PurchaseBox(course, { compact = false } = {}) {
   const badge = getCourseBadge(course);
   const blocked = badge && badge.tone !== 'green' ? badge.label : null;
   const actions = el('div', { className: 'purchase__actions' });
 
   function render() {
-    actions.replaceChildren(
-      CartAction(course, compact),
-      // 바로 구매(주문 확인 화면)는 다음 단계에서 연결
-      SoonButton({ label: blocked ?? '바로 구매', className: 'button button--primary' }),
-    );
+    actions.replaceChildren(CartAction(course, compact), BuyAction(course));
   }
 
   render();
@@ -59,6 +65,6 @@ export function PurchaseBox(course, { compact = false } = {}) {
     actions,
     compact
       ? null
-      : el('p', { className: 'purchase__note', text: '바로 구매는 준비 중이에요. 실제 결제는 이루어지지 않는 데모 사이트입니다.' }),
+      : el('p', { className: 'purchase__note', text: '데모 결제입니다. 실제로 결제되지 않습니다.' }),
   ]);
 }

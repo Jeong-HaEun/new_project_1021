@@ -1,5 +1,5 @@
 // 장바구니 페이지 — 비로그인으로 담은 강의 목록, 빼기, 합계 (SPEC.md 5절)
-// 주문하기(주문 확인·결제수단 선택 데모)는 다음 단계에서 연결
+// [주문하기] → order.html (주문 확인·결제수단 선택 데모)
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { assetUrl } from '../lib/paths.js';
@@ -10,7 +10,6 @@ import { CART_CHANGE_EVENT, isCartPersistent, readCartState, removeCourseFromCar
 import { COURSES } from '../data/courses/index.js';
 import { CATEGORIES } from '../data/categories.js';
 import { renderPage } from '../components/PageLayout.js';
-import { SoonButton } from '../components/ComingSoon.js';
 import { showToast } from '../components/Toast.js';
 import '../styles/courses.css';
 import '../styles/cart-page.css';
@@ -50,8 +49,8 @@ function Summary(courses, total) {
       el('dd', { className: 'price cart-summary__total', text: formatPrice(total) }),
     ]),
     el('p', { className: 'cart-summary__note', text: '구독 없이 담은 강의만 결제해요. 묶음 할인은 없어요.' }),
-    SoonButton({ label: '주문하기', className: 'button button--primary cart-summary__order' }),
-    el('p', { className: 'cart-summary__note', text: '주문·결제 화면은 준비 중이에요. 데모 결제이며 실제로 결제되지 않습니다.' }),
+    el('a', { href: 'order.html', className: 'button button--primary cart-summary__order', text: '주문하기' }),
+    el('p', { className: 'cart-summary__note', text: '데모 결제입니다. 실제로 결제되지 않습니다.' }),
   ]);
 }
 

@@ -14,6 +14,7 @@ export default defineConfig({
         courses: 'courses.html',
         course: 'course.html',
         cart: 'cart.html',
+        order: 'order.html',
       },
     },
   },
