@@ -11,6 +11,8 @@ export default defineConfig({
     rolldownOptions: {
       input: {
         main: 'index.html',
+        courses: 'courses.html',
+        course: 'course.html',
       },
     },
   },

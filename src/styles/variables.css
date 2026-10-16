@@ -15,10 +15,14 @@
   --color-primary-strong: #d2402c;
   --color-primary-soft: #ffdad4;
   --color-on-primary: #ffffff;
+  --color-on-primary-soft: rgba(255, 255, 255, 0.18); /* 빨강 배경 위 옅은 흰색 */
 
   /* 정보·완료 표시 */
   --color-info: #005ea3;
   --color-success: #10b981;
+  --color-success-soft: #d1fae5;
+  --color-success-strong: #047857;
+  --color-info-soft: #e0efff;
 
   /* 선 */
   --color-line: #e2e8f0;
@@ -45,11 +49,22 @@
 
   /* 그림자 — 한 단계만 */
   --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06);
+
+  /* 진한 선 (비활성 표시 점 등) */
+  --color-line-strong: #cbd5e1;
+
+  /* 틀 크기 */
+  --content-max: 1080px;
+  --header-height: 60px;
+  --bottom-nav-height: 60px;
+  --bottom-bar-height: 72px; /* 상세 페이지 하단 가격 바 */
+  --bottom-stack-height: 92px; /* 데모 고지 + 탭바 */
 }
 
 @media (min-width: 768px) {
   :root {
     --space-page: 32px;
     --text-page-title: 32px;
+    --bottom-stack-height: 32px; /* 탭바 숨김, 데모 고지만 */
   }
 }

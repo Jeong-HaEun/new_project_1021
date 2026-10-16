@@ -1,18 +1,113 @@
-// 메인 페이지 시작 파일 — 지금은 뼈대만. 섹션은 하나씩 추가한다
-import '../styles/variables.css';
-import '../styles/base.css';
+// 메인 페이지 — 소개 배너 → 검색 → 분야 → 강의 → 한클래스의 약속 → 준비 중인 기능
 import { el } from '../lib/dom.js';
-import { SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION } from '../lib/site.js';
-import { DemoNotice } from '../components/DemoNotice.js';
+import { icon } from '../lib/icons.js';
+import { pageUrl } from '../lib/paths.js';
+import { SITE_DESCRIPTION, SITE_TAGLINE } from '../lib/site.js';
+import { sortByCategory } from '../lib/courseQuery.js';
+import { COURSES } from '../data/courses/index.js';
+import { CATEGORIES } from '../data/categories.js';
+import { renderPage } from '../components/PageLayout.js';
+import { CourseGrid } from '../components/CourseCard.js';
+import { SearchForm } from '../components/SearchForm.js';
+import { SoonBadge } from '../components/ComingSoon.js';
+import '../styles/home.css'; // 공통 CSS(PageLayout) 다음에 불러와야 덮어쓰기 순서가 맞다
 
-document.title = SITE_NAME;
+function Hero() {
+  return el('section', { className: 'hero' }, [
+    el('p', { className: 'hero__eyebrow', text: '구독 없이, 필요한 강의만' }),
+    el('h1', { className: 'hero__title', text: SITE_TAGLINE }),
+    el('p', { className: 'hero__desc', text: SITE_DESCRIPTION }),
+    el('a', { href: 'courses.html', className: 'button hero__button', text: '강의 둘러보기' }),
+  ]);
+}
 
-const app = document.querySelector('#app');
-app.append(
-  el('main', {}, [
-    el('h1', { text: SITE_NAME }),
-    el('p', { text: SITE_TAGLINE }),
-    el('p', { className: 'text-muted', text: SITE_DESCRIPTION }),
-  ]),
-  DemoNotice(),
-);
+function CategoryGrid() {
+  return el('section', { className: 'section' }, [
+    el('div', { className: 'section__head' }, [el('h2', { className: 'section__title', text: '분야별로 찾기' })]),
+    el(
+      'ul',
+      { className: 'category-grid' },
+      CATEGORIES.map((category) =>
+        el('li', {}, [
+          el('a', { href: pageUrl('courses.html', { category: category.id }), className: 'category-tile' }, [
+            el('span', { className: 'category-tile__icon' }, [icon(category.id)]),
+            el('strong', { className: 'category-tile__name', text: category.name }),
+            el('span', { className: 'category-tile__desc', text: category.description }),
+          ]),
+        ]),
+      ),
+    ),
+  ]);
+}
+
+function CourseSection() {
+  return el('section', { className: 'section' }, [
+    el('div', { className: 'section__head' }, [
+      el('h2', { className: 'section__title', text: '지금 준비 중인 강의' }),
+      el('a', { href: 'courses.html', className: 'section__more', text: '전체 보기' }),
+    ]),
+    CourseGrid(sortByCategory(COURSES, CATEGORIES), CATEGORIES),
+  ]);
+}
+
+// 무료 교육과 다른 점 세 가지 (CLAUDE.md 핵심 원칙)
+const PROMISES = [
+  { iconName: 'check', title: '한 강 = 결과물 1개', text: '강의 하나를 마치면 바로 쓸 수 있는 표·문서 한 장이 남아요.' },
+  { iconName: 'cart', title: '1,000원부터 한 강씩', text: '구독 없이 필요한 강의만 골라 살 수 있어요.' },
+  { iconName: 'docs', title: '실습 자료 함께 제공', text: '양식과 가상 예시 자료로 바로 따라 할 수 있어요.' },
+];
+
+function Promises() {
+  return el('section', { className: 'section' }, [
+    el('div', { className: 'section__head' }, [el('h2', { className: 'section__title', text: '한클래스는 이렇게 배워요' })]),
+    el(
+      'ul',
+      { className: 'promise-list' },
+      PROMISES.map((item) =>
+        el('li', { className: 'promise' }, [
+          el('span', { className: 'promise__icon' }, [icon(item.iconName)]),
+          el('strong', { className: 'promise__title', text: item.title }),
+          el('p', { className: 'promise__text', text: item.text }),
+        ]),
+      ),
+    ),
+  ]);
+}
+
+// 아직 만들지 않은 기능 — 후속 작업 목록(CLAUDE.md)과 같은 내용
+const UPCOMING = [
+  { iconName: 'wand', title: '서류 도우미', text: '직무·기업·질문·경험을 넣으면 자소서용 요청문을 만들어 드려요.' },
+  { iconName: 'book', title: '내 강의실', text: 'Google 로그인 후 산 강의와 만든 결과물을 모아 봐요.' },
+  { iconName: 'chat', title: '커뮤니티', text: '만든 결과물을 나누고 질문할 수 있어요.' },
+];
+
+function Upcoming() {
+  return el('section', { className: 'section' }, [
+    el('div', { className: 'section__head' }, [el('h2', { className: 'section__title', text: '곧 열리는 기능' })]),
+    el(
+      'ul',
+      { className: 'upcoming-list' },
+      UPCOMING.map((item) =>
+        el('li', { className: 'upcoming' }, [
+          el('span', { className: 'upcoming__icon' }, [icon(item.iconName)]),
+          el('div', {}, [
+            el('div', { className: 'upcoming__head' }, [el('strong', { text: item.title }), SoonBadge()]),
+            el('p', { className: 'upcoming__text', text: item.text }),
+          ]),
+        ]),
+      ),
+    ),
+  ]);
+}
+
+renderPage({
+  active: 'home',
+  content: [
+    Hero(),
+    el('div', { className: 'home-search' }, [SearchForm()]),
+    CategoryGrid(),
+    CourseSection(),
+    Promises(),
+    Upcoming(),
+  ],
+});

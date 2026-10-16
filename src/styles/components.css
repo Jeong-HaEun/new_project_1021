@@ -1,0 +1,176 @@
+/* 공통 부품 — 버튼, 배지, 칩, 검색창, 섹션 제목, 강의 카드 */
+
+/* ── 버튼 ── */
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radius-control);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button--primary {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.button--primary:hover {
+  background: var(--color-primary-strong);
+}
+
+.button--ghost {
+  background: var(--color-surface);
+  border-color: var(--color-line);
+}
+
+.soon-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: 0;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* 버튼 모양을 유지한 채 '준비 중'으로 흐리게 */
+.button.soon-button {
+  padding: 0 16px;
+  opacity: 0.55;
+}
+
+.button--primary.soon-button {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.button--ghost.soon-button {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.button.soon-button .badge--soon {
+  display: none;
+}
+
+/* ── 배지·칩 ── */
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1.6;
+  white-space: nowrap;
+}
+
+.badge--soon {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+}
+
+.badge--planned {
+  background: var(--color-text);
+  color: var(--color-surface);
+}
+
+.badge--preview {
+  background: var(--color-success-soft);
+  color: var(--color-success-strong);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.chip[aria-pressed='true'] {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-surface);
+}
+
+.chip--small {
+  min-height: auto;
+  padding: 2px 8px;
+  border: 0;
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+  font-size: 12px;
+  cursor: default;
+}
+
+/* ── 검색창 ── */
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 6px 6px 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+}
+
+.search-form:focus-within {
+  border-color: var(--color-primary);
+}
+
+.search-form__input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--color-text);
+}
+
+.search-form__button {
+  min-height: 40px;
+}
+
+/* ── 섹션 ── */
+.section {
+  margin-top: var(--space-section);
+}
+
+.section__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section__title {
+  font-size: var(--text-section-title);
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.section__more {
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.price {
+  color: var(--color-primary);
+  font-weight: 800;
+}
+

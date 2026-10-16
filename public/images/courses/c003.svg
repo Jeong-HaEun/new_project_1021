@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <!-- 한클래스 임시 이미지 (c003) — 실제 썸네일 제작 후 같은 파일명으로 교체 -->
+  <rect width="640" height="400" fill="#f1f5f9"/>
+  <rect x="40" y="40" width="560" height="320" rx="20" fill="#ffffff" stroke="#e2e8f0" stroke-width="2"/>
+  <rect x="72" y="76" width="172" height="40" rx="20" fill="#ffdad4"/>
+  <text x="92" y="103" font-family="Pretendard, 'Malgun Gothic', sans-serif" font-size="20" font-weight="700" fill="#af2716">마케팅 실습</text>
+  <text x="72" y="196" font-family="Pretendard, 'Malgun Gothic', sans-serif" font-size="22" fill="#475569">이 강의를 마치면</text>
+  <text x="72" y="244" font-family="Pretendard, 'Malgun Gothic', sans-serif" font-size="36" font-weight="800" fill="#191c1e">주간 광고 성과 보고서 1장</text>
+  <text x="72" y="320" font-family="Pretendard, 'Malgun Gothic', sans-serif" font-size="16" fill="#94a3b8">임시 이미지</text>
+</svg>

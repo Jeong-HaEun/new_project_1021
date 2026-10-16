@@ -1,0 +1,178 @@
+/* 공통 틀 — 헤더, 본문 폭, 하단 고정 영역(데모 고지·탭바) */
+
+/* 본문: 가운데 정렬, 하단 고정 영역에 가려지지 않게 아래 여백 */
+.page {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 20px var(--space-page) calc(var(--bottom-stack-height) + 32px);
+}
+
+.has-bottom-bar .page {
+  padding-bottom: calc(var(--bottom-stack-height) + var(--bottom-bar-height) + 32px);
+}
+
+/* ── 헤더 ── */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.site-header__inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  height: var(--header-height);
+  padding: 0 var(--space-page);
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.logo__mark {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-control);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  font-size: 15px;
+}
+
+.site-nav {
+  display: none;
+}
+
+.site-header__actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.icon-button,
+.icon-soon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  color: var(--color-text);
+}
+
+.icon-button:hover {
+  background: var(--color-surface-subtle);
+}
+
+/* 아이콘 버튼의 '준비 중'은 글자 대신 점으로 */
+.icon-soon .soon-button__label,
+.icon-soon .badge--soon {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.icon-soon {
+  position: relative;
+}
+
+.icon-soon::after {
+  content: '';
+  position: absolute;
+  top: 9px;
+  right: 9px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-line-strong);
+}
+
+/* ── 하단 고정 영역 ── */
+.bottom-stack {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
+}
+
+.demo-notice {
+  padding: 6px var(--space-page);
+  background: var(--color-text);
+  color: var(--color-surface);
+  font-size: var(--text-small);
+  text-align: center;
+}
+
+.bottom-nav {
+  height: var(--bottom-nav-height);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-line);
+}
+
+.bottom-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+  background: none;
+  border: 0;
+}
+
+.bottom-nav__item[aria-current='page'] {
+  color: var(--color-primary);
+  font-weight: 700;
+}
+
+.bottom-nav .badge--soon {
+  display: none;
+}
+
+.bottom-nav .soon-button {
+  opacity: 0.5;
+}
+
+/* ── 넓은 화면: 헤더 메뉴 보이고 탭바 숨김 ── */
+@media (min-width: 768px) {
+  .site-nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .site-nav__link {
+    padding: 8px 12px;
+    border-radius: var(--radius-control);
+    font-weight: 600;
+  }
+
+  .site-nav__link:hover,
+  .site-nav__link[aria-current='page'] {
+    color: var(--color-primary);
+  }
+
+  .bottom-nav {
+    display: none;
+  }
+
+  .page {
+    padding-top: 32px;
+  }
+}

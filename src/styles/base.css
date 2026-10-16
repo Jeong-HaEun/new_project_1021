@@ -17,30 +17,41 @@ body {
 
 img {
   max-width: 100%;
+  height: auto;
   display: block;
 }
 
-main {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 24px var(--space-page) 64px;
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .text-muted {
   color: var(--color-text-muted);
-}
-
-/* 데모 고지 띠 — 화면 하단에 항상 고정 */
-.demo-notice {
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-  margin: 0;
-  padding: 8px 16px;
-  background: var(--color-text);
-  color: var(--color-bg);
-  font-size: var(--text-small);
-  text-align: center;
 }
