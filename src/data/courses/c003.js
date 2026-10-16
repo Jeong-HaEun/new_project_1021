@@ -4,7 +4,7 @@ import { ACCESS_PERIOD, INSTRUCTOR_ID, REFUND_POLICY } from '../policy.js';
 export const course = {
   id: 'c003',
   slug: 'weekly-ad-report',
-  status: 'planned',
+  status: 'open', // 시연용으로 열어 둠 (실제 강의 본문은 아직 없음)
   title: '광고 데이터로 주간 성과 보고서 1장 만들기',
   summary: '노출·클릭·전환 숫자를 지표와 한 줄 결론으로 정리합니다.',
   category: 'marketing-practice',

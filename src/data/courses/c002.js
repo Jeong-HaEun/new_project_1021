@@ -4,7 +4,7 @@ import { ACCESS_PERIOD, INSTRUCTOR_ID, REFUND_POLICY } from '../policy.js';
 export const course = {
   id: 'c002',
   slug: 'xlookup-merge-tables',
-  status: 'planned',
+  status: 'open', // 시연용으로 열어 둠 (실제 강의 본문은 아직 없음)
   title: 'XLOOKUP으로 흩어진 두 표 합치기',
   summary: '거래처 코드 하나로 주문 내역에 담당자 정보를 한 번에 붙입니다.',
   category: 'excel',
