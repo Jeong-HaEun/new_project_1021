@@ -13,6 +13,7 @@ import { LearningPath } from '../components/LearningPath.js';
 import { ReportExample } from '../components/ReportExample.js';
 import '../styles/learning.css';
 import { SoonBadge } from '../components/ComingSoon.js';
+import { track } from '../lib/analytics.js';
 import '../styles/home.css'; // 공통 CSS(PageLayout) 다음에 불러와야 덮어쓰기 순서가 맞다
 
 function Hero() {
@@ -116,3 +117,5 @@ renderPage({
     Upcoming(),
   ],
 });
+
+track('view_item_list', { item_list_id: 'home', result_count: document.querySelectorAll('.course-card').length });

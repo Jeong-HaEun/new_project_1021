@@ -7,6 +7,7 @@ import { CATEGORIES } from '../data/categories.js';
 import { renderPage } from '../components/PageLayout.js';
 import { CourseGrid } from '../components/CourseCard.js';
 import { SearchForm } from '../components/SearchForm.js';
+import { track } from '../lib/analytics.js';
 import '../styles/courses.css';
 
 // 화면 상태 — 주소에서 처음 값을 읽는다
@@ -22,7 +23,8 @@ const results = el('div', { className: 'results' });
 
 function handleCategoryClick(categoryId) {
   state.category = categoryId;
-  update();
+  const count = update();
+  track('course_filter', { category_id: categoryId, result_count: count });
 }
 
 function handleSearch(query) {
@@ -67,6 +69,7 @@ function update() {
   resultCount.textContent = `강의 ${list.length}개`;
   results.replaceChildren(CourseGrid(list, CATEGORIES, EmptyState()));
   history.replaceState(null, '', pageUrl('courses.html', { category: state.category, q: state.query.trim() }));
+  return list.length;
 }
 
 const searchForm = SearchForm({ value: state.query, onSearch: handleSearch });
@@ -85,4 +88,4 @@ renderPage({
   ],
 });
 
-update();
+track('view_item_list', { item_list_id: 'courses', result_count: update() });

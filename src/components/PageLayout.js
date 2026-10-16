@@ -9,19 +9,24 @@ import '../styles/cart-ui.css';
 import { el } from '../lib/dom.js';
 import { SITE_NAME } from '../lib/site.js';
 import { syncAccountEnrollments } from '../lib/accountSync.js';
+import { initAnalytics } from '../lib/analytics.js';
 import { SiteHeader } from './SiteHeader.js';
 import { BottomNav } from './BottomNav.js';
 import { DemoNotice } from './DemoNotice.js';
+import { VisitNotice } from './VisitNotice.js';
 
 // syncAccount: 로그인한 계정의 데모 수강 기록을 읽어 수강 상태에 반영 (내 강의실은 직접 읽으므로 false)
-export function renderPage({ active, title, content, bottomBar = null, syncAccount = true }) {
+// pageType: 방문 통계의 페이지 종류 (기본은 active. 상세·주문처럼 메뉴와 다른 페이지는 따로 넘긴다)
+export function renderPage({ active, title, content, bottomBar = null, syncAccount = true, pageType = active ?? 'other' }) {
   document.title = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 
-  const main = el('main', { id: 'main', className: 'page' }, content);
+  const main = el('main', { id: 'main', className: 'page' }, [...[].concat(content), VisitNotice()]);
   const bottom = el('div', { className: 'bottom-stack' }, [bottomBar, DemoNotice(), BottomNav({ active })]);
   if (bottomBar) document.body.classList.add('has-bottom-bar');
 
   document.querySelector('#app').replaceChildren(SiteHeader({ active }), main, bottom);
+  document.body.dataset.pageType = pageType;
+  initAnalytics(pageType);
   if (syncAccount) syncAccountEnrollments();
   return main;
 }

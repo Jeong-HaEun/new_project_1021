@@ -7,6 +7,7 @@ import { formatPrice } from '../lib/price.js';
 import { getOrderDraft, validateOrder } from '../lib/order.js';
 import { completeDemoOrder, readOwnedState } from '../lib/cartStore.js';
 import { whenAccountSynced } from '../lib/accountSync.js';
+import { track } from '../lib/analytics.js';
 import { ACCESS_PERIOD, REFUND_POLICY } from '../data/policy.js';
 import { COURSES } from '../data/courses/index.js';
 import { renderPage } from '../components/PageLayout.js';
@@ -77,6 +78,7 @@ function handleSubmit(event, draft, error) {
     return;
   }
   const added = completeDemoOrder(draft, methodId);
+  if (added.length > 0) track('demo_order_complete', { item_count: added.length, order_mode: draft.mode, payment_method: methodId });
   if (added.length === 0) {
     render(); // 그사이 다른 탭에서 샀거나 살 수 없게 된 경우 — 현재 상태로 다시 그린다
     return;
@@ -85,11 +87,17 @@ function handleSubmit(event, draft, error) {
   body.querySelector('.order-complete__title').focus();
 }
 
+let checkoutTracked = false; // 주문 화면을 연 것은 한 번만 기록
+
 function render() {
   const draft = readDraft();
   if (draft.items.length === 0) {
     body.replaceChildren(EmptyOrder(draft));
     return;
+  }
+  if (!checkoutTracked) {
+    checkoutTracked = true;
+    track('demo_begin_checkout', { item_count: draft.items.length, order_mode: draft.mode });
   }
   const error = el('p', { className: 'order-error', role: 'alert' });
   body.replaceChildren(
@@ -115,6 +123,7 @@ function render() {
 
 renderPage({
   active: courseId ? 'courses' : 'cart',
+  pageType: 'order',
   title: '주문 확인',
   content: [
     BackLink(),

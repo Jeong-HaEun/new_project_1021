@@ -6,13 +6,17 @@ import { formatPrice } from '../lib/price.js';
 import { getCourseBadge } from '../lib/enrollment.js';
 import { addCourseToCart, CART_CHANGE_EVENT, getCourseAddStatus } from '../lib/cartStore.js';
 import { showToast } from './Toast.js';
+import { track } from '../lib/analytics.js';
 
 // 담을 수 없는 이유별 버튼 문구
 const BLOCKED_LABELS = { planned: '제작 예정', upcoming: '모집 예정', closed: '모집 마감', owned: '구매한 강의' };
 
 function handleAddClick(course) {
   const status = addCourseToCart(course);
-  if (status === 'ok') showToast('장바구니에 담았어요');
+  if (status === 'ok') {
+    showToast('장바구니에 담았어요');
+    track('demo_add_to_cart', { item_id: course.id, item_category: course.category, price: course.price });
+  }
   else if (status === 'in-cart') showToast('이미 담긴 강의예요');
 }
 

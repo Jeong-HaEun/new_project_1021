@@ -72,6 +72,7 @@ function render() {
 }
 
 renderPage({
+  pageType: 'learn',
   title: course ? `수강하기 · ${course.title}` : '강의를 찾을 수 없어요',
   content: [
     BackLink(),

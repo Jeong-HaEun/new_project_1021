@@ -1,0 +1,21 @@
+/* 방문 통계 안내 페이지 */
+.privacy-section {
+  display: grid;
+  gap: 8px;
+  max-width: 760px;
+  margin-top: var(--space-card-gap);
+  padding: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.privacy-section__title {
+  font-size: var(--text-card-title);
+  font-weight: 700;
+}
+
+.privacy-link {
+  color: var(--color-primary);
+  text-decoration: underline;
+}

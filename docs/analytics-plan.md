@@ -1,12 +1,15 @@
-# GA4 연결 계획 — 아직 수집하지 않음
+# GA4 연결 — 코드 준비 완료, 측정 ID 등록 전
 
-현재는 추적 스크립트·쿠키·측정 ID를 넣지 않았다. 아래는 후속 연결을 위한 설계이며, 실시간 측정이 되고 있다는 뜻이 아니다.
-측정 ID(G-...)와 운영 시 개인정보 안내를 확정한 뒤 한 곳의 공통 모듈에서 연결한다. GA4 자동 페이지 조회와 수동 전송이 중복되지 않도록 한다.
+공통 모듈 `src/lib/analytics.js` 한 곳에서 연결한다. 측정 ID(`VITE_GA4_ID`, 공개 값)가 없으면 스크립트·쿠키를 넣지 않는다.
+수집 주소는 `https://jeong-haeun.github.io/new_project_1021/` 아래뿐이다. 같은 github.io의 다른 사이트(세시드·Adporter 등)·다른 도메인·내부망 주소(192.168.x.x)에서는 불러오지 않는다.
+내 컴퓨터(localhost)에서는 `?ga_debug=1`일 때만 불러온다 (개발 방문 제외, DebugView 확인용). report.html 안에 끼워 넣은 Adporter 화면에는 GA 코드가 없다.
+page_view는 GA4 config가 자동으로 한 번 보낸다(정리한 page_location·page_type). 수동 page_view는 보내지 않는다.
+안내: 본문 맨 아래 한 줄(VisitNotice) + `privacy.html`. GA4 설정: Google 신호 끔, 데이터 보관 2개월, 향상된 측정의 사이트 검색·양식 상호작용 끔.
 
 ## 퍼널
 
-메인 방문 → 강의 탐색 → 상세 조회 → (후속) 장바구니 → 주문 확인 → 실제 구매.
-현재 구현된 단계는 상세 조회까지다. 준비 중 버튼 클릭을 add_to_cart, begin_checkout, purchase로 보내지 않는다.
+메인 방문 → 강의 탐색 → 상세 조회 → 장바구니 담기(데모) → 주문 확인(데모) → 데모 주문 완료.
+데모 주문은 실제 결제가 아니므로 GA4 표준 add_to_cart·begin_checkout·purchase를 쓰지 않고 demo_ 이벤트로 따로 보낸다 (가짜 매출 방지, 금액 value 없음).
 
 | 이벤트 | 시점 | 허용 속성 |
 |---|---|---|
@@ -14,9 +17,14 @@
 | view_item_list | 메인·목록의 강의 표시 | item_list_id, 강의 id 목록, result_count |
 | select_item | 강의 카드·추천 학습 순서 클릭 | item_id, item_category, placement |
 | view_item | 유효한 강의 상세 표시 | item_id, item_category, price, currency=KRW |
-| course_search | 검색 제출 | query_length, result_count, category_id |
+| course_search | 검색 제출 (입력마다 X) | query_length |
 | course_filter | 분야 선택 | category_id, result_count |
-| report_example_open | 보고서 열기 클릭 (report.html 이동·새 창) | placement=home/detail, item_id=c003 |
+| report_example_open | 보고서 열기 클릭 (report.html 이동·새 창) | placement(page_type), item_id=c003 |
+| demo_add_to_cart | 장바구니 담기 성공 | item_id, item_category, price |
+| demo_begin_checkout | 주문 화면 첫 표시 (한 번) | item_count, order_mode(cart/direct) |
+| demo_order_complete | 데모 주문 완료 | item_count, order_mode, payment_method |
+
+허용 항목 목록은 `EVENT_PARAMS`(analytics.js)가 기준이며, 그 밖의 항목은 보내지 않는다 (tests/analytics.test.js).
 
 ## 코드의 연결 지점
 

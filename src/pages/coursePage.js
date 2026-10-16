@@ -9,6 +9,7 @@ import { renderPage } from '../components/PageLayout.js';
 import { DetailBody, DetailHero } from '../components/CourseDetail.js';
 import { PurchaseBox } from '../components/PurchaseBox.js';
 import { ReportExample } from '../components/ReportExample.js';
+import { track } from '../lib/analytics.js';
 import '../styles/learning.css';
 import '../styles/courses.css';
 import '../styles/detail.css';
@@ -31,6 +32,7 @@ function NotFound() {
 if (course) {
   renderPage({
     active: 'courses',
+    pageType: 'course',
     title: course.title,
     content: [
       BackLink(),
@@ -40,6 +42,7 @@ if (course) {
     ],
     bottomBar: PurchaseBox(course, { compact: true }),
   });
+  track('view_item', { item_id: course.id, item_category: course.category, price: course.price, currency: 'KRW' });
 } else {
-  renderPage({ active: 'courses', title: '강의를 찾을 수 없어요', content: [BackLink(), NotFound()] });
+  renderPage({ active: 'courses', pageType: 'course-not-found', title: '강의를 찾을 수 없어요', content: [BackLink(), NotFound()] });
 }

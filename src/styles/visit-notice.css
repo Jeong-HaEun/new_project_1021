@@ -1,0 +1,12 @@
+/* 방문 통계 안내 한 줄 — 본문 맨 아래 (GA4를 쓸 때만) */
+.visit-notice {
+  margin-top: 40px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-line);
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.visit-notice a {
+  text-decoration: underline;
+}

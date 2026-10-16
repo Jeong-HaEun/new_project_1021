@@ -44,6 +44,7 @@ jobs:
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
+          VITE_GA4_ID: ${{ vars.VITE_GA4_ID }}
 
       - name: Pages 설정
         uses: actions/configure-pages@v5

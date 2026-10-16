@@ -18,6 +18,7 @@ export default defineConfig({
         learn: 'learn.html',
         myclass: 'myclass.html',
         report: 'report.html',
+        privacy: 'privacy.html',
       },
     },
   },
