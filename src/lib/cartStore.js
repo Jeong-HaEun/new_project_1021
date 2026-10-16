@@ -16,30 +16,50 @@ import {
   savePurchases,
 } from './cartStorage.js';
 import { toggleOutcome } from './learn.js';
+import { getOutcomeTarget, mergeOutcomes, mergePurchases } from './myClassroom.js';
+import { unmarkOutcome } from './purchase.js';
+import { removeOutcome, saveOutcome } from './enrollmentApi.js';
 import { placeDemoOrder } from './order.js';
 
 export const CART_CHANGE_EVENT = 'hanclass:cart-change';
 
 const storage = createSafeStorage(() => window.localStorage);
 
+// 로그인한 계정의 기록 — 메모리에만 둔다 (브라우저에 저장하지 않아 로그아웃 후 남지 않음)
+let accountPurchases = []; // 데모 수강 신청 [{ courseId, purchasedAt }]
+let accountOutcomes = []; // 결과물 완성 체크한 강의 id
+
 function notify() {
   window.dispatchEvent(new CustomEvent(CART_CHANGE_EVENT));
 }
 
-// 현재 장바구니·구매 기록 (깨진 값·담을 수 없는 강의는 불러올 때 정리됨)
+// 이 브라우저에 저장된 장바구니·구매 기록만 (저장할 때 쓴다. 깨진 값·담을 수 없는 강의는 불러올 때 정리됨)
 export function readCartState() {
   const purchases = loadPurchases(storage, COURSES);
   return { cart: loadCart(storage, COURSES, purchases), purchases };
 }
 
+// 화면 판단용 — 브라우저 기록 + 로그인한 계정 기록. 같은 계정이면 어느 기기에서나 같은 수강 상태
+export function readOwnedState() {
+  const purchases = mergePurchases(loadPurchases(storage, COURSES), accountPurchases);
+  return { cart: loadCart(storage, COURSES, purchases), purchases };
+}
+
+// 계정 기록 바꾸기 (accountSync.js·내 강의실에서 호출). 로그아웃이면 빈 값
+export function setAccountRecords({ purchases = [], outcomes = [] } = {}) {
+  accountPurchases = purchases;
+  accountOutcomes = outcomes;
+  notify();
+}
+
 export function getCourseAddStatus(course) {
-  const { cart, purchases } = readCartState();
+  const { cart, purchases } = readOwnedState();
   return getAddStatus(cart, course, purchases);
 }
 
 // 담기 — 결과 상태를 돌려준다 ('ok'면 담김, 나머지는 담지 않은 이유)
 export function addCourseToCart(course) {
-  const { cart, purchases } = readCartState();
+  const { cart, purchases } = readOwnedState();
   const status = getAddStatus(cart, course, purchases);
   if (status === 'ok') {
     saveCart(storage, addToCart(cart, course, purchases));
@@ -64,14 +84,27 @@ export function completeDemoOrder(draft, methodId) {
   return result.added;
 }
 
-// 결과물 완성 체크 목록 (구매한 강의만 남김)
-export function readOutcomes() {
-  return loadOutcomes(storage, COURSES, readCartState().purchases);
+// 이 브라우저에 저장된 완성 체크 (수강 중인 강의만 남김)
+function readLocalOutcomes() {
+  return loadOutcomes(storage, COURSES, readOwnedState().purchases);
 }
 
-// 결과물 완성 체크 켜고 끄기 — 구매한 강의만
-export function toggleCourseOutcome(course) {
-  saveOutcomes(storage, toggleOutcome(readOutcomes(), course, readCartState().purchases));
+// 결과물 완성 체크 목록 — 브라우저 체크 + 계정 체크
+export function readOutcomes() {
+  return mergeOutcomes(readLocalOutcomes(), accountOutcomes);
+}
+
+// 결과물 완성 체크 켜고 끄기 — 계정에 신청한 강의는 서버에, 이 브라우저에서만 산 강의는 브라우저에 저장
+// 서버 저장이 실패하면 오류를 던지고 화면 상태는 바꾸지 않는다
+export async function toggleCourseOutcome(course) {
+  const done = readOutcomes().includes(course.id);
+  if (getOutcomeTarget(course.id, accountPurchases) === 'account') {
+    await (done ? removeOutcome(course.id) : saveOutcome(course.id));
+    accountOutcomes = done ? accountOutcomes.filter((id) => id !== course.id) : [...accountOutcomes, course.id];
+    saveOutcomes(storage, unmarkOutcome(readLocalOutcomes(), course.id)); // 계정 기준으로 통일
+  } else {
+    saveOutcomes(storage, toggleOutcome(readLocalOutcomes(), course, readOwnedState().purchases));
+  }
   notify();
 }
 

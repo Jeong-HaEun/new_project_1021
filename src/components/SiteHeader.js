@@ -1,4 +1,4 @@
-// 상단 헤더 — 로고, (넓은 화면) 메뉴, 검색·장바구니·로그인
+// 상단 헤더 — 로고, (넓은 화면) 메뉴, 검색·장바구니·내 강의실(로그인)
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { SITE_NAME } from '../lib/site.js';
@@ -23,7 +23,9 @@ export function SiteHeader({ active }) {
       el('div', { className: 'site-header__actions' }, [
         el('a', { href: 'courses.html', className: 'icon-button', 'aria-label': '강의 검색' }, [icon('search')]),
         CartLink({ className: 'icon-button', active: active === 'cart' }),
-        SoonButton({ label: '로그인', iconNode: icon('user'), className: 'icon-soon' }),
+        el('a', { href: 'myclass.html', className: 'icon-button', 'aria-label': '내 강의실·로그인', ...(active === 'myclass' && { 'aria-current': 'page' }) }, [
+          icon('user'),
+        ]),
       ]),
     ]),
   ]);

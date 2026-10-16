@@ -40,6 +40,10 @@ jobs:
 
       - name: 빌드 (결과물은 dist/)
         run: npm run build
+        # 공개용 Supabase 값 (저장소 Variables). 없으면 내 강의실은 '서버 연결 준비 중'으로 빌드된다
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_PUBLISHABLE_KEY: ${{ vars.VITE_SUPABASE_PUBLISHABLE_KEY }}
 
       - name: Pages 설정
         uses: actions/configure-pages@v5

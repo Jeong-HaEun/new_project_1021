@@ -110,3 +110,16 @@
     margin-left: 0;
   }
 }
+
+/* 계정 기록을 못 읽었을 때 안내 */
+.learn-sync-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  background: var(--color-warning-soft);
+  color: var(--color-warning-strong);
+  font-size: var(--text-small);
+}

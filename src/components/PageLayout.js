@@ -8,11 +8,13 @@ import '../styles/course-card.css';
 import '../styles/cart-ui.css';
 import { el } from '../lib/dom.js';
 import { SITE_NAME } from '../lib/site.js';
+import { syncAccountEnrollments } from '../lib/accountSync.js';
 import { SiteHeader } from './SiteHeader.js';
 import { BottomNav } from './BottomNav.js';
 import { DemoNotice } from './DemoNotice.js';
 
-export function renderPage({ active, title, content, bottomBar = null }) {
+// syncAccount: 로그인한 계정의 데모 수강 기록을 읽어 수강 상태에 반영 (내 강의실은 직접 읽으므로 false)
+export function renderPage({ active, title, content, bottomBar = null, syncAccount = true }) {
   document.title = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 
   const main = el('main', { id: 'main', className: 'page' }, content);
@@ -20,5 +22,6 @@ export function renderPage({ active, title, content, bottomBar = null }) {
   if (bottomBar) document.body.classList.add('has-bottom-bar');
 
   document.querySelector('#app').replaceChildren(SiteHeader({ active }), main, bottom);
+  if (syncAccount) syncAccountEnrollments();
   return main;
 }

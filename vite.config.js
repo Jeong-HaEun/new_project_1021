@@ -16,6 +16,7 @@ export default defineConfig({
         cart: 'cart.html',
         order: 'order.html',
         learn: 'learn.html',
+        myclass: 'myclass.html',
       },
     },
   },

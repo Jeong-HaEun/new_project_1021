@@ -100,7 +100,7 @@ export function DemoReset(onReset) {
   button.addEventListener('click', handleResetClick);
   return el('section', { className: 'learn-section demo-reset' }, [
     el('h2', { className: 'learn-section__title', text: '데모 초기화' }),
-    el('p', { className: 'text-muted', text: '발표 시연을 처음부터 다시 할 때 써요. 이 브라우저의 장바구니·구매 기록·결과물 체크가 모두 지워져요.' }),
+    el('p', { className: 'text-muted', text: '발표 시연을 처음부터 다시 할 때 써요. 이 브라우저의 장바구니·구매 기록·결과물 체크가 모두 지워져요. 로그인한 계정의 데모 수강 기록은 남아요.' }),
     button,
   ]);
 }

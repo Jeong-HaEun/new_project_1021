@@ -5,7 +5,8 @@ import { icon } from '../lib/icons.js';
 import { readParam } from '../lib/paths.js';
 import { formatPrice } from '../lib/price.js';
 import { getOrderDraft, validateOrder } from '../lib/order.js';
-import { completeDemoOrder, readCartState } from '../lib/cartStore.js';
+import { completeDemoOrder, readOwnedState } from '../lib/cartStore.js';
+import { whenAccountSynced } from '../lib/accountSync.js';
 import { ACCESS_PERIOD, REFUND_POLICY } from '../data/policy.js';
 import { COURSES } from '../data/courses/index.js';
 import { renderPage } from '../components/PageLayout.js';
@@ -19,7 +20,7 @@ const courseId = readParam('id');
 const body = el('div', { className: 'order-body' });
 
 function readDraft() {
-  return getOrderDraft({ courseId, ...readCartState(), courses: COURSES });
+  return getOrderDraft({ courseId, ...readOwnedState(), courses: COURSES });
 }
 
 function BackLink() {
@@ -123,4 +124,6 @@ renderPage({
   ],
 });
 
-render();
+// 계정 기록을 먼저 확인해야 이미 신청한 강의를 주문에서 뺄 수 있다 (서버 연결 전이면 바로 그림)
+body.replaceChildren(el('p', { className: 'text-muted', role: 'status', text: '불러오는 중이에요…' }));
+whenAccountSynced().finally(render);

@@ -4,6 +4,7 @@ import { icon } from '../lib/icons.js';
 import { assetUrl } from '../lib/paths.js';
 import { formatPrice } from '../lib/price.js';
 import { PAYMENT_METHODS, SKIP_REASONS } from '../lib/order.js';
+import { ServerSaveStatus } from './ServerSaveStatus.js';
 
 export const DEMO_PAYMENT_NOTE = '데모 결제입니다. 실제로 결제되지 않습니다.';
 
@@ -62,6 +63,7 @@ export function OrderComplete(courses) {
     el('p', { className: 'text-muted', text: '실제로 결제되지 않았어요. 구매 기록은 이 브라우저에만 남아요.' }),
     el('ul', { className: 'cart-list' }, courses.map((course) => OrderItem(course, { learnLink: true }))),
     el('p', { className: 'order-complete__total' }, [el('span', { text: '합계 ' }), el('strong', { className: 'price', text: formatPrice(total) })]),
+    ServerSaveStatus(courses.map((course) => course.id)),
     el('div', { className: 'order-complete__actions' }, [
       el('a', { href: 'courses.html', className: 'button button--ghost', text: '강의 더 둘러보기' }),
     ]),

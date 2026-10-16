@@ -6,7 +6,7 @@ import { assetUrl } from '../lib/paths.js';
 import { formatPrice } from '../lib/price.js';
 import { getCategoryName } from '../lib/courseQuery.js';
 import { getCartCourses, getCartTotal } from '../lib/cart.js';
-import { CART_CHANGE_EVENT, isCartPersistent, readCartState, removeCourseFromCart } from '../lib/cartStore.js';
+import { CART_CHANGE_EVENT, isCartPersistent, readOwnedState, removeCourseFromCart } from '../lib/cartStore.js';
 import { COURSES } from '../data/courses/index.js';
 import { CATEGORIES } from '../data/categories.js';
 import { renderPage } from '../components/PageLayout.js';
@@ -65,7 +65,7 @@ function EmptyCart() {
 
 // 장바구니가 바뀔 때마다 다시 그린다 (이 화면에서 빼거나, 다른 탭에서 담았을 때)
 function render() {
-  const { cart } = readCartState();
+  const { cart } = readOwnedState();
   const courses = getCartCourses(cart, COURSES);
   if (courses.length === 0) {
     body.replaceChildren(EmptyCart());

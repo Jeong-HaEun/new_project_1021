@@ -1,0 +1,79 @@
+/* 내 강의실 — 상태 안내, 계정 줄, 신청 강의 목록 */
+.myclass-body {
+  display: grid;
+  gap: var(--space-card-gap);
+  max-width: 760px;
+}
+
+.myclass-panel .icon {
+  color: var(--color-text-muted);
+}
+
+.myclass-account {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-subtle);
+  font-size: var(--text-small);
+}
+
+.myclass-section {
+  display: grid;
+  gap: 10px;
+}
+
+.myclass-section__title {
+  font-size: var(--text-card-title);
+  font-weight: 700;
+}
+
+.myclass-note {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.myclass-date {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.myclass-item {
+  align-items: center;
+}
+
+.myclass-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.myclass-done {
+  background: var(--color-success-soft);
+  color: var(--color-success-strong);
+}
+
+/* 좁은 화면: [수강 화면]을 정보 아래 한 줄로 */
+@media (max-width: 479px) {
+  .myclass-item {
+    grid-template-columns: 96px 1fr;
+  }
+
+  .myclass-item__learn {
+    grid-column: 1 / -1;
+  }
+}
+
+/* 카카오 로그인 버튼 — 카카오 가이드 색 (노란 배경 + 검은 글자) */
+.kakao-login {
+  border: 0;
+  background: var(--color-kakao);
+  color: var(--color-on-kakao);
+  font-weight: 700;
+}
+
+.kakao-login:hover {
+  background: var(--color-kakao-hover);
+}

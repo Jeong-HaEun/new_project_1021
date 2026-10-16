@@ -58,6 +58,11 @@
   /* 진한 선 (비활성 표시 점 등) */
   --color-line-strong: #cbd5e1;
 
+  /* 카카오 로그인 버튼 — 카카오 디자인 가이드 색 */
+  --color-kakao: #fee500;
+  --color-kakao-hover: #fada0a;
+  --color-on-kakao: rgba(0, 0, 0, 0.85);
+
   /* 틀 크기 */
   --content-max: 1080px;
   --header-height: 60px;

@@ -80,7 +80,7 @@ function Promises() {
 // 아직 만들지 않은 기능 — 후속 작업 목록(CLAUDE.md)과 같은 내용
 const UPCOMING = [
   { iconName: 'wand', title: '서류 도우미', text: '직무·기업·질문·경험을 넣으면 자소서용 요청문을 만들어 드려요.' },
-  { iconName: 'book', title: '내 강의실', text: 'Google 로그인 후 산 강의와 만든 결과물을 모아 봐요.' },
+  { iconName: 'book', title: '내 강의실', text: '카카오 로그인 후 데모 수강 신청한 강의를 계정에 모아 봐요. 서버 연결을 준비하고 있어요.' },
   { iconName: 'chat', title: '커뮤니티', text: '만든 결과물을 나누고 질문할 수 있어요.' },
 ];
 
