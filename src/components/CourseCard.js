@@ -10,7 +10,7 @@ export function StatusBadge(course) {
 
 export function CourseCard(course, categories) {
   return el('article', { className: 'course-card' }, [
-    el('a', { href: `course.html?id=${course.id}`, className: 'course-card__link' }, [
+    el('a', { href: `course.html?id=${course.id}`, className: 'course-card__link', 'data-course-id': course.id, 'data-course-category': course.category }, [
       el('div', { className: 'course-card__thumb' }, [
         el('img', {
           src: assetUrl(course.thumbnail),

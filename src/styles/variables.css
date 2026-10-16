@@ -47,6 +47,9 @@
   --space-section: 40px;
   --space-card-gap: 12px;
 
+  --space-step-gap: 8px;
+  --space-feature-padding: 24px;
+
   /* 그림자 — 한 단계만 */
   --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06);
 

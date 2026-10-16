@@ -9,12 +9,15 @@ import { CATEGORIES } from '../data/categories.js';
 import { renderPage } from '../components/PageLayout.js';
 import { CourseGrid } from '../components/CourseCard.js';
 import { SearchForm } from '../components/SearchForm.js';
+import { LearningPath } from '../components/LearningPath.js';
+import { ReportExample } from '../components/ReportExample.js';
+import '../styles/learning.css';
 import { SoonBadge } from '../components/ComingSoon.js';
 import '../styles/home.css'; // 공통 CSS(PageLayout) 다음에 불러와야 덮어쓰기 순서가 맞다
 
 function Hero() {
   return el('section', { className: 'hero' }, [
-    el('p', { className: 'hero__eyebrow', text: '구독 없이, 필요한 강의만' }),
+    el('p', { className: 'hero__eyebrow', text: '마케터를 꿈꾸는 실무 초보에게' }),
     el('h1', { className: 'hero__title', text: SITE_TAGLINE }),
     el('p', { className: 'hero__desc', text: SITE_DESCRIPTION }),
     el('a', { href: 'courses.html', className: 'button hero__button', text: '강의 둘러보기' }),
@@ -83,7 +86,7 @@ const UPCOMING = [
 
 function Upcoming() {
   return el('section', { className: 'section' }, [
-    el('div', { className: 'section__head' }, [el('h2', { className: 'section__title', text: '곧 열리는 기능' })]),
+    el('div', { className: 'section__head' }, [el('h2', { className: 'section__title', text: '준비 중인 기능' })]),
     el(
       'ul',
       { className: 'upcoming-list' },
@@ -105,8 +108,10 @@ renderPage({
   content: [
     Hero(),
     el('div', { className: 'home-search' }, [SearchForm()]),
+    LearningPath(),
     CategoryGrid(),
     CourseSection(),
+    ReportExample(),
     Promises(),
     Upcoming(),
   ],
