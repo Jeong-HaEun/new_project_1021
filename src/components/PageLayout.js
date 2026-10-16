@@ -5,6 +5,7 @@ import '../styles/base.css';
 import '../styles/layout.css';
 import '../styles/components.css';
 import '../styles/course-card.css';
+import '../styles/cart-ui.css';
 import { el } from '../lib/dom.js';
 import { SITE_NAME } from '../lib/site.js';
 import { SiteHeader } from './SiteHeader.js';

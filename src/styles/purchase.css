@@ -85,3 +85,15 @@
     padding-bottom: calc(var(--bottom-stack-height) + 32px);
   }
 }
+
+/* 장바구니 버튼 상태 — 담김(초록 체크) / 담을 수 없음(흐리게) */
+.button--done {
+  border-color: var(--color-success-soft);
+  background: var(--color-success-soft);
+  color: var(--color-success-strong);
+}
+
+.button:disabled:not(.soon-button) {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

@@ -13,6 +13,7 @@ export default defineConfig({
         main: 'index.html',
         courses: 'courses.html',
         course: 'course.html',
+        cart: 'cart.html',
       },
     },
   },

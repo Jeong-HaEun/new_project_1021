@@ -2,6 +2,7 @@
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { SoonButton } from './ComingSoon.js';
+import { CartLink } from './CartLink.js';
 
 export function BottomNav({ active }) {
   const tab = (href, label, iconName, key) =>
@@ -13,7 +14,7 @@ export function BottomNav({ active }) {
   return el('nav', { className: 'bottom-nav', 'aria-label': '하단 메뉴' }, [
     tab('index.html', '홈', 'home', 'home'),
     tab('courses.html', '강의 찾기', 'grid', 'courses'),
-    SoonButton({ label: '장바구니', iconNode: icon('cart', 22), className: 'bottom-nav__item' }),
+    CartLink({ className: 'bottom-nav__item', iconSize: 22, showLabel: true, active: active === 'cart' }),
     SoonButton({ label: '내 강의실', iconNode: icon('book', 22), className: 'bottom-nav__item' }),
   ]);
 }

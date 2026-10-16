@@ -3,6 +3,7 @@ import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { SITE_NAME } from '../lib/site.js';
 import { SoonButton } from './ComingSoon.js';
+import { CartLink } from './CartLink.js';
 
 export function SiteHeader({ active }) {
   const navLink = (href, label, key) =>
@@ -21,7 +22,7 @@ export function SiteHeader({ active }) {
       ]),
       el('div', { className: 'site-header__actions' }, [
         el('a', { href: 'courses.html', className: 'icon-button', 'aria-label': '강의 검색' }, [icon('search')]),
-        SoonButton({ label: '장바구니', iconNode: icon('cart'), className: 'icon-soon' }),
+        CartLink({ className: 'icon-button', active: active === 'cart' }),
         SoonButton({ label: '로그인', iconNode: icon('user'), className: 'icon-soon' }),
       ]),
     ]),

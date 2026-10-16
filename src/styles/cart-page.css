@@ -1,0 +1,135 @@
+/* 장바구니 페이지 */
+.cart-warning {
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  border-radius: var(--radius-control);
+  background: var(--color-warning-soft);
+  color: var(--color-warning-strong);
+  font-size: 14px;
+}
+
+.cart-layout {
+  display: grid;
+  gap: 20px;
+}
+
+.cart-list {
+  display: grid;
+  gap: var(--space-card-gap);
+}
+
+/* 강의 한 줄 — 썸네일 · 정보 · 빼기 */
+.cart-item {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 14px;
+  align-items: start;
+  padding: 14px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.cart-item__thumb {
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-control);
+  overflow: hidden;
+  background: var(--color-surface-subtle);
+}
+
+.cart-item__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cart-item__info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cart-item__title {
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.cart-item__title:hover {
+  color: var(--color-primary);
+}
+
+.cart-item__outcome {
+  font-size: var(--text-small);
+  color: var(--color-info);
+}
+
+.cart-item__remove {
+  padding: 6px 10px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.cart-item__remove:hover {
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+/* 합계 상자 */
+.cart-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.cart-summary__rows {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px 12px;
+  margin: 0;
+}
+
+.cart-summary__rows dd {
+  margin: 0;
+  text-align: right;
+  font-weight: 700;
+}
+
+.cart-summary__total {
+  font-size: 22px;
+}
+
+.cart-summary__order {
+  width: 100%;
+}
+
+.cart-summary__note {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.empty-state .icon {
+  color: var(--color-text-muted);
+}
+
+@media (min-width: 1080px) {
+  .cart-layout {
+    grid-template-columns: 1fr 320px;
+    align-items: start;
+  }
+
+  .cart-summary {
+    position: sticky;
+    top: calc(var(--header-height) + 24px);
+  }
+}
