@@ -1,0 +1,2 @@
+# 줄바꿈을 윈도우 방식(CRLF)으로 통일 — 팀원 모두 윈도우 사용
+* text=auto eol=crlf

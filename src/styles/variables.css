@@ -1,0 +1,30 @@
+/* 디자인 기준값 — 색상·글꼴·여백은 여기서만 정의한다 (초안, 디자인 확정 시 수정) */
+:root {
+  /* 배경 */
+  --color-bg: #ffffff;
+  --color-surface: #f5f6f8;
+
+  /* 글자 */
+  --color-text: #1a1d23;
+  --color-text-muted: #5f6672;
+
+  /* 포인트 — 버튼·링크 / 가격 강조 */
+  --color-primary: #2f5bea;
+  --color-price: #e8590c;
+
+  /* 선 */
+  --color-line: #e3e6eb;
+
+  /* 글꼴 — Pretendard(무료, OFL) */
+  --font-base: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+
+  /* 여백·모서리 */
+  --space-page: 16px;
+  --radius: 8px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --space-page: 40px;
+  }
+}

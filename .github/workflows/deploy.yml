@@ -1,0 +1,61 @@
+# main 브랜치에 푸시하면 자동으로 테스트 → 빌드 → GitHub Pages 배포
+# 테스트가 실패하면 배포되지 않는다
+name: GitHub Pages 배포
+
+on:
+  push:
+    branches: [main]
+  # GitHub 화면의 Actions 탭에서 직접 실행할 수도 있게 한다
+  workflow_dispatch:
+
+# Pages에 올리는 데 필요한 최소 권한만 준다
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# 배포가 겹치면 이전 배포는 취소하고 최신 것만 올린다
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 가져오기
+        uses: actions/checkout@v5
+
+      - name: Node.js 준비
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: 패키지 설치
+        run: npm ci
+
+      - name: 테스트
+        run: npm test
+
+      - name: 빌드 (결과물은 dist/)
+        run: npm run build
+
+      - name: Pages 설정
+        uses: actions/configure-pages@v5
+
+      - name: dist/ 업로드
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages에 배포
+        id: deployment
+        uses: actions/deploy-pages@v4

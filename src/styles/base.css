@@ -1,0 +1,45 @@
+/* 기본 스타일 — 모바일 우선, 넓은 화면은 미디어쿼리로 확장 */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-base);
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+main {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px var(--space-page) 64px;
+}
+
+.text-muted {
+  color: var(--color-text-muted);
+}
+
+/* 데모 고지 띠 — 화면 하단에 항상 고정 */
+.demo-notice {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 100;
+  margin: 0;
+  padding: 8px 16px;
+  background: var(--color-text);
+  color: var(--color-bg);
+  font-size: 12px;
+  text-align: center;
+}
