@@ -28,7 +28,7 @@ function handleSelect(mode) {
   history.replaceState(null, '', pageUrl('helper.html', { mode }));
   track('helper_tab_select', { helper_mode: mode });
   render();
-  body.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  requestAnimationFrame(() => body.scrollIntoView({ behavior: 'smooth', block: 'start' }));
 }
 
 function handleInput(event) {
