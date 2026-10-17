@@ -1,5 +1,5 @@
 // 메인 페이지 — 윗부분만 A/B로 다르고(HomeHero.js), 아래 공통 구역은 두 안이 같다
-// 공통: 검색 → 강의 → 분야 → 추천 학습 순서 → 광고 보고서 → 한클래스의 약속 → 준비 중인 기능
+// 공통: 검색 → 강의 → 분야 → 추천 학습 순서 → 광고 보고서 → 한클래스의 약속 → 커뮤니티
 // A/B 기준: planning/home-ab-v2 지시서. 1단계는 ?ab_preview=A/B 시연만, 기본은 B
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
@@ -13,7 +13,6 @@ import { SearchForm } from '../components/SearchForm.js';
 import { LearningPath } from '../components/LearningPath.js';
 import { ReportExample } from '../components/ReportExample.js';
 import '../styles/learning.css';
-import { SoonBadge } from '../components/ComingSoon.js';
 import { track } from '../lib/analytics.js';
 import { HOME_EXPERIMENT_ACTIVE, markPreviewSession, resolveHomeVariant } from '../lib/homeExperiment.js';
 import { browserStorage, createExposureWatcher, markClassesView, recordExposure, setPendingCourse } from '../lib/experimentTracking.js';
@@ -76,11 +75,6 @@ function Promises() {
   ]);
 }
 
-// 아직 만들지 않은 기능 — 후속 작업 목록(CLAUDE.md)과 같은 내용
-const UPCOMING = [
-  { iconName: 'chat', title: '커뮤니티', text: '만든 결과물을 나누고 질문할 수 있어요.' },
-];
-
 // 서류 도우미 소개 — 모바일은 헤더 메뉴가 없어서 메인에서 들어가게 한다 (A·B 공통)
 function HelperPromo() {
   return el('section', { className: 'section home-helper' }, [
@@ -93,22 +87,15 @@ function HelperPromo() {
   ]);
 }
 
-function Upcoming() {
-  return el('section', { className: 'section' }, [
-    el('div', { className: 'section__head' }, [el('h2', { className: 'section__title', text: '준비 중인 기능' })]),
-    el(
-      'ul',
-      { className: 'upcoming-list' },
-      UPCOMING.map((item) =>
-        el('li', { className: 'upcoming' }, [
-          el('span', { className: 'upcoming__icon' }, [icon(item.iconName)]),
-          el('div', {}, [
-            el('div', { className: 'upcoming__head' }, [el('strong', { text: item.title }), SoonBadge()]),
-            el('p', { className: 'upcoming__text', text: item.text }),
-          ]),
-        ]),
-      ),
-    ),
+// 커뮤니티 소개 — 서류 도우미 카드와 같은 모양 (A·B 공통, 예전 '준비 중인 기능' 자리)
+function CommunityPromo() {
+  return el('section', { className: 'section home-helper' }, [
+    el('span', { className: 'home-helper__icon' }, [icon('chat')]),
+    el('div', {}, [
+      el('h2', { className: 'section__title', text: '커뮤니티' }),
+      el('p', { className: 'text-muted', text: '강의에서 만든 결과물을 나누고, 막힌 부분을 질문해요. 읽기는 누구나, 글쓰기는 카카오 로그인 후에 할 수 있어요.' }),
+    ]),
+    el('a', { href: 'community.html', className: 'button button--primary', text: '커뮤니티 열기' }),
   ]);
 }
 
@@ -135,7 +122,7 @@ renderPage({
     HelperPromo(),
     ReportExample(),
     Promises(),
-    Upcoming(),
+    CommunityPromo(),
   ],
 });
 

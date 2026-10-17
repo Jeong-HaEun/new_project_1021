@@ -1,0 +1,111 @@
+/* 커뮤니티 — 목록, 글 보기, 글쓰기, 댓글 (입력 칸·버튼은 helper.css·components.css를 함께 쓴다) */
+.community-body {
+  display: grid;
+  gap: 16px;
+  max-width: 760px;
+}
+
+.community-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.community-head .page-desc {
+  margin-bottom: 0;
+}
+
+.community-chips {
+  margin-top: 0;
+}
+
+.community-chips .chip[aria-current='page'] {
+  background: var(--color-text);
+  border-color: var(--color-text);
+  color: var(--color-surface);
+}
+
+.community-rules,
+.community-hint {
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.community-rules {
+  padding: 10px 12px;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-subtle);
+}
+
+.community-list {
+  display: grid;
+  gap: var(--space-card-gap);
+}
+
+.community-item {
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.community-item:hover,
+.community-item:focus-visible {
+  border-color: var(--color-line-strong);
+}
+
+.community-item__title {
+  font-size: var(--text-card-title);
+  overflow-wrap: anywhere;
+}
+
+.community-item__preview {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 14px;
+  color: var(--color-text-muted);
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.community-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.community-badges {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.community-badge--outcome {
+  background: var(--color-success-soft);
+  color: var(--color-success-strong);
+}
+
+.community-badge--question {
+  background: var(--color-info-soft);
+  color: var(--color-info);
+}
+
+.community-badge--free {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+}
+
+.community-course {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}

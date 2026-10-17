@@ -1,0 +1,121 @@
+/* 커뮤니티 글 보기·댓글·글쓰기 폼 */
+.community-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  justify-self: start;
+}
+
+.community-post,
+.community-comments {
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.community-post__title,
+.community-form__title {
+  font-size: var(--text-section-title);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.community-post__body,
+.community-comment__body {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+
+.community-post__course {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  justify-self: start;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-subtle);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.community-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.community-danger {
+  color: var(--color-primary);
+}
+
+.community-comment-list {
+  display: grid;
+}
+
+.community-comment {
+  display: grid;
+  gap: 4px;
+  padding: 12px 0;
+  border-top: 1px solid var(--color-line);
+}
+
+.community-link-button {
+  justify-self: start;
+  min-height: 32px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-size: var(--text-small);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.community-comment-form,
+.community-login {
+  display: grid;
+  gap: 10px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-line);
+}
+
+.community-login {
+  justify-items: start;
+}
+
+.community-picker {
+  display: grid;
+  gap: 8px;
+  border: 0;
+}
+
+.community-picker__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.community-picker__item > span {
+  display: grid;
+}
+
+.community-picker__item:has(input:checked) {
+  border-color: var(--color-text);
+}
+
+.community-picker__item input {
+  margin-top: 4px;
+}
+
+.community-panel strong {
+  font-size: var(--text-card-title);
+}

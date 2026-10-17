@@ -20,6 +20,7 @@ export default defineConfig({
         report: 'report.html',
         privacy: 'privacy.html',
         helper: 'helper.html',
+        community: 'community.html',
       },
     },
   },

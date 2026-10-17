@@ -63,22 +63,19 @@
 }
 
 /* 한클래스의 약속 */
-.promise-list,
-.upcoming-list {
+.promise-list {
   display: grid;
   gap: var(--space-card-gap);
 }
 
-.promise,
-.upcoming {
+.promise {
   padding: 18px;
   border-radius: var(--radius-card);
   background: var(--color-surface);
   border: 1px solid var(--color-line);
 }
 
-.promise__icon,
-.upcoming__icon {
+.promise__icon {
   display: grid;
   place-items: center;
   width: 36px;
@@ -93,30 +90,10 @@
   margin-top: 10px;
 }
 
-.promise__text,
-.upcoming__text {
+.promise__text {
   margin-top: 4px;
   font-size: 14px;
   color: var(--color-text-muted);
-}
-
-/* 준비 중인 기능 — 흐리게 */
-.upcoming {
-  display: flex;
-  gap: 14px;
-  background: var(--color-surface-subtle);
-}
-
-.upcoming__icon {
-  flex: none;
-  background: var(--color-surface);
-  color: var(--color-text-muted);
-}
-
-.upcoming__head {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 
 @media (min-width: 768px) {
@@ -124,8 +101,7 @@
     grid-template-columns: repeat(3, 1fr);
   }
 
-  .promise-list,
-  .upcoming-list {
+  .promise-list {
     grid-template-columns: repeat(3, 1fr);
   }
 }

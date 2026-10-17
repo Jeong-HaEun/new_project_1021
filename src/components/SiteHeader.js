@@ -2,7 +2,6 @@
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { SITE_NAME } from '../lib/site.js';
-import { SoonButton } from './ComingSoon.js';
 import { CartLink } from './CartLink.js';
 
 export function SiteHeader({ active }) {
@@ -19,7 +18,7 @@ export function SiteHeader({ active }) {
         navLink('courses.html', '강의 찾기', 'courses'),
         navLink('report.html', '광고 보고서', 'report'),
         navLink('helper.html', '서류 도우미', 'helper'),
-        SoonButton({ label: '커뮤니티', className: 'site-nav__soon' }),
+        navLink('community.html', '커뮤니티', 'community'),
       ]),
       el('div', { className: 'site-header__actions' }, [
         el('a', { href: 'courses.html', className: 'icon-button', 'aria-label': '강의 검색' }, [icon('search')]),

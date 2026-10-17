@@ -1,0 +1,64 @@
+// 커뮤니티 글·댓글 서버(Supabase) 읽기·쓰기 (supabase/migrations/20261018000000_community.sql)
+// 사용자 id는 보내지 않는다 — 서버가 로그인 정보로 채우고, 수정·삭제는 RLS가 본인 것만 허락한다
+import { getServerClient } from './server.js';
+
+const POSTS = 'community_posts';
+const COMMENTS = 'community_comments';
+const POST_COLUMNS = 'id, user_id, category, title, body, author_name, course_id, created_at, updated_at, community_comments(count)';
+export const PAGE_SIZE = 50;
+
+async function run(query) {
+  const { data, error } = await query;
+  if (error) throw error;
+  return data;
+}
+
+// 최신 글 50개 (category: 'all' 또는 분류 id)
+export async function fetchPosts(category) {
+  const client = await getServerClient();
+  let query = client.from(POSTS).select(POST_COLUMNS).order('created_at', { ascending: false }).limit(PAGE_SIZE);
+  if (category !== 'all') query = query.eq('category', category);
+  return run(query);
+}
+
+// 글 하나 (없으면 null)
+export async function fetchPost(id) {
+  const client = await getServerClient();
+  return run(client.from(POSTS).select(POST_COLUMNS).eq('id', id).maybeSingle());
+}
+
+export async function fetchComments(postId) {
+  const client = await getServerClient();
+  return run(client.from(COMMENTS).select('id, user_id, body, author_name, created_at').eq('post_id', postId).order('created_at'));
+}
+
+// 새 글 → 새 글 번호
+export async function createPost(fields) {
+  const client = await getServerClient();
+  const row = await run(client.from(POSTS).insert(fields).select('id').single());
+  return row.id;
+}
+
+// 본인 글이 아니면 RLS 때문에 0개가 바뀐다 → 'not-owner'
+export async function updatePost(id, fields) {
+  const client = await getServerClient();
+  const rows = await run(client.from(POSTS).update(fields).eq('id', id).select('id'));
+  if (rows.length === 0) throw new Error('not-owner');
+}
+
+export async function deletePost(id) {
+  const client = await getServerClient();
+  const rows = await run(client.from(POSTS).delete().eq('id', id).select('id'));
+  if (rows.length === 0) throw new Error('not-owner');
+}
+
+export async function createComment(postId, fields) {
+  const client = await getServerClient();
+  await run(client.from(COMMENTS).insert({ post_id: postId, ...fields }));
+}
+
+export async function deleteComment(id) {
+  const client = await getServerClient();
+  const rows = await run(client.from(COMMENTS).delete().eq('id', id).select('id'));
+  if (rows.length === 0) throw new Error('not-owner');
+}

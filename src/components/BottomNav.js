@@ -13,6 +13,7 @@ export function BottomNav({ active }) {
   return el('nav', { className: 'bottom-nav', 'aria-label': '하단 메뉴' }, [
     tab('index.html', '홈', 'home', 'home'),
     tab('courses.html', '강의 찾기', 'grid', 'courses'),
+    tab('community.html', '커뮤니티', 'chat', 'community'),
     CartLink({ className: 'bottom-nav__item', iconSize: 22, showLabel: true, active: active === 'cart' }),
     tab('myclass.html', '내 강의실', 'book', 'myclass'),
   ]);
