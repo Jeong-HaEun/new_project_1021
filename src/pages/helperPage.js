@@ -1,6 +1,4 @@
 // 서류 도우미 — helper.html?mode=cover_letter|interview|edit (SPEC.md '서류 도우미')
-// 자소서·면접 길잡이: 로그인한 사람만, 하루 3회, 서버 함수(doc-helper)가 Gemini 무료 등급으로 답한다 (실습 기간)
-// 첨삭 길잡이: 로그인 없이, 내 AI에 붙여 넣을 프롬프트만 만든다 (서버로 보내지 않음)
 import { el } from '../lib/dom.js';
 import { pageUrl, readParam } from '../lib/paths.js';
 import { isServerConfigured } from '../lib/server.js';
@@ -12,7 +10,7 @@ import { track } from '../lib/analytics.js';
 import { buildEditPrompt, DAILY_LIMIT, MODES, validateFields } from '../../supabase/functions/_shared/docHelperRules.js';
 import { HELPER_EXAMPLES } from '../data/helperExamples.js';
 import { renderPage } from '../components/PageLayout.js';
-import { errorText, Field, MODE_INTRO, Notice, ResultBox, Tabs } from '../components/HelperParts.js';
+import { errorText, ExperienceGuideSection, Field, MODE_INTRO, Notice, ResultBox, Tabs } from '../components/HelperParts.js';
 import { showToast } from '../components/Toast.js';
 import '../styles/courses.css';
 import '../styles/myclass.css';
@@ -21,15 +19,16 @@ import '../styles/helper.css';
 const session = browserStorage('sessionStorage');
 const configured = isServerConfigured();
 const startMode = readParam('mode');
-// user: undefined(확인 중) | null(로그아웃) | 사용자, status: { open, remaining } | null(확인 실패)
-const state = { mode: MODES[startMode] ? startMode : 'cover_letter', user: undefined, status: null, loading: false, result: null, error: null };
+const EXP_INIT = () => ({ input: '', loading: false, result: null, error: null });
+const state = { mode: MODES[startMode] ? startMode : 'cover_letter', user: undefined, status: null, loading: false, result: null, error: null, exp: EXP_INIT() };
 const body = el('div', { className: 'helper-body' });
 
 function handleSelect(mode) {
-  Object.assign(state, { mode, result: null, error: null });
+  Object.assign(state, { mode, result: null, error: null, exp: EXP_INIT() });
   history.replaceState(null, '', pageUrl('helper.html', { mode }));
   track('helper_tab_select', { helper_mode: mode });
   render();
+  body.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function handleInput(event) {
@@ -50,13 +49,10 @@ function handleClear() {
 }
 
 async function handleCopy(text) {
-  try {
-    await navigator.clipboard.writeText(text);
-    showToast('복사했어요');
-    track('helper_copy', { helper_mode: state.mode });
-  } catch {
-    showToast('복사하지 못했어요. 글을 직접 선택해 복사해 주세요.');
-  }
+  await navigator.clipboard.writeText(text).then(
+    () => { showToast('복사했어요'); track('helper_copy', { helper_mode: state.mode }); },
+    () => showToast('복사하지 못했어요. 글을 직접 선택해 복사해 주세요.'),
+  );
 }
 
 async function handleSubmit(event) {
@@ -81,6 +77,7 @@ async function handleSubmit(event) {
   if (response.ok) {
     state.result = { title: `${MODES[mode].label} 결과`, text: response.data.text };
     state.status = { ...state.status, remaining: response.data.remaining };
+    state.exp = EXP_INIT();
   } else {
     state.error = errorText(response);
     if (response.error === 'closed') state.status = { ...state.status, open: false };
@@ -89,6 +86,18 @@ async function handleSubmit(event) {
   track('helper_generate', { helper_mode: mode, result: response.ok ? 'ok' : response.error });
   render();
   body.querySelector('.helper-result, .helper-notice--error')?.scrollIntoView({ block: 'nearest' });
+}
+
+async function handleExpSubmit() {
+  const experiences = state.exp.input.trim();
+  if (!experiences) return;
+  state.exp = { input: state.exp.input, loading: true, result: null, error: null };
+  render();
+  const r = await callDocHelper({ mode: 'experience_guide', fields: { ...loadDraft(session, 'cover_letter'), experiences } });
+  state.exp = { input: state.exp.input, loading: false, result: r.ok ? r.data.text : null, error: r.ok ? null : errorText(r) };
+  if (r.ok) state.status = { ...state.status, remaining: r.data.remaining };
+  track('helper_generate', { helper_mode: 'experience_guide', result: r.ok ? 'ok' : r.error });
+  render();
 }
 
 // AI 길잡이를 쓸 수 없는 상태면 안내를 돌려준다 (쓸 수 있으면 null)
@@ -138,13 +147,10 @@ function Result() {
   if (!state.result) return null;
   const { title, text } = state.result;
   const actions = [el('button', { type: 'button', className: 'button button--primary', onClick: () => handleCopy(text), text: '복사하기' })];
-  if (!MODES[state.mode].usesAi) {
-    actions.push(el('a', {
-      href: 'https://chatgpt.com/', target: '_blank', rel: 'noopener noreferrer', className: 'button button--ghost',
-      text: 'ChatGPT 열기 ↗', onClick: () => track('helper_open_ai', { helper_mode: state.mode }),
-    }));
-  }
-  return ResultBox(title, text, actions);
+  if (!MODES[state.mode].usesAi) actions.push(el('a', { href: 'https://chatgpt.com/', target: '_blank', rel: 'noopener noreferrer', className: 'button button--ghost', text: 'ChatGPT 열기 ↗', onClick: () => track('helper_open_ai', { helper_mode: state.mode }) }));
+  const box = ResultBox(title, text, actions);
+  if (state.mode !== 'cover_letter') return box;
+  return el('div', { className: 'helper-result-group' }, [box, ExperienceGuideSection(state.exp, (e) => { state.exp = { ...state.exp, input: e.target.value }; }, handleExpSubmit, () => { state.exp = { ...state.exp, result: null, error: null }; render(); })]);
 }
 
 function render() {

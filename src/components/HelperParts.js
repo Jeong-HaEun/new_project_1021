@@ -24,13 +24,15 @@ export function Tabs(current, onSelect) {
   return el(
     'div',
     { className: 'helper-tabs', role: 'tablist', 'aria-label': '길잡이 선택' },
-    Object.entries(MODES).map(([mode, config]) =>
-      el('button', {
-        type: 'button', role: 'tab', id: `tab-${mode}`, className: 'helper-tab',
-        'aria-selected': String(mode === current), 'aria-controls': 'helper-panel',
-        onClick: () => onSelect(mode), text: config.label,
-      }),
-    ),
+    Object.entries(MODES)
+      .filter(([, config]) => config.tab !== false)
+      .map(([mode, config]) =>
+        el('button', {
+          type: 'button', role: 'tab', id: `tab-${mode}`, className: 'helper-tab',
+          'aria-selected': String(mode === current), 'aria-controls': 'helper-panel',
+          onClick: () => onSelect(mode), text: config.label,
+        }),
+      ),
   );
 }
 
@@ -64,6 +66,28 @@ export function ResultBox(title, text, actions) {
 
 export function Notice(text, tone = 'info') {
   return el('p', { className: `helper-notice helper-notice--${tone}`, role: tone === 'error' ? 'alert' : 'note', text });
+}
+
+// 자소서 길잡이 결과 아래 — 내 경험 소재를 넣으면 문항에 맞게 쓰는 법을 안내 (1회 차감)
+export function ExperienceGuideSection(exp, onInput, onSubmit, onReset) {
+  if (exp.result) {
+    return ResultBox('내 경험 가이드', exp.result, [
+      el('button', { type: 'button', className: 'button button--ghost', onClick: onReset, text: '다시 작성' }),
+    ]);
+  }
+  const ta = el('textarea', {
+    className: 'helper-input', rows: '5',
+    placeholder: '예)\n- GA4로 이탈률을 분석해 랜딩페이지 CTA 개선\n- F&B 브랜드 SNS 운영 (팔로워 +1,200)\n- 교내 홍보팀 포스터·카드뉴스 제작',
+  });
+  ta.value = exp.input;
+  ta.addEventListener('input', onInput);
+  return el('section', { className: 'helper-exp-guide' }, [
+    el('h3', { className: 'helper-exp-guide__title', text: '내 경험 가이드 받기' }),
+    el('p', { className: 'helper-exp-guide__desc', text: '위 결과에서 내 상황에 맞는 경험 소재를 간략히 적어 주세요. AI가 각 경험을 이 문항에 맞게 어떻게 쓸지 구성·표현까지 안내해 드려요. (1회 차감)' }),
+    exp.error ? Notice(exp.error, 'error') : null,
+    ta,
+    el('button', { type: 'button', className: 'button button--secondary', text: exp.loading ? '분석 중이에요…' : '가이드 받기', onClick: onSubmit, ...(exp.loading && { disabled: '' }) }),
+  ].filter(Boolean));
 }
 
 // 오류 → 안내 문구 (입력 확인 실패·서버 응답 공통)

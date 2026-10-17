@@ -14,11 +14,13 @@ const coverLetter = { job: '퍼포먼스 마케터', company: '가상 커머스'
 const interview = { job: '콘텐츠 마케터', letter: '대학 동아리에서 SNS 계정을 운영하며 게시물 반응을 표로 정리했습니다.', documents: 'GA4 자격증' };
 
 describe('모드와 제한', () => {
-  it('세 가지 길잡이: 자소서·면접은 AI 답변, 첨삭은 프롬프트만', () => {
-    expect(Object.keys(MODES)).toEqual(['cover_letter', 'interview', 'edit']);
+  it('자소서·면접은 AI 답변, 첨삭은 프롬프트만, 경험 길잡이는 AI 답변·탭바 숨김', () => {
+    expect(['cover_letter', 'interview', 'edit'].every((m) => m in MODES)).toBe(true);
     expect(MODES.cover_letter.usesAi).toBe(true);
     expect(MODES.interview.usesAi).toBe(true);
     expect(MODES.edit.usesAi).toBe(false);
+    expect(MODES.experience_guide.usesAi).toBe(true);
+    expect(MODES.experience_guide.tab).toBe(false);
   });
 
   it('1인 하루 3회, 사이트 전체 하루 상한 (무료 한도 안에서만 쓰도록)', () => {

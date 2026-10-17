@@ -53,7 +53,11 @@ async function askAi(mode: string, fields: Record<string, unknown>) {
     body: JSON.stringify(buildGeminiRequest(mode, fields)),
     signal: AbortSignal.timeout(50_000),
   });
-  if (!res.ok) throw new AiError(res.status);
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '(읽기 실패)');
+    console.error('gemini error:', res.status, errBody.slice(0, 300));
+    throw new AiError(res.status);
+  }
   const text = readGeminiText(await res.json());
   if (!text) throw new Error('gemini empty answer');
   return text;
