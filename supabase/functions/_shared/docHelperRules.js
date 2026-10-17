@@ -1,16 +1,17 @@
 // 서류 도우미 공통 규칙 — 서버 함수(supabase/functions/doc-helper)와 브라우저(src/pages/helperPage.js)가 함께 쓴다
-// GPT에 보낼 지시문은 서버에서만 만든다. 브라우저는 정해진 칸의 값만 보낸다 (GPT를 다른 용도로 못 쓰게)
+// AI에 보낼 지시문은 서버에서만 만든다. 브라우저는 정해진 칸의 값만 보낸다 (AI를 다른 용도로 못 쓰게)
 // 원칙: 입력한 사실만 사용, 경험·수치를 지어내지 않음, 합격·취업 보장 표현 금지
 
 export const DAILY_LIMIT = 3; // 로그인한 사람 1명당 하루(한국 날짜) 횟수 — 자소서·면접 길잡이 합산
+export const DAILY_TOTAL_LIMIT = 50; // 사이트 전체 하루 상한 — Gemini 무료 한도보다 한참 낮게 (넘으면 내일까지 쉼)
 
 export const FIELD_LIMITS = { job: 50, company: 50, question: 500, posting: 3000, letter: 3000, documents: 1500 };
 
 // fields: 이 모드에서 받는 칸, required: 꼭 필요한 칸
 export const MODES = {
-  cover_letter: { label: '자소서 길잡이', usesGpt: true, fields: ['job', 'company', 'question', 'posting'], required: ['job', 'question'] },
-  interview: { label: '면접 길잡이', usesGpt: true, fields: ['job', 'company', 'letter', 'documents'], required: ['job', 'letter'] },
-  edit: { label: '자소서 첨삭 길잡이', usesGpt: false, fields: ['job', 'question', 'letter', 'limit'], required: ['question', 'letter'] },
+  cover_letter: { label: '자소서 길잡이', usesAi: true, fields: ['job', 'company', 'question', 'posting'], required: ['job', 'question'] },
+  interview: { label: '면접 길잡이', usesAi: true, fields: ['job', 'company', 'letter', 'documents'], required: ['job', 'letter'] },
+  edit: { label: '자소서 첨삭 길잡이', usesAi: false, fields: ['job', 'question', 'letter', 'limit'], required: ['question', 'letter'] },
 };
 
 export const FIELD_LABELS = {
@@ -67,7 +68,7 @@ const SYSTEM = {
   ],
 };
 
-// GPT에 보낼 메시지 [system, user] — 서버 함수에서 사용
+// AI에 보낼 메시지 [system, user] — 서버 함수에서 사용
 export function buildMessages(mode, fields) {
   return [
     { role: 'system', content: [...SYSTEM[mode], '', '지켜야 할 규칙:', ...COMMON_RULES.map((rule) => `- ${rule}`)].join('\n') },

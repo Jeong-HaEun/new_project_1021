@@ -95,9 +95,15 @@ describe('doc_helper_usage — 서류 도우미 하루 사용 횟수 (입력 내
   });
 
   it('횟수 차감·환불 함수는 서버 함수(service_role)만 부를 수 있다', () => {
-    expect(sql).toMatch(/revoke all on function public\.consume_doc_helper_quota\(uuid, integer\) from public, anon, authenticated/);
-    expect(sql).toMatch(/grant execute on function public\.consume_doc_helper_quota\(uuid, integer\) to service_role/);
+    expect(sql).toMatch(/revoke all on function public\.consume_doc_helper_quota\(uuid, integer, integer\) from public, anon, authenticated/);
+    expect(sql).toMatch(/grant execute on function public\.consume_doc_helper_quota\(uuid, integer, integer\) to service_role/);
     expect(sql).toMatch(/revoke all on function public\.refund_doc_helper_quota\(uuid\) from public, anon, authenticated/);
+  });
+
+  it('사이트 전체 하루 상한을 넘으면 -2 (동시에 와도 넘지 않게 잠근다)', () => {
+    expect(sql).toContain('p_total_limit');
+    expect(sql).toContain('pg_advisory_xact_lock');
+    expect(sql).toContain('return -2');
   });
 
   it('하루 기준은 한국 날짜', () => {
@@ -108,17 +114,24 @@ describe('doc_helper_usage — 서류 도우미 하루 사용 횟수 (입력 내
 describe('서류 도우미 서버 함수 — 비밀키는 서버 환경변수로만', () => {
   const fn = read('supabase/functions/doc-helper/index.ts');
 
-  it('OpenAI 키를 코드에 쓰지 않고 환경변수에서 읽는다', () => {
-    expect(fn).toContain("Deno.env.get('OPENAI_API_KEY')");
-    expect(fn).not.toMatch(/sk-[A-Za-z0-9]{10,}/);
+  it('Gemini 키를 코드에 쓰지 않고 환경변수에서 읽는다 (주소가 아닌 헤더로 보낸다)', () => {
+    expect(fn).toContain("Deno.env.get('GEMINI_API_KEY')");
+    expect(fn).toContain('x-goog-api-key');
+    expect(fn).not.toMatch(/AIza[0-9A-Za-z_-]{10,}/);
+    expect(fn).not.toMatch(/[?&]key=/);
+    expect(fn).not.toMatch(/openai/i);
   });
 
-  it('로그인 확인 뒤에만 GPT를 부른다 (getUser가 OpenAI 호출보다 먼저)', () => {
+  it('사이트 전체 하루 상한을 함께 넘긴다', () => {
+    expect(fn).toContain('p_total_limit: DAILY_TOTAL_LIMIT');
+  });
+
+  it('로그인 확인 뒤에만 AI를 부른다 (getUser가 Gemini 호출보다 먼저)', () => {
     expect(fn.indexOf('auth.getUser')).toBeGreaterThan(-1);
-    // 요청 처리(Deno.serve) 안에서 로그인 확인 → 횟수 차감 → GPT 호출 순서
+    // 요청 처리(Deno.serve) 안에서 로그인 확인 → 횟수 차감 → AI 호출 순서
     const handler = fn.slice(fn.indexOf('Deno.serve('));
     expect(handler.indexOf('auth.getUser')).toBeLessThan(handler.indexOf('consume_doc_helper_quota'));
-    expect(handler.indexOf('consume_doc_helper_quota')).toBeLessThan(handler.indexOf('await askGpt('));
+    expect(handler.indexOf('consume_doc_helper_quota')).toBeLessThan(handler.indexOf('await askAi('));
   });
 
   it('입력 내용을 로그로 남기지 않는다', () => {

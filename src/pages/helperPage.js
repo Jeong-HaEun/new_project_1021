@@ -1,5 +1,5 @@
 // 서류 도우미 — helper.html?mode=cover_letter|interview|edit (SPEC.md '서류 도우미')
-// 자소서·면접 길잡이: 로그인한 사람만, 하루 3회, 운영자의 GPT가 서버 함수(doc-helper)에서 답한다 (실습 기간)
+// 자소서·면접 길잡이: 로그인한 사람만, 하루 3회, 서버 함수(doc-helper)가 Gemini 무료 등급으로 답한다 (실습 기간)
 // 첨삭 길잡이: 로그인 없이, 내 AI에 붙여 넣을 프롬프트만 만든다 (서버로 보내지 않음)
 import { el } from '../lib/dom.js';
 import { pageUrl, readParam } from '../lib/paths.js';
@@ -69,7 +69,7 @@ async function handleSubmit(event) {
     body.querySelector(`[name="${checked.field}"]`)?.focus();
     return;
   }
-  if (!MODES[mode].usesGpt) {
+  if (!MODES[mode].usesAi) {
     Object.assign(state, { error: null, result: { title: '내 AI에 붙여 넣을 첨삭 프롬프트', text: buildEditPrompt(checked.fields) } });
     render();
     return;
@@ -91,8 +91,8 @@ async function handleSubmit(event) {
   body.querySelector('.helper-result, .helper-notice--error')?.scrollIntoView({ block: 'nearest' });
 }
 
-// GPT 길잡이를 쓸 수 없는 상태면 안내를 돌려준다 (쓸 수 있으면 null)
-function GptGate() {
+// AI 길잡이를 쓸 수 없는 상태면 안내를 돌려준다 (쓸 수 있으면 null)
+function AiGate() {
   const notReady = Notice('AI 답변 서버를 준비하고 있어요. 첨삭 길잡이는 지금 쓸 수 있어요.');
   if (!configured) return notReady;
   if (state.user === undefined) return Notice('로그인 상태를 확인하고 있어요…');
@@ -116,20 +116,20 @@ function GptGate() {
 
 function Form() {
   const mode = state.mode;
-  const usesGpt = MODES[mode].usesGpt;
+  const usesAi = MODES[mode].usesAi;
   const values = loadDraft(session, mode);
-  const noneLeft = usesGpt && state.status?.remaining === 0;
-  const submitText = state.loading ? '답변을 만드는 중이에요… (최대 1분)' : usesGpt ? '길잡이 받기' : '프롬프트 만들기';
+  const noneLeft = usesAi && state.status?.remaining === 0;
+  const submitText = state.loading ? '답변을 만드는 중이에요… (최대 1분)' : usesAi ? '길잡이 받기' : '프롬프트 만들기';
   return el('form', { className: 'helper-form', novalidate: '', onSubmit: handleSubmit, onInput: handleInput, 'aria-busy': String(state.loading) }, [
     ...MODES[mode].fields.map((name) => Field(mode, name, values[name])),
-    usesGpt ? el('p', { className: 'helper-quota', text: `오늘 남은 횟수 ${state.status.remaining} / ${DAILY_LIMIT}` }) : null,
+    usesAi ? el('p', { className: 'helper-quota', text: `오늘 남은 횟수 ${state.status.remaining} / ${DAILY_LIMIT}` }) : null,
     el('div', { className: 'helper-actions' }, [
       el('button', { type: 'submit', className: 'button button--primary', text: submitText, ...((state.loading || noneLeft) && { disabled: '' }) }),
       el('button', { type: 'button', className: 'button button--ghost', onClick: handleExample, text: '예시로 채우기' }),
       el('button', { type: 'button', className: 'button button--ghost', onClick: handleClear, text: '모두 지우기' }),
     ]),
-    el('p', { className: 'helper-privacy', text: usesGpt
-      ? '입력한 내용은 답변을 만들기 위해 OpenAI로 보내져요. 한클래스는 내용을 저장하지 않고 이용 횟수만 기록해요. AI 답변은 참고용이니 사실은 직접 확인해 주세요.'
+    el('p', { className: 'helper-privacy', text: usesAi
+      ? '입력한 내용은 답변을 만들기 위해 Google(Gemini)로 보내져요. 무료 버전이라 Google이 서비스 개선에 쓰거나 사람이 검토할 수 있으니, 이름·연락처·학교 같은 개인정보는 빼고 넣어 주세요. 한클래스는 내용을 저장하지 않고 이용 횟수만 기록해요. AI 답변은 참고용이니 사실은 직접 확인해 주세요.'
       : '입력한 내용은 이 브라우저에서만 프롬프트로 바뀌고, 어디로도 보내지 않아요.' }),
   ]);
 }
@@ -138,7 +138,7 @@ function Result() {
   if (!state.result) return null;
   const { title, text } = state.result;
   const actions = [el('button', { type: 'button', className: 'button button--primary', onClick: () => handleCopy(text), text: '복사하기' })];
-  if (!MODES[state.mode].usesGpt) {
+  if (!MODES[state.mode].usesAi) {
     actions.push(el('a', {
       href: 'https://chatgpt.com/', target: '_blank', rel: 'noopener noreferrer', className: 'button button--ghost',
       text: 'ChatGPT 열기 ↗', onClick: () => track('helper_open_ai', { helper_mode: state.mode }),
@@ -148,7 +148,7 @@ function Result() {
 }
 
 function render() {
-  const gate = MODES[state.mode].usesGpt ? GptGate() : null;
+  const gate = MODES[state.mode].usesAi ? AiGate() : null;
   body.replaceChildren(
     Tabs(state.mode, handleSelect),
     el('div', { id: 'helper-panel', role: 'tabpanel', 'aria-labelledby': `tab-${state.mode}`, className: 'helper-panel' }, [

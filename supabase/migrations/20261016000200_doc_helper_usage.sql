@@ -12,13 +12,20 @@ create table public.doc_helper_usage (
 alter table public.doc_helper_usage enable row level security;
 revoke all on public.doc_helper_usage from anon, authenticated;
 
--- 한 번 차감. 남은 횟수를 돌려주고, 이미 다 썼으면 -1 (차감하지 않음). 하루 기준은 한국 날짜
-create or replace function public.consume_doc_helper_quota(p_user uuid, p_limit integer)
+-- 한 번 차감. 남은 횟수를 돌려준다. 이 사람이 다 썼으면 -1, 사이트 전체 하루 상한에 닿았으면 -2 (둘 다 차감하지 않음)
+-- 전체 상한은 무료 AI 한도를 넘지 않게 하는 안전장치. 동시에 여러 요청이 와도 넘지 않도록 하루 단위로 잠근다. 하루 기준은 한국 날짜
+create or replace function public.consume_doc_helper_quota(p_user uuid, p_limit integer, p_total_limit integer)
 returns integer language plpgsql security definer set search_path = '' as $$
 declare
   today date := (now() at time zone 'Asia/Seoul')::date;
+  total integer;
   new_count integer;
 begin
+  perform pg_advisory_xact_lock(hashtext('doc_helper_usage'), (today - date '2000-01-01'));
+  select coalesce(sum(used_count), 0) into total from public.doc_helper_usage where used_on = today;
+  if total >= p_total_limit then
+    return -2;
+  end if;
   insert into public.doc_helper_usage (user_id, used_on, used_count)
   values (p_user, today, 1)
   on conflict (user_id, used_on) do update
@@ -32,7 +39,7 @@ begin
 end;
 $$;
 
--- GPT 호출이 실패했을 때 한 번 되돌린다
+-- AI 호출이 실패했을 때 한 번 되돌린다
 create or replace function public.refund_doc_helper_quota(p_user uuid)
 returns void language plpgsql security definer set search_path = '' as $$
 begin
@@ -51,9 +58,9 @@ returns integer language sql security definer set search_path = '' as $$
     0);
 $$;
 
-revoke all on function public.consume_doc_helper_quota(uuid, integer) from public, anon, authenticated;
+revoke all on function public.consume_doc_helper_quota(uuid, integer, integer) from public, anon, authenticated;
 revoke all on function public.refund_doc_helper_quota(uuid) from public, anon, authenticated;
 revoke all on function public.get_doc_helper_usage(uuid) from public, anon, authenticated;
-grant execute on function public.consume_doc_helper_quota(uuid, integer) to service_role;
+grant execute on function public.consume_doc_helper_quota(uuid, integer, integer) to service_role;
 grant execute on function public.refund_doc_helper_quota(uuid) to service_role;
 grant execute on function public.get_doc_helper_usage(uuid) to service_role;

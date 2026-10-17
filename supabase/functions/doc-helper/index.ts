@@ -1,9 +1,10 @@
-// 서류 도우미 서버 함수 — 자소서 길잡이·면접 길잡이를 운영자의 OpenAI(GPT)로 답한다 (SPEC.md '서류 도우미')
-// 순서: 로그인 확인 → (status면 남은 횟수) → 켜짐 확인 → 입력 확인 → 하루 3회 차감 → GPT → 실패하면 환불
-// 비밀값은 Supabase Edge Function Secrets에만 둔다: OPENAI_API_KEY, OPENAI_MODEL, DOC_HELPER_ENABLED, DOC_HELPER_UNTIL
+// 서류 도우미 서버 함수 — 자소서 길잡이·면접 길잡이를 Gemini API(무료 등급)로 답한다 (SPEC.md '서류 도우미')
+// 순서: 로그인 확인 → (status면 남은 횟수) → 켜짐 확인 → 입력 확인 → 하루 횟수 차감(1인 3회·전체 상한) → Gemini → 실패하면 환불
+// 비밀값은 Supabase Edge Function Secrets에만 둔다: GEMINI_API_KEY, GEMINI_MODEL, DOC_HELPER_ENABLED, DOC_HELPER_UNTIL
 // 입력 내용은 저장하거나 로그로 남기지 않는다
 import { createClient } from 'npm:@supabase/supabase-js@2';
-import { buildMessages, DAILY_LIMIT, MODES, validateFields } from '../_shared/docHelperRules.js';
+import { DAILY_LIMIT, DAILY_TOTAL_LIMIT, MODES, validateFields } from '../_shared/docHelperRules.js';
+import { buildGeminiRequest, readGeminiText } from '../_shared/gemini.js';
 
 const ALLOWED_ORIGINS = ['https://jeong-haeun.github.io', 'http://localhost:5174'];
 
@@ -36,19 +37,24 @@ function supabaseKeys() {
   return { publishable, secret };
 }
 
-async function askGpt(mode: string, fields: Record<string, unknown>) {
-  const apiKey = Deno.env.get('OPENAI_API_KEY');
-  const model = Deno.env.get('OPENAI_MODEL');
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+class AiError extends Error {
+  constructor(public status: number) {
+    super(`gemini status ${status}`);
+  }
+}
+
+// 키는 주소 뒤에 붙이지 않고 헤더로 보낸다 — 주소는 기록에 남을 수 있다
+async function askAi(mode: string, fields: Record<string, unknown>) {
+  const model = Deno.env.get('GEMINI_MODEL');
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model ?? '')}:generateContent`, {
     method: 'POST',
-    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ model, messages: buildMessages(mode, fields), max_completion_tokens: 1500 }),
+    headers: { 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY') ?? '', 'Content-Type': 'application/json' },
+    body: JSON.stringify(buildGeminiRequest(mode, fields)),
     signal: AbortSignal.timeout(50_000),
   });
-  if (!res.ok) throw new Error(`openai status ${res.status}`);
-  const data = await res.json();
-  const text = data.choices?.[0]?.message?.content?.trim();
-  if (!text) throw new Error('openai empty answer');
+  if (!res.ok) throw new AiError(res.status);
+  const text = readGeminiText(await res.json());
+  if (!text) throw new Error('gemini empty answer');
   return text;
 }
 
@@ -86,24 +92,29 @@ Deno.serve(async (req) => {
 
   // 3) 켜짐·설정·입력 확인
   if (!isOpen()) return json(403, { error: 'closed' }, origin);
-  if (!Deno.env.get('OPENAI_API_KEY') || !Deno.env.get('OPENAI_MODEL')) return json(503, { error: 'not_configured' }, origin);
+  if (!Deno.env.get('GEMINI_API_KEY') || !Deno.env.get('GEMINI_MODEL')) return json(503, { error: 'not_configured' }, origin);
   const mode = body.mode ?? '';
-  if (!MODES[mode as keyof typeof MODES]?.usesGpt) return json(400, { error: 'unknown_mode' }, origin);
+  if (!MODES[mode as keyof typeof MODES]?.usesAi) return json(400, { error: 'unknown_mode' }, origin);
   const checked = validateFields(mode, body.fields ?? {});
   if (!checked.ok) return json(400, checked, origin);
 
-  // 4) 하루 횟수 차감 (다 썼으면 -1)
-  const { data: remaining, error } = await admin.rpc('consume_doc_helper_quota', { p_user: user.id, p_limit: DAILY_LIMIT });
+  // 4) 하루 횟수 차감 (이 사람이 다 썼으면 -1, 사이트 전체 상한이면 -2)
+  const { data: remaining, error } = await admin.rpc('consume_doc_helper_quota', {
+    p_user: user.id, p_limit: DAILY_LIMIT, p_total_limit: DAILY_TOTAL_LIMIT,
+  });
   if (error) return json(500, { error: 'server' }, origin);
+  if (remaining === -2) return json(429, { error: 'busy' }, origin);
   if (remaining < 0) return json(429, { error: 'quota', remaining: 0 }, origin);
 
-  // 5) GPT — 실패하면 횟수를 돌려준다. 오류 내용만 남기고 입력은 남기지 않는다
+  // 5) Gemini — 실패하면 횟수를 돌려준다. 오류 내용만 남기고 입력은 남기지 않는다
   try {
-    const text = await askGpt(mode, checked.fields);
+    const text = await askAi(mode, checked.fields);
     return json(200, { text, remaining }, origin);
   } catch (failure) {
     await admin.rpc('refund_doc_helper_quota', { p_user: user.id });
-    console.error('doc-helper gpt failed:', failure instanceof Error ? failure.message : 'unknown');
-    return json(502, { error: 'gpt', remaining: remaining + 1 }, origin);
+    console.error('doc-helper ai failed:', failure instanceof Error ? failure.message : 'unknown');
+    // 429: Gemini 무료 한도(분당·하루)에 닿음 — 잠시 뒤 다시
+    if (failure instanceof AiError && failure.status === 429) return json(429, { error: 'busy', remaining: remaining + 1 }, origin);
+    return json(502, { error: 'ai', remaining: remaining + 1 }, origin);
   }
 });
