@@ -6,11 +6,12 @@ import { createClient } from 'npm:@supabase/supabase-js@2';
 import { DAILY_LIMIT, DAILY_TOTAL_LIMIT, MODES, validateFields } from '../_shared/docHelperRules.js';
 import { buildGeminiRequest, readGeminiText } from '../_shared/gemini.js';
 
-const ALLOWED_ORIGINS = ['https://jeong-haeun.github.io', 'http://localhost:5174'];
+const ALLOWED_ORIGINS = ['https://jeong-haeun.github.io'];
+const isAllowedOrigin = (o: string) => ALLOWED_ORIGINS.includes(o) || /^http:\/\/localhost(:\d+)?$/.test(o);
 
 function corsHeaders(origin: string) {
   return {
-    'Access-Control-Allow-Origin': ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0],
+    'Access-Control-Allow-Origin': isAllowedOrigin(origin) ? origin : ALLOWED_ORIGINS[0],
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
     Vary: 'Origin',
