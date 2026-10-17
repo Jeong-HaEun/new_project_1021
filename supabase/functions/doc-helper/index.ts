@@ -87,7 +87,8 @@ Deno.serve(async (req) => {
 
   // 2) 남은 횟수만 묻기
   if (body.action === 'status') {
-    const { data: used } = await admin.rpc('get_doc_helper_usage', { p_user: user.id });
+    const { data: used, error: usageError } = await admin.rpc('get_doc_helper_usage', { p_user: user.id });
+    if (usageError) return json(500, { error: 'server' }, origin);
     return json(200, { open: isOpen(), limit: DAILY_LIMIT, remaining: Math.max(DAILY_LIMIT - (used ?? 0), 0) }, origin);
   }
 

@@ -53,13 +53,40 @@ const PANELS = {
       el('p', { className: 'text-muted', text: '올린 CSV는 내 계정에만 저장돼요. 다른 사람은 볼 수 없어요.' }),
       el('button', { type: 'button', className: 'button kakao-login', onClick: handleLogin, text: '카카오로 로그인' }),
     ]),
-  ready: () => [
-    el('iframe', { className: 'report-frame', src: REPORT_FRAME_PATH, title: 'Adporter 광고 성과 보고서' }),
-    el('a', {
-      href: REPORT_APP_PATH, target: '_blank', rel: 'noopener noreferrer', className: 'report-open',
-      text: '보고서를 새 창에서 크게 보기 ↗', 'data-analytics': 'report-example-open',
-    }),
-  ],
+  ready: () => {
+    const openLink = el('a', {
+      href: REPORT_APP_PATH, target: '_blank', rel: 'noopener noreferrer', className: 'report-open button button--secondary',
+      text: '새 창에서 크게 보기 ↗', 'data-analytics': 'report-example-open',
+    });
+    const hint = el('p', { className: 'report-frame-hint text-muted', text: '보고서를 연결하고 있어요…' });
+    const wrapper = el('div', { className: 'report-frame-wrap' }, [hint]);
+
+    // fetch 탐색: 같은 출처 요청이라 CORS 없이 확인 가능 (localhost 프록시·GitHub Pages 모두)
+    fetch(REPORT_FRAME_PATH, { method: 'HEAD', cache: 'no-store' })
+      .then((res) => {
+        if (!res.ok) throw new Error(`${res.status}`);
+        const frame = el('iframe', { className: 'report-frame', src: REPORT_FRAME_PATH, title: 'Adporter 광고 성과 보고서' });
+        frame.addEventListener('load', () => hint.remove(), { once: true });
+        wrapper.appendChild(frame);
+      })
+      .catch(() => {
+        body.replaceChildren(
+          Panel([
+            icon('marketing-practice', 32),
+            el('strong', { text: '보고서를 불러오지 못했어요' }),
+            el('p', { className: 'text-muted', text: '잠시 후 다시 시도하거나 새 창에서 열어 주세요.' }),
+            el('a', {
+              href: REPORT_APP_PATH, target: '_blank', rel: 'noopener noreferrer',
+              className: 'button button--primary',
+              text: '새 창에서 열기 ↗', 'data-analytics': 'report-example-open',
+            }),
+            el('button', { type: 'button', className: 'button button--ghost', onClick: init, text: '다시 시도' }),
+          ])
+        );
+      });
+
+    return [openLink, wrapper];
+  },
 };
 
 function render() {
