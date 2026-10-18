@@ -19,3 +19,16 @@ export function readGeminiText(data) {
   const parts = data?.candidates?.[0]?.content?.parts ?? [];
   return parts.filter((part) => !part.thought && typeof part.text === 'string').map((part) => part.text).join('').trim();
 }
+
+// 일시 오류: 서버 과부하(503 "high demand", 500)는 잠깐 뒤 다시 물으면 대개 풀린다
+// 무료 한도(429)는 바로 다시 물어도 안 풀리므로 다시 묻지 않는다
+export const GEMINI_RETRY_DELAYS_MS = [1000, 2500];
+
+export function isRetryableStatus(status) {
+  return status === 500 || status === 503;
+}
+
+// 사용자에게 "지금 이용이 많아요"로 안내할 오류 (그 밖은 일반 실패 안내)
+export function isBusyStatus(status) {
+  return status === 429 || isRetryableStatus(status);
+}

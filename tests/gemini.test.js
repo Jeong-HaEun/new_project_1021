@@ -1,6 +1,6 @@
 // 서류 도우미 — Gemini 요청 만들기·답 읽기 (서버 함수 doc-helper가 쓴다)
 import { describe, it, expect } from 'vitest';
-import { buildGeminiRequest, GEMINI_MAX_OUTPUT_TOKENS, readGeminiText } from '../supabase/functions/_shared/gemini.js';
+import { buildGeminiRequest, GEMINI_MAX_OUTPUT_TOKENS, GEMINI_RETRY_DELAYS_MS, isBusyStatus, isRetryableStatus, readGeminiText } from '../supabase/functions/_shared/gemini.js';
 
 const fields = { job: '퍼포먼스 마케터', question: '지원 동기를 적어 주세요.' };
 
@@ -30,5 +30,27 @@ describe('readGeminiText — 답 글만 꺼낸다', () => {
     expect(readGeminiText(data)).toBe('답');
     expect(readGeminiText({})).toBe('');
     expect(readGeminiText({ candidates: [{ finishReason: 'SAFETY' }] })).toBe('');
+  });
+});
+
+describe('Gemini 일시 오류 — 잠깐 붐비면 다시 묻고, 그래도 안 되면 "이용이 많아요"', () => {
+  it('서버 과부하(500·503)만 다시 시도한다', () => {
+    expect(isRetryableStatus(503)).toBe(true);
+    expect(isRetryableStatus(500)).toBe(true);
+    expect(isRetryableStatus(429)).toBe(false); // 무료 한도 — 바로 다시 물어도 안 풀림
+    expect(isRetryableStatus(400)).toBe(false);
+    expect(isRetryableStatus(404)).toBe(false);
+  });
+
+  it('다시 시도는 2번, 기다림은 서버 함수 시간 안에 끝난다', () => {
+    expect(GEMINI_RETRY_DELAYS_MS).toHaveLength(2);
+    expect(GEMINI_RETRY_DELAYS_MS.reduce((a, b) => a + b, 0)).toBeLessThanOrEqual(5000);
+  });
+
+  it('한도(429)·과부하(503·500)는 사용자에게 "이용이 많아요"로 안내한다', () => {
+    expect(isBusyStatus(429)).toBe(true);
+    expect(isBusyStatus(503)).toBe(true);
+    expect(isBusyStatus(500)).toBe(true);
+    expect(isBusyStatus(400)).toBe(false);
   });
 });

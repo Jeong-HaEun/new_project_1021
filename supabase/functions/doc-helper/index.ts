@@ -4,7 +4,7 @@
 // 입력 내용은 저장하거나 로그로 남기지 않는다
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { DAILY_LIMIT, DAILY_TOTAL_LIMIT, MODES, validateFields } from '../_shared/docHelperRules.js';
-import { buildGeminiRequest, readGeminiText } from '../_shared/gemini.js';
+import { buildGeminiRequest, GEMINI_RETRY_DELAYS_MS, isBusyStatus, isRetryableStatus, readGeminiText } from '../_shared/gemini.js';
 
 const ALLOWED_ORIGINS = ['https://jeong-haeun.github.io'];
 const isAllowedOrigin = (o: string) => ALLOWED_ORIGINS.includes(o) || /^http:\/\/localhost(:\d+)?$/.test(o);
@@ -45,13 +45,13 @@ class AiError extends Error {
 }
 
 // 키는 주소 뒤에 붙이지 않고 헤더로 보낸다 — 주소는 기록에 남을 수 있다
-async function askAi(mode: string, fields: Record<string, unknown>) {
+async function askAiOnce(mode: string, fields: Record<string, unknown>) {
   const model = Deno.env.get('GEMINI_MODEL');
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model ?? '')}:generateContent`, {
     method: 'POST',
     headers: { 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY') ?? '', 'Content-Type': 'application/json' },
     body: JSON.stringify(buildGeminiRequest(mode, fields)),
-    signal: AbortSignal.timeout(50_000),
+    signal: AbortSignal.timeout(40_000), // 다시 시도까지 합쳐 서버 함수 시간(150초) 안에 끝나게
   });
   if (!res.ok) {
     const errBody = await res.text().catch(() => '(읽기 실패)');
@@ -61,6 +61,19 @@ async function askAi(mode: string, fields: Record<string, unknown>) {
   const text = readGeminiText(await res.json());
   if (!text) throw new Error('gemini empty answer');
   return text;
+}
+
+// Gemini가 잠깐 붐비면(503 등) 조금 기다렸다 다시 묻는다
+async function askAi(mode: string, fields: Record<string, unknown>) {
+  for (const delay of GEMINI_RETRY_DELAYS_MS) {
+    try {
+      return await askAiOnce(mode, fields);
+    } catch (failure) {
+      if (!(failure instanceof AiError && isRetryableStatus(failure.status))) throw failure;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+  }
+  return askAiOnce(mode, fields);
 }
 
 Deno.serve(async (req) => {
@@ -119,8 +132,8 @@ Deno.serve(async (req) => {
   } catch (failure) {
     await admin.rpc('refund_doc_helper_quota', { p_user: user.id });
     console.error('doc-helper ai failed:', failure instanceof Error ? failure.message : 'unknown');
-    // 429: Gemini 무료 한도(분당·하루)에 닿음 — 잠시 뒤 다시
-    if (failure instanceof AiError && failure.status === 429) return json(429, { error: 'busy', remaining: remaining + 1 }, origin);
+    // 429 무료 한도·503 과부하(다시 시도 뒤에도) — 잠시 뒤 다시
+    if (failure instanceof AiError && isBusyStatus(failure.status)) return json(429, { error: 'busy', remaining: remaining + 1 }, origin);
     return json(502, { error: 'ai', remaining: remaining + 1 }, origin);
   }
 });

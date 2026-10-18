@@ -7,6 +7,7 @@ import { callDocHelper, fetchHelperStatus } from '../lib/docHelperApi.js';
 import { clearDrafts, loadDraft, saveDraft } from '../lib/docHelperDraft.js';
 import { browserStorage } from '../lib/experimentTracking.js';
 import { track } from '../lib/analytics.js';
+import { keepHeightWhile, scrollToStartSmoothly } from '../lib/smoothScroll.js';
 import { buildEditPrompt, DAILY_LIMIT, MODES, validateFields } from '../../supabase/functions/_shared/docHelperRules.js';
 import { HELPER_EXAMPLES } from '../data/helperExamples.js';
 import { renderPage } from '../components/PageLayout.js';
@@ -27,8 +28,8 @@ function handleSelect(mode) {
   Object.assign(state, { mode, result: null, error: null, exp: EXP_INIT() });
   history.replaceState(null, '', pageUrl('helper.html', { mode }));
   track('helper_tab_select', { helper_mode: mode });
-  render();
-  requestAnimationFrame(() => body.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  keepHeightWhile(body, render);
+  scrollToStartSmoothly(body);
 }
 
 function handleInput(event) {
