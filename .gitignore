@@ -39,3 +39,6 @@ docs/design/
 
 # 강좌 검토 보고서·기록 (npm run review가 만듦, 로컬 확인용)
 reports/
+
+# 대화 기록 내보내기 (개인 대화 — 절대 커밋 금지)
+conversation-*.txt
