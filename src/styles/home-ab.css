@@ -123,8 +123,13 @@
 
   [data-home-variant='B'] .home-courses .course-card__thumb {
     flex: none;
-    width: 96px;
+    width: 112px;
     aspect-ratio: auto;
+  }
+
+  /* 세로로 긴 칸에서 가운데만 잘리면 썸네일 속 글자가 끊긴다 → 전체를 줄여서 보여 준다 */
+  [data-home-variant='B'] .home-courses .course-card__thumb img {
+    object-fit: contain;
   }
 
   [data-home-variant='B'] .home-courses .course-card__thumb .badge {
