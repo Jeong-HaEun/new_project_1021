@@ -15,6 +15,14 @@ export function getCommunityRoute(search) {
   return { name: 'list', category: CATEGORIES.some((item) => item.id === category) ? category : 'all' };
 }
 
+// 로그인 뒤 돌아갈 주소 — 저장해 둔 값을 그대로 쓰지 않고, 알아본 화면만 다시 만든다 (다른 사이트·이상한 값 차단)
+export function safeReturnSearch(search) {
+  const route = getCommunityRoute(typeof search === 'string' ? search : '');
+  if (route.name === 'post' || route.name === 'edit') return `?${route.name}=${route.id}`;
+  if (route.name === 'write') return '?write=1';
+  return route.category === 'all' ? '' : `?category=${route.category}`;
+}
+
 // 'unavailable'(서버 연결 전) | 'loading' | 'error' | 'ready'
 export function getCommunityState({ configured, status }) {
   if (!configured) return 'unavailable';

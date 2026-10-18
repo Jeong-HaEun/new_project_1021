@@ -162,7 +162,7 @@ export const course = {
 - 측정: helper_tab_select·helper_generate(결과)·helper_copy·helper_open_ai — 길잡이 이름과 결과만, 입력 원문 없음
 - 메뉴: 헤더 [서류 도우미], 메인 '서류 도우미' 카드(모바일 진입)
 
-### 커뮤니티 (community.html, src/lib/community.js·communityView.js·communityApi.js) — 구현 완료, DB 적용 대기
+### 커뮤니티 (community.html, src/lib/community.js·communityView.js·communityApi.js) — 구현 완료, DB 적용 완료 (main 병합 전)
 - 읽기(목록·글·댓글)는 비로그인 포함 누구나. 글·댓글 쓰기는 카카오 로그인한 사람만. 글 수정·삭제, 댓글 삭제는 본인 것만 (댓글 수정 없음)
 - 화면은 본인 글·댓글에만 [수정]·[삭제]를 보여 주고, 실제 권한은 DB RLS가 막는다. 삭제는 확인 창 뒤 실행, 글을 지우면 댓글도 함께 지워진다
 - 분류: 결과물 공유(`outcome`) / 질문(`question`) / 자유(`free`). 결과물 공유는 결과물을 만든 강의(open 강의)를 꼭 고른다 — "강의 1편 = 결과물 1개". 다른 분류는 강의 선택이 선택 사항
@@ -171,7 +171,8 @@ export const course = {
 - 입력 규칙 (화면과 DB가 같은 길이를 검사): 제목 2~60자, 내용 5~2,000자, 댓글 1~500자, 닉네임 1~12자. 앞뒤 공백 제거
 - 전화번호(휴대폰·지역번호·+82)·이메일이 보이면 올리지 않고 "개인정보는 지우고 올려 주세요". 과장 표현(BANNED_PHRASES)도 거절. 화면에 개인정보·과장 표현·광고 금지 안내를 늘 보여 준다
 - 글쓴이 표시는 사용자가 직접 정한 닉네임만. 카카오 이름·이메일은 저장·표시하지 않는다. 닉네임은 이 브라우저(localStorage `hanclass.communityName.v1`)에만 기억
-- 로그인 안내: 목록은 [카카오로 로그인하고 글쓰기], 글 보기는 댓글 자리에 로그인 버튼. 로그인 뒤 보던 화면으로 돌아온다(sessionStorage `hanclass.communityReturn`)
+- 로그인 안내: 목록은 [카카오로 로그인하고 글쓰기], 글 보기는 댓글 자리에 로그인 버튼. 로그인 뒤 보던 화면으로 돌아온다(sessionStorage `hanclass.communityReturn`, 커뮤니티 안 주소만 다시 만들어 이동 — safeReturnSearch)
+- 안내 문구에 "올린 글과 댓글은 로그인하지 않은 사람도 볼 수 있어요"를 함께 보여 준다
 - 빈 상태: 가짜 글·후기·사용자를 시드로 넣지 않는다. "아직 올라온 글이 없어요" + 첫 글 안내(결과물 공유는 결과물 1개와 배운 점을 나누자고 안내)
 - 상태: 서버 연결 전 / 불러오는 중 / 실패(다시 시도) / 준비. 저장 실패 시 입력값을 지우지 않는다
 - 사용자가 쓴 글은 textContent로만 넣는다 (HTML이 섞여도 실행되지 않음)
@@ -184,9 +185,10 @@ export const course = {
 - 세시드와 함께 쓰는 프로젝트라 `community_` 이름으로 구분한다
 - RLS: 조회는 anon·authenticated 모두, 추가는 로그인한 본인 id로만, 글 수정·삭제와 댓글 삭제는 본인만. anon에는 조회 권한만
 - 추가·수정은 정해진 칸만 권한을 준다 (user_id·created_at·updated_at은 브라우저가 보내거나 바꿀 수 없음)
-- 정의: `supabase/migrations/20261018000000_community.sql` (아직 원격 미적용 — 운영자 승인 후 적용)
-- 카카오 로그인 뒤 돌아올 주소 `community.html`을 Supabase Auth Redirect URLs에 등록해야 한다
-- 후속 검토: 신고·숨김, 글 수 제한(도배 방지), 이미지 첨부, 더 보기(50개 넘을 때)
+- 정의: `supabase/migrations/20261018000000_community.sql` (세시드 프로젝트에 SQL Editor로 적용, 2026-10-18)
+- Supabase Auth Redirect URLs에 `community.html` 등록 완료: 배포 주소, `localhost:5173`, `localhost:5174` (5173을 다른 세션이 쓸 때)
+- 알려진 한계 (MVP): 전화번호·이메일·과장 표현 검사는 화면에서만 한다(DB는 길이·분류·형식만 검사). 글쓴이 계정 id(uuid)는 본인 확인용으로 공개 조회된다(이름·이메일은 아님). 로그인한 사람의 글 수 제한이 없다
+- 후속 검토: 신고·숨김, 글 수 제한(도배 방지, DB 트리거), 서버 쪽 개인정보 검사, 이미지 첨부, 더 보기(50개 넘을 때)
 
 ## 메인 A/B — 감성 몰입형(A) vs 정보 탐색형(B) — src/lib/homeExperiment.js, experimentTracking.js
 - 기준 문서: `planning/home-ab-v2` 브랜치의 claude-development-brief.md. 이전 '카드 제목 vs 결과물' 실험은 대체됨

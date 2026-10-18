@@ -6,7 +6,7 @@ import { pageUrl } from '../lib/paths.js';
 import { CATEGORIES } from '../lib/community.js';
 import { formatPostDate } from '../lib/communityView.js';
 
-export const RULES_NOTE = '전화번호·이메일 같은 개인정보는 쓰지 마세요. 합격·취업을 약속하는 과장 표현과 광고 글은 올릴 수 없어요.';
+export const RULES_NOTE = '올린 글과 댓글은 로그인하지 않은 사람도 볼 수 있어요. 전화번호·이메일 같은 개인정보는 쓰지 마세요. 합격·취업을 약속하는 과장 표현과 광고 글은 올릴 수 없어요.';
 
 const categoryLabel = (id) => CATEGORIES.find((item) => item.id === id)?.label ?? '';
 const courseTitle = (courses, id) => courses.find((course) => course.id === id)?.title;

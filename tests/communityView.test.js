@@ -1,7 +1,7 @@
 // 커뮤니티 화면용 정리 — 주소 읽기, 화면 상태, 서버 응답 정리·정렬, 날짜 표시 (SPEC.md '커뮤니티')
 import { describe, it, expect } from 'vitest';
 import {
-  formatPostDate, getCommunityRoute, getCommunityState, normalizeComments, normalizePost, normalizePosts, problemText,
+  formatPostDate, getCommunityRoute, getCommunityState, normalizeComments, normalizePost, normalizePosts, problemText, safeReturnSearch,
 } from '../src/lib/communityView.js';
 
 describe('주소 → 화면', () => {
@@ -20,6 +20,22 @@ describe('주소 → 화면', () => {
   it('글 번호가 숫자가 아니면 목록', () => {
     expect(getCommunityRoute('?post=abc')).toEqual({ name: 'list', category: 'all' });
     expect(getCommunityRoute('?edit=-3')).toEqual({ name: 'list', category: 'all' });
+  });
+});
+
+describe('로그인 뒤 돌아갈 화면', () => {
+  it('커뮤니티 안의 글쓰기·글·수정·분류 주소만 돌려준다', () => {
+    expect(safeReturnSearch('?write=1')).toBe('?write=1');
+    expect(safeReturnSearch('?post=12')).toBe('?post=12');
+    expect(safeReturnSearch('?edit=3')).toBe('?edit=3');
+    expect(safeReturnSearch('?category=outcome')).toBe('?category=outcome');
+  });
+  it('목록 기본·이상한 값은 빈 문자열(목록)', () => {
+    expect(safeReturnSearch('')).toBe('');
+    expect(safeReturnSearch('?post=abc')).toBe('');
+    expect(safeReturnSearch('//evil.example')).toBe('');
+    expect(safeReturnSearch('?write=1&next=https://evil.example')).toBe('?write=1');
+    expect(safeReturnSearch(null)).toBe('');
   });
 });
 

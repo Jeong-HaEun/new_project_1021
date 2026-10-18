@@ -4,7 +4,7 @@ import { el } from '../lib/dom.js';
 import { isServerConfigured } from '../lib/server.js';
 import { getCurrentUser, onAuthChange, signInWithKakao } from '../lib/account.js';
 import { canManage, validateComment, validatePost } from '../lib/community.js';
-import { getCommunityRoute, getCommunityState, normalizeComments, normalizePost, normalizePosts, problemText } from '../lib/communityView.js';
+import { getCommunityRoute, getCommunityState, normalizeComments, normalizePost, normalizePosts, problemText, safeReturnSearch } from '../lib/communityView.js';
 import * as Api from '../lib/communityApi.js';
 import { browserStorage } from '../lib/experimentTracking.js';
 import { COURSES } from '../data/courses/index.js';
@@ -177,10 +177,11 @@ async function init() {
     setUser(null); // 로그인 확인이 안 돼도 읽기는 할 수 있다
   }
   // 로그인하고 돌아왔으면 로그인 전에 보던 화면(글쓰기 등)으로
-  const back = readStore(session, RETURN_KEY);
-  if (back) {
+  const saved = readStore(session, RETURN_KEY);
+  if (saved) {
     try { session.removeItem(RETURN_KEY); } catch { /* 무시 */ }
-    if (view.user && back !== window.location.search) return go(back);
+    const back = safeReturnSearch(saved);
+    if (view.user && back && back !== window.location.search) return go(back);
   }
 }
 
