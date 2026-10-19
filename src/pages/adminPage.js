@@ -3,8 +3,8 @@
 import { el } from '../lib/dom.js';
 import { isServerConfigured } from '../lib/server.js';
 import { getCurrentUser, onAuthChange, signInWithKakao, signOut } from '../lib/account.js';
-import { deletePostAsAdmin, fetchAdminRole, fetchOverview, fetchReportedPosts, setPostHidden } from '../lib/adminApi.js';
-import { adminProblem, getAdminState, normalizeOverview, normalizeReported } from '../lib/adminView.js';
+import { deletePostAsAdmin, fetchAdminLog, fetchAdminRole, fetchOverview, fetchReportedPosts, setPostHidden } from '../lib/adminApi.js';
+import { adminProblem, getAdminState, normalizeLog, normalizeOverview, normalizeReported } from '../lib/adminView.js';
 import { COURSES } from '../data/courses/index.js';
 import { renderPage } from '../components/PageLayout.js';
 import * as Parts from '../components/AdminParts.js';
@@ -19,7 +19,7 @@ const configured = isServerConfigured();
 const body = el('div', { className: 'admin-body' });
 // user: undefined(확인 중) | null | 사용자. 로그아웃하면 운영 정보를 바로 비운다
 // videos: 영상 올리기 조각 — 사용자마다 한 번 만들고, 다시 그려도 고른 파일·목록을 유지한다
-const view = { user: undefined, role: null, status: 'loading', overview: null, reported: [], busyId: null, videos: null };
+const view = { user: undefined, role: null, status: 'loading', overview: null, reported: [], log: [], busyId: null, videos: null };
 let requestId = 0;
 
 async function handleLogin() {
@@ -51,9 +51,9 @@ async function load() {
       Object.assign(view, { status: 'ready', role: null });
       return render();
     }
-    const [overview, reported] = await Promise.all([fetchOverview(), fetchReportedPosts()]);
+    const [overview, reported, log] = await Promise.all([fetchOverview(), fetchReportedPosts(), fetchAdminLog()]);
     if (id !== requestId) return;
-    Object.assign(view, { status: 'ready', role, overview: normalizeOverview(overview, COURSES), reported: normalizeReported(reported) });
+    Object.assign(view, { status: 'ready', role, overview: normalizeOverview(overview, COURSES), reported: normalizeReported(reported), log: normalizeLog(log) });
     view.videos ??= AdminVideos({ courses: COURSES, toast: showToast });
   } catch (error) {
     if (id !== requestId) return;
@@ -76,7 +76,9 @@ async function runAction(post, action, doneText) {
     await action();
     showToast(doneText);
   } catch (error) {
-    showToast(adminProblem(error) === 'not-found' ? '이미 지워진 글이에요.' : '처리하지 못했어요. 잠시 후 다시 시도해 주세요.');
+    const problem = adminProblem(error);
+    const texts = { 'not-found': '이미 지워진 글이에요.', 'not-super-admin': '영구 삭제는 최고 관리자만 할 수 있어요.' };
+    showToast(texts[problem] ?? '처리하지 못했어요. 잠시 후 다시 시도해 주세요.');
   }
   view.busyId = null;
   load();
@@ -101,8 +103,9 @@ const PANELS = {
   ready: () => [
     Parts.AccountBar(view.role, handleLogout),
     ...Parts.OverviewSections(view.overview),
-    Parts.ReportedSection(view.reported, { onToggle: handleToggle, onDelete: handleDelete, busyId: view.busyId }),
+    Parts.ReportedSection(view.reported, { onToggle: handleToggle, onDelete: handleDelete, busyId: view.busyId, canDelete: view.role === 'super_admin' }),
     view.videos,
+    Parts.LogSection(view.log),
   ],
 };
 

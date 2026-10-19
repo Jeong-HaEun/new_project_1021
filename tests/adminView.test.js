@@ -1,6 +1,6 @@
 // 운영자 페이지 규칙 — 화면 상태·회원 통계 정리·서버 오류 해석 (SPEC.md '운영자 페이지')
 import { describe, it, expect } from 'vitest';
-import { adminProblem, completionRate, getAdminState, normalizeOverview, normalizeReported, shortDay } from '../src/lib/adminView.js';
+import { adminProblem, completionRate, getAdminState, normalizeLog, normalizeOverview, normalizeReported, overviewSource, shortDay } from '../src/lib/adminView.js';
 import { serverProblem, guardText } from '../src/lib/communityGuard.js';
 import { normalizeComments, normalizePost } from '../src/lib/communityView.js';
 
@@ -33,6 +33,7 @@ describe('adminProblem', () => {
   it('운영자가 아니면 not-admin, 없는 글이면 not-found, 나머지는 unknown', () => {
     expect(adminProblem({ code: 'P0001', message: 'hanclass_not_admin' })).toBe('not-admin');
     expect(adminProblem({ code: 'P0001', message: 'hanclass_not_found' })).toBe('not-found');
+    expect(adminProblem({ code: 'P0001', message: 'hanclass_not_super_admin' })).toBe('not-super-admin');
     expect(adminProblem(new Error('network'))).toBe('unknown');
     expect(adminProblem(null)).toBe('unknown');
   });
@@ -64,6 +65,30 @@ describe('normalizeOverview', () => {
   it('매출·결제라는 이름을 쓰지 않는다 (데모 기록)', () => {
     const labels = [...normalizeOverview({}, courses).members, ...normalizeOverview({}, courses).activity].map((item) => item.label).join(' ');
     expect(labels).not.toMatch(/매출|결제|구매/);
+  });
+});
+
+describe('집계 시각·출처', () => {
+  it('서버 집계 시각을 한국 시간으로, 출처·운영자 제외를 함께 표시', () => {
+    const view = normalizeOverview({ generatedAt: '2026-10-19T06:05:00Z' }, courses);
+    expect(view.generatedAt).toBe('2026-10-19T06:05:00Z');
+    expect(overviewSource(view.generatedAt)).toMatch(/^집계 10\. 19\. 오후 3:05 · 출처 한클래스 서버 기록 \(운영자 제외/);
+  });
+  it('시각이 없거나 깨지면 알 수 없음', () => {
+    expect(normalizeOverview({ generatedAt: 'x' }, courses).generatedAt).toBeNull();
+    expect(overviewSource(null)).toContain('집계 알 수 없음');
+  });
+});
+
+describe('normalizeLog', () => {
+  it('처리 이름을 한국어로, 모르는 동작·깨진 행은 버리고 처리자 id는 빼고', () => {
+    const rows = normalizeLog([
+      { id: 2, actor: 'u1', action: 'delete_post', target_id: '7', reason: '운영자 삭제', created_at: '2026-10-19T06:00:00Z' },
+      { id: 1, action: 'drop_all', target_id: '1', created_at: '2026-10-19T05:00:00Z' },
+      { id: 3, action: 'hide_post', target_id: '8', reason: null },
+    ]);
+    expect(rows).toEqual([{ id: 2, action: '글 삭제', target: '글 7', reason: '운영자 삭제', createdAt: '2026-10-19T06:00:00Z' }]);
+    expect(normalizeLog(undefined)).toEqual([]);
   });
 });
 

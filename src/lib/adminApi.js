@@ -20,4 +20,12 @@ export const fetchReportedPosts = () => rpc('admin_reported_posts');
 export const setPostHidden = (postId, hidden, reason) =>
   rpc('admin_set_post_hidden', { p_post: postId, p_hidden: hidden, p_reason: reason });
 
-export const deletePostAsAdmin = (postId, reason) => rpc('admin_delete_post', { p_post: postId, p_reason: reason });
+// 최근 활동 기록 20개 — 최고 관리자는 전체, 운영자는 본인 것만 (RLS)
+export async function fetchAdminLog() {
+  const client = await getServerClient();
+  const { data, error } = await client.from('hanclass_admin_log').select('id, action, target_id, reason, created_at').order('created_at', { ascending: false }).limit(20);
+  if (error) throw error;
+  return data;
+}
+
+export const deletePostAsAdmin =(postId, reason) => rpc('admin_delete_post', { p_post: postId, p_reason: reason });

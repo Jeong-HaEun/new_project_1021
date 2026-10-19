@@ -10,10 +10,11 @@ export function getAdminState({ configured, user, role, status }) {
   return role ? 'ready' : 'not-admin';
 }
 
-// 서버 오류 → 'not-ready'(운영자 SQL 적용 전) | 'not-admin' | 'not-found' | 'unknown'
+// 서버 오류 → 'not-ready'(운영자 SQL 적용 전) | 'not-super-admin' | 'not-admin' | 'not-found' | 'unknown'
 export function adminProblem(error) {
   const message = error?.message ?? '';
   if (error?.code === 'PGRST202' || error?.code === '42883' || message.includes('Could not find the function')) return 'not-ready';
+  if (message.includes('hanclass_not_super_admin')) return 'not-super-admin';
   if (message.includes('hanclass_not_admin')) return 'not-admin';
   if (message.includes('hanclass_not_found')) return 'not-found';
   return 'unknown';
@@ -56,7 +57,16 @@ export function normalizeOverview(raw, courses) {
   const days = (Array.isArray(data.newMembersByDay) ? data.newMembersByDay : [])
     .filter((row) => row && /^\d{4}-\d{2}-\d{2}$/.test(row.day))
     .map((row) => ({ day: row.day, count: count(row.count) }));
-  return { members, activity, byCourse, days };
+  const generatedAt = typeof data.generatedAt === 'string' && !Number.isNaN(Date.parse(data.generatedAt)) ? data.generatedAt : null;
+  return { members, activity, byCourse, days, generatedAt };
+}
+
+// '집계 10.19 오후 3:05 · 출처 한클래스 서버 기록 (운영자 제외)'
+export function overviewSource(generatedAt) {
+  const time = generatedAt
+    ? new Date(generatedAt).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit', timeZone: 'Asia/Seoul' })
+    : '알 수 없음';
+  return `집계 ${time} · 출처 한클래스 서버 기록 (운영자 제외, 새로고침하면 다시 집계)`;
 }
 
 const REASON_LABELS = { spam: '광고·도배', personal: '개인정보 노출', abuse: '욕설·비방', etc: '기타' };
@@ -71,6 +81,16 @@ export function normalizeReported(rows) {
       const reasons = [...tally].map(([id, n]) => `${REASON_LABELS[id] ?? '기타'} ${n}`).join(' · ');
       return { id: row.id, title: row.title, authorName: row.author_name ?? '', hidden: row.hidden === true, reportCount: count(row.report_count), reasons, createdAt: row.created_at };
     });
+}
+
+const ACTION_LABELS = { hide_post: '글 숨김', unhide_post: '다시 보이기', delete_post: '글 삭제' };
+
+// 활동 기록 → 화면용 (처리자 id는 보여 주지 않는다)
+export function normalizeLog(rows) {
+  if (!Array.isArray(rows)) return [];
+  return rows
+    .filter((row) => row && ACTION_LABELS[row.action] && typeof row.created_at === 'string')
+    .map((row) => ({ id: row.id, action: ACTION_LABELS[row.action], target: `글 ${row.target_id}`, reason: row.reason ?? '', createdAt: row.created_at }));
 }
 
 // '10.19' 형식 (한국 날짜 문자열 'YYYY-MM-DD'에서)

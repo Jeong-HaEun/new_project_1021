@@ -4,6 +4,7 @@ import { el } from '../lib/dom.js';
 import { isServerConfigured } from '../lib/server.js';
 import { getCurrentUser, onAuthChange, signInWithKakao, signOut } from '../lib/account.js';
 import { fetchMyEnrollments, fetchMyOutcomes } from '../lib/enrollmentApi.js';
+import { fetchAdminRole } from '../lib/adminApi.js';
 import { getClassroomState, normalizeEnrollments, normalizeOutcomeRows, toPurchaseRecords } from '../lib/myClassroom.js';
 import { readCartState, setAccountRecords } from '../lib/cartStore.js';
 import { COURSES } from '../data/courses/index.js';
@@ -17,7 +18,8 @@ import '../styles/myclass.css';
 const configured = isServerConfigured();
 const body = el('div', { className: 'myclass-body' });
 // user: undefined(확인 중) | null | 사용자. 로그아웃하면 기록을 바로 비워 이전 사용자 정보가 남지 않게 한다
-const view = { user: undefined, status: 'loading', enrollments: [], outcomes: [] };
+// isAdmin: 운영자면 계정 줄에 [운영자 페이지] (확인 실패·운영자 SQL 적용 전이면 false)
+const view = { user: undefined, status: 'loading', enrollments: [], outcomes: [], isAdmin: false };
 let requestId = 0;
 
 function browserOrderCourses() {
@@ -48,11 +50,11 @@ async function loadEnrollments() {
   Object.assign(view, { status: 'loading', enrollments: [], outcomes: [] });
   render();
   try {
-    const [rows, outcomeRows] = await Promise.all([fetchMyEnrollments(), fetchMyOutcomes()]);
+    const [rows, outcomeRows, role] = await Promise.all([fetchMyEnrollments(), fetchMyOutcomes(), fetchAdminRole().catch(() => null)]);
     if (id !== requestId) return;
     const enrollments = normalizeEnrollments(rows, COURSES);
     const outcomes = normalizeOutcomeRows(outcomeRows, COURSES);
-    Object.assign(view, { status: 'ready', enrollments, outcomes });
+    Object.assign(view, { status: 'ready', enrollments, outcomes, isAdmin: Boolean(role) });
     setAccountRecords({ purchases: toPurchaseRecords(enrollments), outcomes }); // 다른 화면도 같은 계정 기준으로
   } catch {
     if (id !== requestId) return;
@@ -63,7 +65,7 @@ async function loadEnrollments() {
 
 function setUser(user) {
   requestId += 1;
-  Object.assign(view, { user, enrollments: [], outcomes: [], status: user ? 'loading' : 'ready' });
+  Object.assign(view, { user, enrollments: [], outcomes: [], isAdmin: false, status: user ? 'loading' : 'ready' });
   setAccountRecords();
   if (user) loadEnrollments();
   else render();
@@ -93,8 +95,8 @@ const PANELS = {
   'signed-out': () => [Parts.SignedOutPanel(handleLogin), Parts.BrowserOrders(browserOrderCourses())],
   loading: () => [Parts.LoadingPanel()],
   error: () => [Parts.ErrorPanel(handleRetry)],
-  empty: () => [Parts.AccountBar(handleLogout), Parts.EmptyPanel()],
-  list: () => [Parts.AccountBar(handleLogout), Parts.EnrollmentList(view.enrollments, view.outcomes)],
+  empty: () => [Parts.AccountBar(handleLogout, view.isAdmin), Parts.EmptyPanel()],
+  list: () => [Parts.AccountBar(handleLogout, view.isAdmin), Parts.EnrollmentList(view.enrollments, view.outcomes)],
 };
 
 function render() {

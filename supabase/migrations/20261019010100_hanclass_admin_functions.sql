@@ -2,7 +2,7 @@
 -- 회원 통계·신고 글 처리. 모두 시작할 때 운영자인지 확인하고, 관리자 키(service role)로 우회하지 않는다
 -- 되돌리기: supabase/rollback/20261019010000_hanclass_admin_down.sql (두 파일을 함께 되돌린다)
 
--- 회원 통계 — 세시드와 회원을 함께 쓰므로 '한클래스에 기록이 있는 사람'만 센다. 이메일·이름은 돌려주지 않는다
+-- 회원 통계 — 세시드와 회원을 함께 쓰므로 '한클래스에 기록이 있는 사람'만 센다. 운영자 본인은 회원 수에서 뺀다. 이메일·이름은 돌려주지 않는다
 create function public.admin_overview()
 returns jsonb
 language plpgsql
@@ -22,11 +22,14 @@ begin
     union all select user_id, created_at from public.community_comments
     union all select user_id, (used_on::timestamp at time zone 'Asia/Seoul') from public.doc_helper_usage
   ), members as (
-    select user_id, min(at) as first_at, max(at) as last_at from activity group by user_id
+    select user_id, min(at) as first_at, max(at) as last_at from activity
+    where user_id not in (select a.user_id from public.hanclass_admins a)
+    group by user_id
   ), days as (
     select generate_series((now() at time zone 'Asia/Seoul')::date - 13, (now() at time zone 'Asia/Seoul')::date, interval '1 day')::date as day
   )
   select jsonb_build_object(
+    'generatedAt', now(),
     'members', (select count(*) from members),
     'newMembers7d', (select count(*) from members where first_at > now() - interval '7 days'),
     'activeMembers7d', (select count(*) from members where last_at > now() - interval '7 days'),
@@ -104,7 +107,7 @@ begin
 end;
 $$;
 
--- 규칙을 어긴 글 삭제 (댓글·신고도 함께 지워진다)
+-- 규칙을 어긴 글 영구 삭제 (댓글·신고도 함께 지워진다). 되돌릴 수 없어 최고 관리자만 — 운영자는 숨기기까지
 create function public.admin_delete_post(p_post bigint, p_reason text default null)
 returns void
 language plpgsql
@@ -114,6 +117,9 @@ as $$
 begin
   if public.hanclass_admin_role() is null then
     raise exception 'hanclass_not_admin';
+  end if;
+  if public.hanclass_admin_role() <> 'super_admin' then
+    raise exception 'hanclass_not_super_admin';
   end if;
   delete from public.community_posts where id = p_post;
   if not found then

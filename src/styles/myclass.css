@@ -77,3 +77,18 @@
 .kakao-login:hover {
   background: var(--color-kakao-hover);
 }
+
+.myclass-account__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.myclass-account {
+  flex-wrap: wrap;
+}
+
+.myclass-account__actions {
+  margin-left: auto;
+  flex-wrap: nowrap;
+}

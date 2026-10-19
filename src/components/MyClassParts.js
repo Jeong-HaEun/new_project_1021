@@ -90,9 +90,13 @@ export function BrowserOrders(courses) {
   ]);
 }
 
-export function AccountBar(onLogout) {
+// isAdmin: 운영자 명단에 있는 계정이면 [운영자 페이지] — 길 안내일 뿐, 실제 권한은 DB가 확인한다
+export function AccountBar(onLogout, isAdmin = false) {
   return el('div', { className: 'myclass-account' }, [
     el('span', { text: '카카오 계정으로 로그인했어요' }),
-    el('button', { type: 'button', className: 'button button--ghost', onClick: onLogout, text: '로그아웃' }),
+    el('div', { className: 'myclass-account__actions' }, [
+      isAdmin ? el('a', { href: 'admin.html', className: 'button button--ghost', text: '운영자 페이지' }) : null,
+      el('button', { type: 'button', className: 'button button--ghost', onClick: onLogout, text: '로그아웃' }),
+    ]),
   ]);
 }

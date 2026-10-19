@@ -2,7 +2,7 @@
 // 숫자는 DB에 저장된 로그인 회원 기록만이다. 실제 결제·매출이 아니며, 비로그인 데모 주문은 세지 않는다
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
-import { shortDay } from '../lib/adminView.js';
+import { overviewSource, shortDay } from '../lib/adminView.js';
 import { formatPostDate } from '../lib/communityView.js';
 import { OfficialBadge } from './OfficialBadge.js';
 
@@ -91,7 +91,8 @@ export function OverviewSections(overview) {
     : [el('tr', {}, el('td', { colspan: '4', text: '아직 데모 수강 신청이 없어요' }))];
   const dayRows = overview.days.map((row) => el('tr', {}, [el('th', { scope: 'row', text: shortDay(row.day) }), el('td', { text: String(row.count) })]));
   return [
-    Section('회원', [StatGrid(overview.members)], '한클래스에 신청·완성 체크·글·댓글·서류 도우미 기록이 하나라도 있는 회원이에요.'),
+    el('p', { className: 'admin-note admin-source', text: overviewSource(overview.generatedAt) }),
+    Section('회원', [StatGrid(overview.members)], '한클래스에 신청·완성 체크·글·댓글·서류 도우미 기록이 하나라도 있는 회원이에요. 운영자는 빼고 세요.'),
     Section('활동', [StatGrid(overview.activity)]),
     Section('강의별 데모 수강 신청', [Table('강의별 데모 수강 신청과 완성 체크', ['강의', '신청', '완성 체크', '완성률'], courseRows)]),
     Section('최근 14일 새 회원', [Table('날짜별 새 회원 수', ['날짜', '새 회원'], dayRows)]),
@@ -99,7 +100,21 @@ export function OverviewSections(overview) {
 }
 
 // 신고·숨김 글 — 숨긴 글은 [다시 보이기], 신고만 있는 글은 [숨기기], 둘 다 [삭제](두 번 눌러야 실행)
-export function ReportedSection(posts, { onToggle, onDelete, busyId }) {
+// 운영자 활동 기록 — 최근 20개, 고치거나 지울 수 없다
+export function LogSection(entries) {
+  const rows = entries.length
+    ? entries.map((entry) => el('tr', {}, [
+      el('th', { scope: 'row', text: new Date(entry.createdAt).toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: 'numeric', minute: '2-digit' }) }),
+      el('td', { text: entry.action }),
+      el('td', { text: entry.target }),
+      el('td', { text: entry.reason || '-' }),
+    ]))
+    : [el('tr', {}, el('td', { colspan: '4', text: '아직 처리한 기록이 없어요' }))];
+  return Section('운영자 활동 기록', [Table('운영자 활동 기록', ['시각', '처리', '대상', '사유'], rows)], '숨기기·다시 보이기·삭제가 자동으로 남아요. 고치거나 지울 수 없어요.');
+}
+
+// canDelete: 영구 삭제는 최고 관리자만 (DB도 한 번 더 막는다)
+export function ReportedSection(posts, { onToggle, onDelete, busyId, canDelete }) {
   const item = (post) => {
     const busy = busyId === post.id;
     const remove = el('button', { type: 'button', className: 'button button--ghost community-danger', text: '삭제' });
@@ -118,7 +133,7 @@ export function ReportedSection(posts, { onToggle, onDelete, busyId }) {
       el('p', { className: 'admin-note', text: `${post.authorName} · ${formatPostDate(post.createdAt)} · 신고 ${post.reportCount}${post.reasons ? ` (${post.reasons})` : ''}` }),
       el('div', { className: 'community-actions' }, [
         el('button', { type: 'button', className: 'button button--ghost', onClick: () => onToggle(post), ...(busy && { disabled: '' }), text: post.hidden ? '다시 보이기' : '숨기기' }),
-        remove,
+        canDelete ? remove : null,
       ]),
     ]);
   };
