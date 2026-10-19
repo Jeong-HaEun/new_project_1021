@@ -30,3 +30,24 @@
   background: var(--color-text);
   color: var(--color-surface);
 }
+
+/* 비밀번호를 잊었어요·로그인으로 돌아가기 — 글자 링크 모양 버튼 */
+.login-text-button {
+  justify-self: start;
+  min-height: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.login-text-button:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}

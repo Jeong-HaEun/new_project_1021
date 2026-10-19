@@ -1,6 +1,6 @@
 // 이메일 로그인·가입 — 입력 확인, 오류 안내, 로그인 뒤 돌아갈 페이지
 import { describe, it, expect } from 'vitest';
-import { authErrorText, MIN_PASSWORD_LENGTH, safeNextPage, validateAuthForm } from '../src/lib/emailAuth.js';
+import { authErrorText, getRecoveryState, MIN_PASSWORD_LENGTH, safeNextPage, validateAuthForm } from '../src/lib/emailAuth.js';
 
 describe('validateAuthForm — 서버에 보내기 전에 입력 확인', () => {
   const ok = { email: 'test@example.com', password: 'abcd1234', passwordConfirm: 'abcd1234' };
@@ -58,5 +58,37 @@ describe('safeNextPage — 로그인 뒤에는 정해 둔 페이지로만 돌아
     expect(safeNextPage('https://evil.example/')).toBe('myclass.html');
     expect(safeNextPage('//evil.example/myclass.html')).toBe('myclass.html');
     expect(safeNextPage('cart.html')).toBe('myclass.html');
+  });
+});
+
+describe('비밀번호 찾기 — 재설정 메일 요청과 새 비밀번호', () => {
+  it('찾기(forgot)는 이메일만 확인한다', () => {
+    expect(validateAuthForm('forgot', { email: ' test@example.com ' })).toEqual({ ok: true, email: 'test@example.com', password: '' });
+    expect(validateAuthForm('forgot', { email: 'test@' })).toMatchObject({ ok: false, field: 'email' });
+  });
+  it('재설정(reset)은 이메일 없이 새 비밀번호 8자 이상·확인 일치', () => {
+    expect(validateAuthForm('reset', { password: 'abcd1234', passwordConfirm: 'abcd1234' })).toEqual({ ok: true, email: '', password: 'abcd1234' });
+    expect(validateAuthForm('reset', { password: '', passwordConfirm: '' })).toMatchObject({ ok: false, field: 'password' });
+    expect(validateAuthForm('reset', { password: 'abc123', passwordConfirm: 'abc123' })).toMatchObject({ ok: false, field: 'password' });
+    expect(validateAuthForm('reset', { password: 'abcd1234', passwordConfirm: 'abcd9999' })).toMatchObject({ ok: false, field: 'passwordConfirm' });
+  });
+  it('지금 비밀번호와 같으면 다르게 정하라고 안내한다', () => {
+    expect(authErrorText({ code: 'same_password' })).toContain('지금 비밀번호와 다르게');
+  });
+});
+
+describe('getRecoveryState — 재설정 메일 링크로 들어왔는지', () => {
+  it('링크로 들어오면 ready (주소 # 뒤 type=recovery, 또는 ?reset=1&code=)', () => {
+    expect(getRecoveryState('?reset=1', '#access_token=x&type=recovery')).toBe('ready');
+    expect(getRecoveryState('?reset=1&code=abc', '')).toBe('ready');
+  });
+  it('링크가 만료·잘못됐으면 expired', () => {
+    expect(getRecoveryState('?reset=1', '#error=access_denied&error_code=otp_expired')).toBe('expired');
+    expect(getRecoveryState('?reset=1&error_code=otp_expired', '')).toBe('expired');
+  });
+  it('그냥 들어오면 none (reset=1만 붙여도 새 비밀번호 화면을 열지 않는다)', () => {
+    expect(getRecoveryState('', '')).toBe('none');
+    expect(getRecoveryState('?reset=1', '')).toBe('none');
+    expect(getRecoveryState('?next=myclass.html', '#type=signup')).toBe('none');
   });
 });

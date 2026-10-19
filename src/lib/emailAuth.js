@@ -1,4 +1,4 @@
-// 이메일 로그인·가입 규칙 — 입력 확인, 오류 안내, 로그인 뒤 돌아갈 페이지 (login.html)
+// 이메일 로그인·가입·비밀번호 찾기 규칙 — 입력 확인, 오류 안내, 로그인 뒤 돌아갈 페이지 (login.html)
 // 비밀번호는 Supabase Auth가 맡는다. 이 파일은 비밀번호를 저장·기록하지 않는다
 
 export const MIN_PASSWORD_LENGTH = 8;
@@ -9,14 +9,26 @@ const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const fail = (field, message) => ({ ok: false, field, message });
 
-// mode: 'login' | 'signup'
+// 새 비밀번호(가입·재설정) — 8자 이상, 확인 칸과 같아야 한다
+function checkNewPassword(password, passwordConfirm) {
+  if (password.length < MIN_PASSWORD_LENGTH) return fail('password', `비밀번호는 ${MIN_PASSWORD_LENGTH}자 이상으로 정해 주세요.`);
+  if (password !== passwordConfirm) return fail('passwordConfirm', '비밀번호 확인이 달라요. 다시 입력해 주세요.');
+  return null;
+}
+
+// mode: 'login' | 'signup' | 'forgot'(재설정 메일 요청, 이메일만) | 'reset'(새 비밀번호, 이메일 없음)
 export function validateAuthForm(mode, { email = '', password = '', passwordConfirm = '' }) {
+  if (mode === 'reset') {
+    if (!password) return fail('password', '새 비밀번호를 입력해 주세요.');
+    return checkNewPassword(password, passwordConfirm) ?? { ok: true, email: '', password };
+  }
   const trimmed = email.trim();
   if (!EMAIL_PATTERN.test(trimmed)) return fail('email', '이메일 주소를 확인해 주세요.');
+  if (mode === 'forgot') return { ok: true, email: trimmed, password: '' };
   if (!password) return fail('password', '비밀번호를 입력해 주세요.');
   if (mode === 'signup') {
-    if (password.length < MIN_PASSWORD_LENGTH) return fail('password', `비밀번호는 ${MIN_PASSWORD_LENGTH}자 이상으로 정해 주세요.`);
-    if (password !== passwordConfirm) return fail('passwordConfirm', '비밀번호 확인이 달라요. 다시 입력해 주세요.');
+    const problem = checkNewPassword(password, passwordConfirm);
+    if (problem) return problem;
   }
   return { ok: true, email: trimmed, password };
 }
@@ -29,6 +41,8 @@ const ERROR_TEXT = {
   over_email_send_rate_limit: '메일 보내기가 잠시 막혔어요. 잠시 뒤 다시 시도해 주세요.',
   over_request_rate_limit: '요청이 많아요. 잠시 뒤 다시 시도해 주세요.',
   weak_password: `비밀번호가 너무 쉬워요. 영문·숫자를 섞어 ${MIN_PASSWORD_LENGTH}자 이상으로 정해 주세요.`,
+  same_password: '지금 비밀번호와 다르게 정해 주세요.',
+  session_not_found: '재설정 링크가 만료됐어요. 비밀번호 찾기를 다시 해 주세요.',
 };
 
 // 서버 원문(message)은 보여 주지 않는다
@@ -38,4 +52,16 @@ export function authErrorText(error) {
 
 export function safeNextPage(next) {
   return NEXT_PAGES.includes(next) ? next : 'myclass.html';
+}
+
+// 재설정 메일 링크로 들어왔는지 — 'ready' | 'expired' | 'none'
+// Supabase는 링크 확인 뒤 주소 # 뒤(type=recovery)나 ?code= 로 돌려보낸다. 실패하면 error_code를 붙인다
+// ?reset=1만 붙여서는 새 비밀번호 화면을 열지 않는다 (링크를 거친 경우만)
+export function getRecoveryState(search, hash) {
+  const query = new URLSearchParams(search);
+  const fragment = new URLSearchParams(hash.replace(/^#/, ''));
+  if (query.get('reset') !== '1') return 'none';
+  if (query.get('error_code') || fragment.get('error_code')) return 'expired';
+  if (fragment.get('type') === 'recovery' || query.get('code')) return 'ready';
+  return 'none';
 }

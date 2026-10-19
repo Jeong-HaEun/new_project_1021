@@ -52,3 +52,19 @@ export async function signUpWithEmail(email, password, returnPage = 'myclass.htm
   const { error } = await client.auth.signUp({ email, password, options: { emailRedirectTo } });
   if (error) throw error;
 }
+
+// 비밀번호 재설정 메일 — 링크를 누르면 login.html?reset=1 로 돌아와 새 비밀번호를 정한다
+// 가입하지 않은 이메일이어도 Supabase는 같은 응답을 준다 (가입 여부가 드러나지 않게)
+export async function sendPasswordReset(email, nextPage = 'myclass.html') {
+  const client = await getServerClient();
+  const redirectTo = new URL(`./login.html?reset=1&next=${encodeURIComponent(nextPage)}`, window.location.href).href;
+  const { error } = await client.auth.resetPasswordForEmail(email, { redirectTo });
+  if (error) throw error;
+}
+
+// 새 비밀번호 저장 — 재설정 링크로 열린 로그인 상태에서만 부른다
+export async function updatePassword(password) {
+  const client = await getServerClient();
+  const { error } = await client.auth.updateUser({ password });
+  if (error) throw error;
+}
