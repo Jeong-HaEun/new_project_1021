@@ -16,6 +16,7 @@
 - 이미지는 `public/images/courses/`의 교체 가능한 임시 SVG, 메인 A안 배경 `public/images/home/hero-art.webp`. 목록은 IMAGES.md.
 - 메인 A/B(감성형 vs 정보형): 50:50 배정·탭 세션 측정 진행 중(스위치 HOME_EXPERIMENT_ACTIVE). 시연 ?ab_preview=A/B는 측정 제외. 결과를 성과로 단정하지 않는다 (SPEC.md)
 - 커뮤니티(community.html): 읽기 누구나, 쓰기 카카오 로그인, 수정·삭제 본인만(RLS). 분류 결과물 공유·질문·자유. 개인정보·과장 표현 거절, 가짜 글 시드 금지. 테이블 `community_posts`·`community_comments`.
+- 운영자 페이지(admin.html): 운영자 명단(`hanclass_admins`, SQL로만 지정)에 있는 계정만 회원 통계·신고 글 처리. 운영자 글·댓글은 DB가 '취메'(취업메이트) 표시. 숫자는 로그인 회원의 서버 기록만이며 매출로 표현하지 않는다. 관리자 키로 우회하지 않는다.
 - 미구현 기능(영상 재생·실습 파일)은 준비 중임을 표시한다.
 - 결제는 데모만: 결제수단 이름만 고르고 구매 기록을 남긴다. 실제 결제·카드정보 입력칸 금지.
 

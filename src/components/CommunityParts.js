@@ -5,6 +5,7 @@ import { icon } from '../lib/icons.js';
 import { pageUrl } from '../lib/paths.js';
 import { CATEGORIES } from '../lib/community.js';
 import { formatPostDate } from '../lib/communityView.js';
+import { OfficialBadge } from './OfficialBadge.js';
 
 export const RULES_NOTE = '올린 글과 댓글은 로그인하지 않은 사람도 볼 수 있어요. 전화번호·이메일 같은 개인정보는 쓰지 마세요. 합격·취업을 약속하는 과장 표현과 광고 글은 올릴 수 없어요.';
 
@@ -59,6 +60,7 @@ export function CategoryChips(active) {
 function Meta(post, extra = []) {
   return el('p', { className: 'community-meta' }, [
     el('span', { text: post.authorName }),
+    post.official ? OfficialBadge() : null,
     el('span', { text: formatPostDate(post.createdAt) }),
     post.edited ? el('span', { text: '수정됨' }) : null,
     ...extra,

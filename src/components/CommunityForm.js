@@ -4,6 +4,7 @@ import { el } from '../lib/dom.js';
 import { CATEGORIES, LIMITS } from '../lib/community.js';
 import { formatPostDate } from '../lib/communityView.js';
 import { RULES_NOTE } from './CommunityParts.js';
+import { OfficialBadge } from './OfficialBadge.js';
 
 function Field(label, control, hint) {
   return el('label', { className: 'helper-field' }, [
@@ -67,7 +68,7 @@ export function PostForm({ post, values, courses, authorName, error, busy, onSub
 // 댓글 영역 — 목록(오래된 순) + 로그인했으면 쓰기 폼, 아니면 로그인 안내(loginNode)
 export function CommentSection({ comments, user, authorName, draft = '', error, busy, onSubmit, onDelete, loginNode }) {
   const item = (comment) => el('li', { className: 'community-comment' }, [
-    el('p', { className: 'community-meta' }, [el('strong', { text: comment.authorName }), el('span', { text: formatPostDate(comment.createdAt) })]),
+    el('p', { className: 'community-meta' }, [el('strong', { text: comment.authorName }), comment.official ? OfficialBadge() : null, el('span', { text: formatPostDate(comment.createdAt) })]),
     el('p', { className: 'community-comment__body', text: comment.body }),
     user?.id && comment.userId === user.id
       ? el('button', { type: 'button', className: 'community-link-button community-danger', onClick: () => onDelete(comment.id), text: '삭제' })

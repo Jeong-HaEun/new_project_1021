@@ -59,7 +59,7 @@ describe('글 정리', () => {
   it('서버 행 → 화면용 글', () => {
     expect(normalizePost(row())).toEqual({
       id: 1, userId: 'u1', category: 'free', title: '제목', body: '본문입니다', authorName: '닉', courseId: null,
-      createdAt: '2026-10-18T01:00:00Z', edited: false, commentCount: 2, hidden: false,
+      createdAt: '2026-10-18T01:00:00Z', edited: false, commentCount: 2, hidden: false, official: false,
     });
   });
   it('숨김 표시는 true일 때만 true', () => {
@@ -94,8 +94,8 @@ describe('댓글 정리', () => {
       { id: 3, body: 5 },
     ]);
     expect(list).toEqual([
-      { id: 1, userId: 'u1', body: '첫 번째', authorName: 'a', createdAt: '2026-10-18T01:00:00Z' },
-      { id: 2, userId: 'u2', body: '두 번째', authorName: 'b', createdAt: '2026-10-18T02:00:00Z' },
+      { id: 1, userId: 'u1', body: '첫 번째', authorName: 'a', createdAt: '2026-10-18T01:00:00Z', official: false },
+      { id: 2, userId: 'u2', body: '두 번째', authorName: 'b', createdAt: '2026-10-18T02:00:00Z', official: false },
     ]);
   });
 });

@@ -49,6 +49,7 @@ export function normalizePost(row) {
     edited: updated - Date.parse(row.created_at) > EDIT_GAP_MS,
     commentCount: Number(row.community_comments?.[0]?.count ?? 0) || 0,
     hidden: row.hidden === true, // 신고가 쌓여 숨긴 글 (글쓴이 본인에게만 내려온다)
+    official: row.is_official === true, // 운영자(취메) 글 — DB가 채운다
   };
 }
 
@@ -63,7 +64,7 @@ export function normalizeComments(rows) {
   if (!Array.isArray(rows)) return [];
   return rows
     .filter((row) => row && typeof row.id === 'number' && [row.body, row.author_name, row.created_at].every(isText))
-    .map((row) => ({ id: row.id, userId: row.user_id, body: row.body, authorName: row.author_name, createdAt: row.created_at }))
+    .map((row) => ({ id: row.id, userId: row.user_id, body: row.body, authorName: row.author_name, createdAt: row.created_at, official: row.is_official === true }))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt));
 }
 

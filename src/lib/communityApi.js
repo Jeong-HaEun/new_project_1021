@@ -4,7 +4,7 @@ import { getServerClient } from './server.js';
 
 const POSTS = 'community_posts';
 const COMMENTS = 'community_comments';
-// '*': 보호 SQL(hidden 칸) 적용 전·후 모두 동작하도록 칸 이름을 하나하나 적지 않는다
+// '*': 보호·운영자 SQL(hidden·is_official 칸) 적용 전·후 모두 동작하도록 칸 이름을 하나하나 적지 않는다 (댓글도 같음)
 const POST_COLUMNS = '*, community_comments(count)';
 const REPORTS = 'community_reports';
 export const PAGE_SIZE = 50;
@@ -31,7 +31,7 @@ export async function fetchPost(id) {
 
 export async function fetchComments(postId) {
   const client = await getServerClient();
-  return run(client.from(COMMENTS).select('id, user_id, body, author_name, created_at').eq('post_id', postId).order('created_at'));
+  return run(client.from(COMMENTS).select('*').eq('post_id', postId).order('created_at'));
 }
 
 // 새 글 → 새 글 번호

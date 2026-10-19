@@ -1,0 +1,160 @@
+/* 운영자 페이지 — 계정 줄, 통계 칸, 표, 신고·숨김 글 */
+.admin-body {
+  display: grid;
+  gap: var(--space-section);
+  max-width: 880px;
+}
+
+.admin-panel .icon {
+  color: var(--color-text-muted);
+}
+
+.admin-id {
+  max-width: 100%;
+  padding: 8px 12px;
+  border-radius: var(--radius-control);
+  background: var(--color-surface-subtle);
+  font-size: var(--text-small);
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+.admin-account {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-card);
+  background: var(--color-surface-subtle);
+  font-size: var(--text-small);
+}
+
+.admin-account .button {
+  margin-left: auto;
+}
+
+.admin-section {
+  display: grid;
+  gap: var(--space-card-gap);
+}
+
+.admin-section__title {
+  font-size: var(--text-section-title);
+  font-weight: 700;
+}
+
+.admin-note {
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-card-gap);
+}
+
+.admin-stat {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.admin-stat dt {
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.admin-stat dd {
+  font-size: var(--text-page-title);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-small);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-line);
+  text-align: left;
+}
+
+.admin-table td {
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-table thead th {
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  font-weight: 600;
+}
+
+.admin-table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.admin-table tbody th {
+  font-weight: 500;
+}
+
+.admin-reports {
+  display: grid;
+  gap: var(--space-card-gap);
+  padding: 0;
+  list-style: none;
+}
+
+.admin-report {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.admin-report__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-report__title {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+@media (min-width: 768px) {
+  .admin-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1080px) {
+  .admin-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.admin-report .community-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}

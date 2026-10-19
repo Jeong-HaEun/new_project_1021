@@ -21,6 +21,7 @@ export default defineConfig({
         privacy: 'privacy.html',
         helper: 'helper.html',
         community: 'community.html',
+        admin: 'admin.html',
       },
     },
   },
