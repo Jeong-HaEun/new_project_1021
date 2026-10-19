@@ -187,8 +187,19 @@ export const course = {
 - 추가·수정은 정해진 칸만 권한을 준다 (user_id·created_at·updated_at은 브라우저가 보내거나 바꿀 수 없음)
 - 정의: `supabase/migrations/20261018000000_community.sql` (세시드 프로젝트에 SQL Editor로 적용, 2026-10-18)
 - Supabase Auth Redirect URLs에 `community.html` 등록 완료: 배포 주소, `localhost:5173`, `localhost:5174` (5173을 다른 세션이 쓸 때)
-- 알려진 한계 (MVP): 전화번호·이메일·과장 표현 검사는 화면에서만 한다(DB는 길이·분류·형식만 검사). 글쓴이 계정 id(uuid)는 본인 확인용으로 공개 조회된다(이름·이메일은 아님). 로그인한 사람의 글 수 제한이 없다
-- 후속 검토: 신고·숨김, 글 수 제한(도배 방지, DB 트리거), 서버 쪽 개인정보 검사, 이미지 첨부, 더 보기(50개 넘을 때)
+- 알려진 한계: 과장 표현 검사는 화면에서만 한다. 글쓴이 계정 id(uuid)는 본인 확인용으로 공개 조회된다(이름·이메일은 아님). 댓글 신고는 없다
+- 후속 검토: 댓글 신고, 운영자 화면(숨김 풀기), 이미지 첨부, 더 보기(50개 넘을 때)
+
+### 커뮤니티 보호 (src/lib/communityGuard.js, components/CommunityReport.js) — 구현 완료, DB 적용 대기
+- 실제로 막는 건 DB다 (`supabase/migrations/20261019000000_community_guard.sql`). 화면은 거절 이유만 안내한다. 기존 글·댓글은 지우지 않고 더하기만 한다
+- 도배 방지: 한 사람이 10분에 글 5개·댓글 20개까지. 넘으면 "글은 10분에 5개까지 올릴 수 있어요…" (입력값은 지우지 않음)
+- 서버 개인정보 검사: 전화번호·이메일이 든 글(추가·수정)·댓글(추가)은 DB가 거절 → "개인정보는 지우고 올려 주세요". 화면 규칙(findPersonalInfo)과 같은 기준 (테스트로 일치 확인)
+- 신고: 로그인한 사람이 남의 글을 한 번씩 신고, 이유는 광고·도배 / 개인정보 노출 / 욕설·비방 / 기타. 글 맨 아래 작은 [신고] → 이유 고르기 → [신고하기]. 신고한 글은 "신고한 글이에요" 표시
+- 신고 3개가 쌓이면 숨김: 다른 사람(비로그인 포함)에게는 목록·글·댓글 모두 안 보이고("글을 찾을 수 없어요"), 글쓴이에게는 '숨김' 배지와 "다른 사람에게는 숨겨진 글이에요" 안내. 숨김 처리로 '수정됨'이 붙지 않는다
+- 글쓴이는 숨김을 직접 풀 수 없다. 운영자가 SQL Editor에서 `update community_posts set hidden = false where id = 글번호;` (필요하면 `delete from community_reports where post_id = 글번호;`)
+- `community_reports`: id, post_id(글 삭제 시 함께 삭제), user_id(기본값 `auth.uid()`), reason, created_at, unique(post_id, user_id). RLS: 본인 신고만 조회, 추가는 본인 id + 남의 글만, 수정·삭제 없음, anon 없음
+- 보호 SQL 적용 전에도 화면은 동작한다 (글 칸을 `*`로 읽고, 신고 여부를 못 읽으면 [신고]를 숨김)
+- 되돌리기: `supabase/rollback/20261019000000_community_guard_down.sql` (신고 기록은 지워지고 숨긴 글은 다시 보임, 글·댓글은 그대로)
 
 ## 메인 A/B — 감성 몰입형(A) vs 정보 탐색형(B) — src/lib/homeExperiment.js, experimentTracking.js
 - 기준 문서: `planning/home-ab-v2` 브랜치의 claude-development-brief.md. 이전 '카드 제목 vs 결과물' 실험은 대체됨

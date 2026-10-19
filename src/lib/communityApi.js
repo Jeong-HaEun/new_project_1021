@@ -1,10 +1,12 @@
-// 커뮤니티 글·댓글 서버(Supabase) 읽기·쓰기 (supabase/migrations/20261018000000_community.sql)
+// 커뮤니티 글·댓글·신고 서버(Supabase) 읽기·쓰기 (supabase/migrations/20261018000000_community.sql, 20261019000000_community_guard.sql)
 // 사용자 id는 보내지 않는다 — 서버가 로그인 정보로 채우고, 수정·삭제는 RLS가 본인 것만 허락한다
 import { getServerClient } from './server.js';
 
 const POSTS = 'community_posts';
 const COMMENTS = 'community_comments';
-const POST_COLUMNS = 'id, user_id, category, title, body, author_name, course_id, created_at, updated_at, community_comments(count)';
+// '*': 보호 SQL(hidden 칸) 적용 전·후 모두 동작하도록 칸 이름을 하나하나 적지 않는다
+const POST_COLUMNS = '*, community_comments(count)';
+const REPORTS = 'community_reports';
 export const PAGE_SIZE = 50;
 
 async function run(query) {
@@ -61,4 +63,17 @@ export async function deleteComment(id) {
   const client = await getServerClient();
   const rows = await run(client.from(COMMENTS).delete().eq('id', id).select('id'));
   if (rows.length === 0) throw new Error('not-owner');
+}
+
+// 내가 이 글을 신고했는지 (RLS가 본인 신고만 돌려준다)
+export async function fetchMyReport(postId) {
+  const client = await getServerClient();
+  const rows = await run(client.from(REPORTS).select('id').eq('post_id', postId));
+  return rows.length > 0;
+}
+
+// 신고 — 내 글·같은 글 두 번은 DB가 거절한다 (supabase/migrations/20261019000000_community_guard.sql)
+export async function reportPost(postId, reason) {
+  const client = await getServerClient();
+  await run(client.from(REPORTS).insert({ post_id: postId, reason }));
 }

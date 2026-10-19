@@ -69,6 +69,7 @@ function CategoryBadge(post, courses) {
   const title = courseTitle(courses, post.courseId);
   return el('div', { className: 'community-badges' }, [
     el('span', { className: `badge community-badge community-badge--${post.category}`, text: categoryLabel(post.category) }),
+    post.hidden ? el('span', { className: 'badge badge--soon', text: '숨김' }) : null,
     title ? el('span', { className: 'community-course', text: title }) : null,
   ]);
 }
@@ -98,10 +99,11 @@ export function PostList(posts, { category, courses, writeAction }) {
   ));
 }
 
-// 글 보기 — owner면 [수정] [삭제]
-export function PostView(post, { courses, owner, onDelete }) {
+// 글 보기 — owner면 [수정] [삭제]. notice: 숨긴 글 안내, reportNode: 신고 영역
+export function PostView(post, { courses, owner, onDelete, notice = null, reportNode = null }) {
   const title = courseTitle(courses, post.courseId);
   return el('article', { className: 'community-post' }, [
+    notice,
     CategoryBadge(post, []),
     el('h1', { className: 'community-post__title', text: post.title }),
     Meta(post),
@@ -111,6 +113,7 @@ export function PostView(post, { courses, owner, onDelete }) {
       el('a', { href: pageUrl('community.html', { edit: String(post.id) }), className: 'button button--ghost', text: '수정' }),
       el('button', { type: 'button', className: 'button button--ghost community-danger', onClick: onDelete, text: '삭제' }),
     ]) : null,
+    reportNode,
   ]);
 }
 

@@ -48,6 +48,7 @@ export function normalizePost(row) {
     createdAt: row.created_at,
     edited: updated - Date.parse(row.created_at) > EDIT_GAP_MS,
     commentCount: Number(row.community_comments?.[0]?.count ?? 0) || 0,
+    hidden: row.hidden === true, // 신고가 쌓여 숨긴 글 (글쓴이 본인에게만 내려온다)
   };
 }
 

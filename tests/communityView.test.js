@@ -59,8 +59,12 @@ describe('글 정리', () => {
   it('서버 행 → 화면용 글', () => {
     expect(normalizePost(row())).toEqual({
       id: 1, userId: 'u1', category: 'free', title: '제목', body: '본문입니다', authorName: '닉', courseId: null,
-      createdAt: '2026-10-18T01:00:00Z', edited: false, commentCount: 2,
+      createdAt: '2026-10-18T01:00:00Z', edited: false, commentCount: 2, hidden: false,
     });
+  });
+  it('숨김 표시는 true일 때만 true', () => {
+    expect(normalizePost(row({ hidden: true })).hidden).toBe(true);
+    expect(normalizePost(row({ hidden: 'yes' })).hidden).toBe(false);
   });
   it('수정 시각이 1분 넘게 늦으면 수정됨', () => {
     expect(normalizePost(row({ updated_at: '2026-10-18T02:00:00Z' })).edited).toBe(true);
