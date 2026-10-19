@@ -213,6 +213,15 @@ export const course = {
 - 운영자 SQL 적용 전에도 커뮤니티는 동작한다 (글·댓글을 `*`로 읽어 칸이 없으면 표시 없음)
 - 추후: 회원 정지·해제, 관리자 부여·회수 화면, 수강 권한 수동 부여, 신청 강의 서버 검사(제작 예정 강의 신청 차단), 세시드와 Supabase 분리 뒤 회원 수 기준 변경
 
+### 강의 영상 올리기 (admin.html, src/lib/videoUpload.js·videoApi.js, components/AdminVideos.js) — 시험 업로드 구현, DB 적용 대기
+- 지금 범위: 운영자가 강의·차시를 골라 영상을 올리고, 목록·[재생 확인]·[삭제]로 올라갔는지 확인한다. **수강생 재생은 아직 없다** (데모 수강 신청은 누구나 무료라 전체 영상을 열면 사실상 무료 공개 → 유료 콘텐츠는 결제 검증 전 공개 금지)
+- 저장소: Supabase Storage 비공개 버킷 `hanclass-videos` (무료 플랜: 파일 1개 50MB, 저장 1GB를 세시드와 함께 씀, 월 전송 5GB). 720p로 차시당 3~4분이면 30~45MB. 실제 판매 때 Cloudflare Stream·Bunny Stream 등으로 바꿀 수 있게 저장소 호출은 videoApi.js에만 둔다
+- 경로: `강의id/차시id.확장자`(예: `c002/l1.mp4`). 같은 차시에 다시 올리면 덮어쓴다. mp4·webm·mov만. 제작 예정 강의도 미리 올릴 수 있다
+- 권한(Storage 정책): 보기·올리기·바꾸기·지우기 모두 `hanclass_admin_role()`이 있는 운영자만, 경로 첫 폴더는 `c000` 형식만. 재생 확인은 10분짜리 임시 주소(signed URL). 관리자 키는 쓰지 않는다
+- 정의: `supabase/migrations/20261019020000_hanclass_videos.sql` (운영자 SQL 다음). 되돌리기 `supabase/rollback/20261019020000_hanclass_videos_down.sql` — 정책만 지운다. 버킷·파일은 SQL로 지울 수 없어 대시보드 Storage에서 지운다
+- 저장소 SQL 적용 전: 목록 자리에 "영상 저장소가 아직 서버에 없어요" 안내, [올리기] 비활성
+- 추후: 수강 화면 재생(신청·결제 확인 뒤 임시 주소), 업로드 진행률, 차시별 영상 연결 표시
+
 ## 메인 A/B — 감성 몰입형(A) vs 정보 탐색형(B) — src/lib/homeExperiment.js, experimentTracking.js
 - 기준 문서: `planning/home-ab-v2` 브랜치의 claude-development-brief.md. 이전 '카드 제목 vs 결과물' 실험은 대체됨
 - 실험 id `hc_home_strategy_v1`. 스위치 `HOME_EXPERIMENT_ACTIVE`(지금 켬). 끄면 모두 B + 실험 이벤트 중지. 화면 버전이 바뀌면 새 id

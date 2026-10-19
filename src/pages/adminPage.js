@@ -8,15 +8,18 @@ import { adminProblem, getAdminState, normalizeOverview, normalizeReported } fro
 import { COURSES } from '../data/courses/index.js';
 import { renderPage } from '../components/PageLayout.js';
 import * as Parts from '../components/AdminParts.js';
+import { AdminVideos } from '../components/AdminVideos.js';
 import { showToast } from '../components/Toast.js';
 import '../styles/courses.css';
+import '../styles/helper.css';
 import '../styles/community.css';
 import '../styles/admin.css';
 
 const configured = isServerConfigured();
 const body = el('div', { className: 'admin-body' });
 // user: undefined(확인 중) | null | 사용자. 로그아웃하면 운영 정보를 바로 비운다
-const view = { user: undefined, role: null, status: 'loading', overview: null, reported: [], busyId: null };
+// videos: 영상 올리기 조각 — 사용자마다 한 번 만들고, 다시 그려도 고른 파일·목록을 유지한다
+const view = { user: undefined, role: null, status: 'loading', overview: null, reported: [], busyId: null, videos: null };
 let requestId = 0;
 
 async function handleLogin() {
@@ -51,6 +54,7 @@ async function load() {
     const [overview, reported] = await Promise.all([fetchOverview(), fetchReportedPosts()]);
     if (id !== requestId) return;
     Object.assign(view, { status: 'ready', role, overview: normalizeOverview(overview, COURSES), reported: normalizeReported(reported) });
+    view.videos ??= AdminVideos({ courses: COURSES, toast: showToast });
   } catch (error) {
     if (id !== requestId) return;
     view.status = adminProblem(error) === 'not-ready' ? 'not-ready' : 'error';
@@ -60,7 +64,7 @@ async function load() {
 
 function setUser(user) {
   requestId += 1;
-  Object.assign(view, { user, role: null, overview: null, reported: [], status: user ? 'loading' : 'ready' });
+  Object.assign(view, { user, role: null, overview: null, reported: [], videos: null, status: user ? 'loading' : 'ready' });
   if (user) load();
   else render();
 }
@@ -98,6 +102,7 @@ const PANELS = {
     Parts.AccountBar(view.role, handleLogout),
     ...Parts.OverviewSections(view.overview),
     Parts.ReportedSection(view.reported, { onToggle: handleToggle, onDelete: handleDelete, busyId: view.busyId }),
+    view.videos,
   ],
 };
 

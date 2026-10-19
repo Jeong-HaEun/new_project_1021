@@ -158,3 +158,33 @@
   flex-wrap: wrap;
   gap: 8px;
 }
+
+/* 강의 영상 시험 업로드 */
+.admin-upload {
+  display: grid;
+  gap: var(--space-card-gap);
+  padding: 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.admin-upload .button {
+  justify-self: start;
+}
+
+.admin-file {
+  padding: 8px;
+}
+
+.admin-error {
+  font-size: var(--text-small);
+  color: var(--color-primary);
+}
+
+.admin-video {
+  width: 100%;
+  max-height: 360px;
+  border-radius: var(--radius-control);
+  background: var(--color-text);
+}
