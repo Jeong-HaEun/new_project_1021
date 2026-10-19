@@ -49,12 +49,14 @@ export function Curriculum(course) {
   ]);
 }
 
-export function DetailBody(course) {
+// extra: 준비물 바로 아래에 붙일 구역 (강의 자료 목록 — 자료가 없으면 스스로 숨는다)
+export function DetailBody(course, extra = null) {
   return el('div', { className: 'detail-body' }, [
     section('학습 목표', [bulletList(course.learn, 'check-list')]),
     section('이런 분께 추천해요', [bulletList(course.target)]),
     Curriculum(course),
     section('준비물', [bulletList(course.materials)]),
+    extra,
     section('구매 전 확인해 주세요', [
       el('dl', { className: 'info-list' }, [
         ['완성 결과물', course.outcome],

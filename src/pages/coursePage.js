@@ -9,12 +9,15 @@ import { renderPage } from '../components/PageLayout.js';
 import { DetailBody, DetailHero } from '../components/CourseDetail.js';
 import { PurchaseBox } from '../components/PurchaseBox.js';
 import { ReportExample } from '../components/ReportExample.js';
+import { CourseMaterials } from '../components/CourseMaterials.js';
 import { track } from '../lib/analytics.js';
 import { browserStorage, consumeCourseOpen } from '../lib/experimentTracking.js';
 import '../styles/learning.css';
 import '../styles/courses.css';
 import '../styles/detail.css';
 import '../styles/purchase.css';
+import '../styles/myclass.css';
+import '../styles/materials.css';
 
 const course = findCourse(COURSES, readParam('id'));
 
@@ -39,7 +42,7 @@ if (course) {
       BackLink(),
       DetailHero(course, CATEGORIES),
       ...(course.id === 'c003' ? [ReportExample({ compact: true })] : []),
-      el('div', { className: 'detail-layout' }, [DetailBody(course), el('aside', {}, [PurchaseBox(course)])]),
+      el('div', { className: 'detail-layout' }, [DetailBody(course, CourseMaterials({ courses: [course] })), el('aside', {}, [PurchaseBox(course)])]),
     ],
     bottomBar: PurchaseBox(course, { compact: true }),
   });

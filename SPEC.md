@@ -230,6 +230,16 @@ export const course = {
 - 저장소 SQL 적용 전: 목록 자리에 "영상 저장소가 아직 서버에 없어요" 안내, [올리기] 비활성
 - 추후: 수강 화면 재생(신청·결제 확인 뒤 임시 주소), 업로드 진행률, 차시별 영상 연결 표시
 
+### 강의 자료 (admin.html·course.html·myclass.html, src/lib/materials.js·materialsApi.js, components/AdminMaterials.js·CourseMaterials.js) — 구현, DB 적용 대기
+- 운영자: 강의 고르기 → 자료 이름(2~40자, 수강생에게 보임) → 공개 범위 → 파일 → [올리기]. 목록에서 [결제 전 공개로 바꾸기]/[결제 후 공개로 바꾸기] 한 번 클릭, [받아 보기], [삭제](두 번 눌러야)
+- 공개 범위: `free` 결제 전 공개(로그인한 회원 누구나) | `enrolled` 결제 후 공개(그 강의를 데모 수강 신청한 본인, 기본값). 비로그인은 목록만 보고 [로그인하고 받기]
+- ⚠ 지금 결제는 데모라 결제 후 자료도 데모 수강 신청만 하면 받는다(사용자 결정 2026-10-19). 가상 실습 자료만 올린다 — 실제 유료 파일·고객 정보 금지. 운영자 화면에 같은 안내를 고정한다. 실제 결제가 생기면 Storage 정책의 demo_enrollments를 결제 기록으로 바꾼다
+- 수강생: 강의 상세 '준비물' 바로 아래 '강의 자료'(자료가 있을 때만), 내 강의실 '내 강의 자료'(신청한 강의가 둘 이상이면 [전체]·강의별 필터 — 한 줄 가로 스크롤, 칩 최대 200px 말줄임, 자료가 없는 강의는 '준비 중'). 🔓[받기] / 🔒"수강 신청하면 내 강의실에서 받을 수 있어요" / [로그인하고 받기]. 받기는 1분짜리 임시 주소, 파일 이름은 '자료 이름.확장자'
+- 파일: xlsx·xls·csv·pptx·docx·pdf·zip, 1개 50MB. 형식은 확장자로 검사. 저장 경로 `강의id/무작위id.확장자`(원래 파일 이름은 저장하지 않음)
+- 저장소: 비공개 버킷 `hanclass-materials`, 목록 테이블 `hanclass_course_materials`(목록은 누구나 조회, 추가·바꾸기·지우기는 운영자만 RLS). Storage 받기 정책: 운영자 또는 목록에 있는 파일 중 free이거나 본인 demo_enrollments에 그 강의가 있을 때. 관리자 키는 쓰지 않는다
+- 정의: `supabase/migrations/20261019050000_hanclass_materials.sql`(영상 SQL 다음). 되돌리기 `supabase/rollback/20261019050000_hanclass_materials_down.sql` — 정책·테이블. 버킷·파일은 대시보드 Storage에서 지운다
+- SQL 적용 전: 운영자 화면은 "강의 자료 저장소가 아직 서버에 없어요" + [올리기] 비활성, 수강생 화면은 자료 영역을 숨긴다
+
 ## 메인 A/B — 감성 몰입형(A) vs 정보 탐색형(B) — src/lib/homeExperiment.js, experimentTracking.js
 - 기준 문서: `planning/home-ab-v2` 브랜치의 claude-development-brief.md. 이전 '카드 제목 vs 결과물' 실험은 대체됨
 - 실험 id `hc_home_strategy_v1`. 스위치 `HOME_EXPERIMENT_ACTIVE`(지금 켬). 끄면 모두 B + 실험 이벤트 중지. 화면 버전이 바뀌면 새 id

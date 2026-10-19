@@ -10,16 +10,19 @@ import { readCartState, setAccountRecords } from '../lib/cartStore.js';
 import { COURSES } from '../data/courses/index.js';
 import { renderPage } from '../components/PageLayout.js';
 import * as Parts from '../components/MyClassParts.js';
+import { CourseMaterials } from '../components/CourseMaterials.js';
 import { showToast } from '../components/Toast.js';
 import '../styles/courses.css';
 import '../styles/cart-page.css';
 import '../styles/myclass.css';
+import '../styles/materials.css';
 
 const configured = isServerConfigured();
 const body = el('div', { className: 'myclass-body' });
 // user: undefined(확인 중) | null | 사용자. 로그아웃하면 기록을 바로 비워 이전 사용자 정보가 남지 않게 한다
 // isAdmin: 운영자면 계정 줄에 [운영자 페이지] (확인 실패·운영자 SQL 적용 전이면 false)
-const view = { user: undefined, status: 'loading', enrollments: [], outcomes: [], isAdmin: false };
+// materials: 신청한 강의의 자료 목록 조각 — 불러올 때 한 번 만들어 다시 그려도 유지한다
+const view = { user: undefined, status: 'loading', enrollments: [], outcomes: [], isAdmin: false, materials: null };
 let requestId = 0;
 
 function browserOrderCourses() {
@@ -54,7 +57,8 @@ async function loadEnrollments() {
     if (id !== requestId) return;
     const enrollments = normalizeEnrollments(rows, COURSES);
     const outcomes = normalizeOutcomeRows(outcomeRows, COURSES);
-    Object.assign(view, { status: 'ready', enrollments, outcomes, isAdmin: Boolean(role) });
+    const materials = enrollments.length ? CourseMaterials({ courses: enrollments.map((item) => item.course), title: '내 강의 자료', variant: 'myclass' }) : null;
+    Object.assign(view, { status: 'ready', enrollments, outcomes, isAdmin: Boolean(role), materials });
     setAccountRecords({ purchases: toPurchaseRecords(enrollments), outcomes }); // 다른 화면도 같은 계정 기준으로
   } catch {
     if (id !== requestId) return;
@@ -65,7 +69,7 @@ async function loadEnrollments() {
 
 function setUser(user) {
   requestId += 1;
-  Object.assign(view, { user, enrollments: [], outcomes: [], isAdmin: false, status: user ? 'loading' : 'ready' });
+  Object.assign(view, { user, enrollments: [], outcomes: [], isAdmin: false, materials: null, status: user ? 'loading' : 'ready' });
   setAccountRecords();
   if (user) loadEnrollments();
   else render();
@@ -96,7 +100,7 @@ const PANELS = {
   loading: () => [Parts.LoadingPanel()],
   error: () => [Parts.ErrorPanel(handleRetry)],
   empty: () => [Parts.AccountBar(handleLogout, view.isAdmin), Parts.EmptyPanel()],
-  list: () => [Parts.AccountBar(handleLogout, view.isAdmin), Parts.EnrollmentList(view.enrollments, view.outcomes)],
+  list: () => [Parts.AccountBar(handleLogout, view.isAdmin), Parts.EnrollmentList(view.enrollments, view.outcomes), view.materials],
 };
 
 function render() {

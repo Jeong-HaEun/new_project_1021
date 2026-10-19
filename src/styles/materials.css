@@ -1,0 +1,84 @@
+/* 강의 자료 — 강의 상세·내 강의실의 자료 목록 (CourseMaterials) */
+.material-section {
+  display: grid;
+  gap: 10px;
+}
+
+.myclass-section.material-section {
+  margin-top: 24px;
+}
+
+.material-section[hidden] {
+  display: none;
+}
+
+.material-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.material-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+  padding: 12px 16px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
+}
+
+.material-item__info {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.material-item__info strong {
+  overflow-wrap: anywhere;
+}
+
+.material-item__meta,
+.material-locked {
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+/* 내 강의실 강의별 필터 — 한 줄 가로 스크롤 (강의가 많아도 줄이 늘지 않게), 스크롤바를 얇게 보여 더 있음을 알린다 */
+.material-filter {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 6px;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-line) transparent;
+}
+
+.material-filter::-webkit-scrollbar {
+  height: 6px;
+}
+
+.material-filter::-webkit-scrollbar-thumb {
+  border-radius: var(--radius-pill);
+  background: var(--color-line);
+}
+
+.material-filter__chip {
+  flex: 0 0 auto;
+  max-width: 200px;
+  min-height: 44px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  scroll-snap-align: start;
+}
+
+.material-filter__chip:focus-visible {
+  outline: 2px solid var(--color-text);
+  outline-offset: 2px;
+}
