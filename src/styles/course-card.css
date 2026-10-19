@@ -10,6 +10,7 @@
   background: var(--color-surface);
   box-shadow: var(--shadow-card);
   overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .course-card__link {
@@ -18,8 +19,37 @@
   height: 100%;
 }
 
-.course-card__link:hover .course-card__title {
-  color: var(--color-primary);
+/* hover — 가벼운 이동·그림자만 (마우스가 있는 기기에서만) */
+@media (hover: hover) {
+  .course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-card-hover);
+  }
+
+  .course-card__link:hover .course-card__title {
+    color: var(--color-primary);
+  }
+}
+
+/* 키보드 포커스 — 카드가 overflow: hidden이라 링크 대신 카드 테두리 밖에 표시 */
+.course-card__link:focus-visible {
+  outline: none;
+}
+
+.course-card:has(.course-card__link:focus-visible) {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+/* 동작 줄이기 설정이면 움직이지 않는다 (그림자만) */
+@media (prefers-reduced-motion: reduce) {
+  .course-card {
+    transition: none;
+  }
+
+  .course-card:hover {
+    transform: none;
+  }
 }
 
 .course-card__thumb {
@@ -49,16 +79,30 @@
   padding: 14px 16px 16px;
 }
 
+/* 위계: 제목(16·굵게) → 결과물(14) → 시간(13·흐리게)·가격(17·굵게). 긴 제목·결과물은 두 줄까지 */
 .course-card__title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
   font-size: var(--text-card-title);
   font-weight: 700;
   line-height: 1.45;
+  overflow-wrap: anywhere;
 }
 
 .course-card__outcome {
   display: flex;
   gap: 6px;
   font-size: 14px;
+  line-height: 1.5;
+}
+
+.course-card__outcome > span:last-child {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .course-card__outcome-label {
@@ -67,17 +111,23 @@
   font-weight: 700;
 }
 
+/* 시간·가격 줄은 카드 맨 아래에 맞춰 같은 높이로 (옆 카드와 줄이 맞게) */
 .course-card__meta {
   margin-top: auto;
   width: 100%;
   display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px solid var(--color-line);
   font-size: var(--text-small);
 }
 
 .course-card__meta .price {
+  flex: none;
   font-size: 17px;
+  font-weight: 700;
 }
 
 @media (min-width: 768px) {

@@ -2,7 +2,8 @@
 // 오늘이 기간 안이면 green(모집중), 시작 전이면 yellow(모집 예정), 끝났으면 red(모집 마감)
 // 기간이 없으면 상시 모집(green) — 단건 구매 강의는 기본적으로 언제든 살 수 있다
 
-export const ENROLLMENT_LABELS = { green: '모집중', yellow: '모집 예정', red: '모집 마감' };
+// 화면 문구만 — green은 지금 데모 신청할 수 있다는 뜻이라 '데모 체험 가능' (2026-10-19, 내부 상태 이름은 그대로)
+export const ENROLLMENT_LABELS = { green: '데모 체험 가능', yellow: '모집 예정', red: '모집 마감' };
 
 // 'YYYY-MM-DD' 형식이고 실제로 있는 날짜인지 (2026-02-30 같은 날짜는 거짓)
 export function isValidDate(value) {
@@ -24,11 +25,11 @@ export function getEnrollmentStatus(course, now = new Date()) {
   return 'green';
 }
 
-// 카드·상세에 붙는 상태 표시. 표시할 것이 없으면(기간 없는 열린 강좌 = 상시 모집) null
+// 카드·상세에 붙는 상태 표시. 데모 신청할 수 있는 열린 강좌는 기간이 없어도(상시) '데모 체험 가능'으로 통일
 // tone: 'planned' | 'green' | 'yellow' | 'red' → CSS 배지 색
 export function getCourseBadge(course, now = new Date()) {
   if (course.status === 'planned') return { tone: 'planned', label: '제작 예정' };
-  if (!course.enrollment) return null;
+  if (!course.enrollment) return course.status === 'open' ? { tone: 'green', label: ENROLLMENT_LABELS.green } : null;
   const tone = getEnrollmentStatus(course, now);
   return { tone, label: ENROLLMENT_LABELS[tone] };
 }

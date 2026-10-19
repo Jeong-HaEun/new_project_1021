@@ -44,7 +44,7 @@ function CategoryGrid() {
 function CourseSection() {
   return el('section', { className: 'section home-courses', id: 'classes' }, [
     el('div', { className: 'section__head' }, [
-      el('h2', { className: 'section__title', text: '지금 준비 중인 강의' }),
+      el('h2', { className: 'section__title', text: '이런 결과물을 만들어볼 수 있어요' }),
       el('a', { href: 'courses.html', className: 'section__more', text: '전체 보기' }),
     ]),
     CourseGrid(sortByCategory(COURSES, CATEGORIES), CATEGORIES),
@@ -80,7 +80,7 @@ function HelperPromo() {
   return el('section', { className: 'section home-helper' }, [
     el('span', { className: 'home-helper__icon' }, [icon('wand')]),
     el('div', {}, [
-      el('h2', { className: 'section__title', text: '서류 도우미' }),
+      el('h2', { className: 'section__title', text: '내 경험을 지원서에 어떻게 담을까요?' }),
       el('p', { className: 'text-muted', text: '자소서 문항 분석·면접 예상 질문을 AI가 바로 알려 드려요. 첨삭은 내 AI에 붙여 넣을 질문을 만들어 드려요.' }),
     ]),
     el('a', { href: 'helper.html', className: 'button button--primary', text: '서류 도우미 열기' }),
@@ -92,8 +92,8 @@ function CommunityPromo() {
   return el('section', { className: 'section home-helper' }, [
     el('span', { className: 'home-helper__icon' }, [icon('chat')]),
     el('div', {}, [
-      el('h2', { className: 'section__title', text: '커뮤니티' }),
-      el('p', { className: 'text-muted', text: '강의에서 만든 결과물을 나누고, 막힌 부분을 질문해요. 읽기는 누구나, 글쓰기는 카카오 로그인 후에 할 수 있어요.' }),
+      el('h2', { className: 'section__title', text: '만든 결과물을 나누고, 막힌 부분을 물어보세요' }),
+      el('p', { className: 'text-muted', text: '읽기는 누구나, 글쓰기는 카카오 로그인 후에 할 수 있어요.' }),
     ]),
     el('a', { href: 'community.html', className: 'button button--primary', text: '커뮤니티 열기' }),
   ]);

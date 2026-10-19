@@ -44,7 +44,7 @@ describe('getEnrollmentStatus — 신호등 색', () => {
 
 describe('ENROLLMENT_LABELS — 화면 표시 이름', () => {
   it('색마다 이름이 있다', () => {
-    expect(ENROLLMENT_LABELS).toEqual({ green: '모집중', yellow: '모집 예정', red: '모집 마감' });
+    expect(ENROLLMENT_LABELS).toEqual({ green: '데모 체험 가능', yellow: '모집 예정', red: '모집 마감' });
   });
 });
 
@@ -65,12 +65,12 @@ describe('getCourseBadge — 카드·상세에 붙는 상태 표시', () => {
     expect(getCourseBadge({ status: 'planned', enrollment: period }, now)).toEqual({ tone: 'planned', label: '제작 예정' });
   });
 
-  it('기간이 없는 열린 강좌는 표시 없음 (상시 모집)', () => {
-    expect(getCourseBadge({ status: 'open' }, now)).toBeNull();
+  it('기간이 없는 열린 강좌(상시)도 데모 체험 가능으로 통일', () => {
+    expect(getCourseBadge({ status: 'open' }, now)).toEqual({ tone: 'green', label: '데모 체험 가능' });
   });
 
   it('기간이 있으면 신호등 색과 이름', () => {
-    expect(getCourseBadge({ status: 'open', enrollment: period }, now)).toEqual({ tone: 'green', label: '모집중' });
+    expect(getCourseBadge({ status: 'open', enrollment: period }, now)).toEqual({ tone: 'green', label: '데모 체험 가능' });
     expect(getCourseBadge({ status: 'open', enrollment: { startDate: '2026-11-01' } }, now)).toEqual({ tone: 'yellow', label: '모집 예정' });
     expect(getCourseBadge({ status: 'open', enrollment: { endDate: '2026-10-01' } }, now)).toEqual({ tone: 'red', label: '모집 마감' });
   });

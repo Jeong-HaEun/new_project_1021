@@ -7,7 +7,7 @@ import { LEARNING_PATH } from '../data/learningPath.js';
 export function LearningPath() {
   return el('section', { className: 'section', 'aria-labelledby': 'learning-path-title' }, [
     el('div', { className: 'section__head' }, [
-      el('h2', { id: 'learning-path-title', className: 'section__title', text: '마케팅 취업 준비, 어디서 시작할까요?' }),
+      el('h2', { id: 'learning-path-title', className: 'section__title', text: '무엇부터 시작할지 막막하다면' }),
     ]),
     el('p', { className: 'learning-path__intro text-muted', text: '기획부터 정리·분석·발표까지. 순서는 참고하고, 지금 부족한 한 강만 골라도 괜찮아요.' }),
     el('ol', { className: 'learning-path' }, LEARNING_PATH.map((step, index) => {
