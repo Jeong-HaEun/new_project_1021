@@ -56,32 +56,38 @@ export function CourseMaterials({ courses, title = '강의 자료', variant = 'd
     ]);
   }
 
-  // 강의가 둘 이상일 때만 필터 — 엑셀 필터처럼 펼쳐지는 목록 하나 (강의가 많아도 한 칸). 고르면 그 강의 자료만
+  // 강의가 둘 이상일 때만 필터 — 엑셀 필터처럼 펼쳐지는 목록 하나, 겉모양은 분류 칩(알약)과 같게. 고르면 그 강의 자료만
   function Filter() {
     const filterList = filterCourses(courses);
     if (!filterList.length) return null;
-    const count = (id) => filterMaterials(view.materials, id).length;
-    const option = (id, label) => el('option', { value: id, text: `${label} (${count(id)}개)`, ...(view.filter === id && { selected: '' }) });
-    const select = el('select', { id: 'material-filter', className: 'helper-input material-filter__select', onChange: handleFilter }, [
+    const option = (id, label) => el('option', { value: id, text: label, ...(view.filter === id && { selected: '' }) });
+    const select = el('select', { id: 'material-filter', className: 'material-filter__select', 'aria-label': '강의 선택', onChange: handleFilter }, [
       option('all', '전체'),
       ...filterList.map((course) => option(course.id, course.title)),
     ]);
-    return el('label', { className: 'material-filter', for: 'material-filter' }, [el('span', { className: 'material-filter__label', text: '강의 선택' }), select]);
+    // 감싼 칸이 화살표(▾)를 그린다 — 색은 글자색(토큰)을 따른다
+    return el('span', { className: 'material-filter', 'data-active': String(view.filter !== 'all') }, [select]);
   }
 
+  // 칩은 그대로 두고 표시 상태와 자료 목록만 바꾼다 (칩을 다시 그리면 키보드 위치·포커스가 흔들림)
   function handleFilter(event) {
     view.filter = event.currentTarget.value;
-    render();
-    root.querySelector('#material-filter')?.focus(); // 다시 그려도 키보드 위치 유지
+    event.currentTarget.parentElement.dataset.active = String(view.filter !== 'all');
+    root.querySelector('.material-body')?.replaceWith(Body());
+  }
+
+  function Body() {
+    const shown = filterMaterials(view.materials, view.filter);
+    return shown.length
+      ? el('ul', { className: 'material-list material-body' }, shown.map(Item))
+      : el('p', { className: 'text-muted material-body', text: '이 강의 자료는 준비 중이에요' });
   }
 
   function render() {
-    const shown = filterMaterials(view.materials, view.filter);
     root.replaceChildren(...[
-      el('h2', { className: style.title, text: title }),
+      el('div', { className: 'material-head' }, [el('h2', { className: style.title, text: title }), Filter()].filter(Boolean)),
       el('p', { className: 'myclass-note', text: '가상 회사·가상 데이터로 만든 실습 자료예요.' }),
-      Filter(),
-      shown.length ? el('ul', { className: 'material-list' }, shown.map(Item)) : el('p', { className: 'text-muted', text: '이 강의 자료는 준비 중이에요' }),
+      Body(),
     ].filter(Boolean));
   }
 
