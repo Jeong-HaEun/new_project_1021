@@ -48,37 +48,21 @@
   color: var(--color-text-muted);
 }
 
-/* 내 강의실 강의별 필터 — 한 줄 가로 스크롤 (강의가 많아도 줄이 늘지 않게), 스크롤바를 얇게 보여 더 있음을 알린다 */
+/* 내 강의실 강의별 필터 — 엑셀 필터처럼 펼쳐지는 목록 하나 (강의가 많아도 한 칸) */
 .material-filter {
   display: flex;
-  flex-wrap: nowrap;
-  gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 6px;
-  scroll-snap-type: x proximity;
-  scrollbar-width: thin;
-  scrollbar-color: var(--color-line) transparent;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
 }
 
-.material-filter::-webkit-scrollbar {
-  height: 6px;
+.material-filter__label {
+  font-size: var(--text-small);
+  font-weight: 600;
 }
 
-.material-filter::-webkit-scrollbar-thumb {
-  border-radius: var(--radius-pill);
-  background: var(--color-line);
-}
-
-.material-filter__chip {
-  flex: 0 0 auto;
-  max-width: 200px;
+.material-filter__select {
+  flex: 1 1 240px;
+  max-width: 420px;
   min-height: 44px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  scroll-snap-align: start;
-}
-
-.material-filter__chip:focus-visible {
-  outline: 2px solid var(--color-text);
-  outline-offset: 2px;
 }

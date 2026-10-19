@@ -56,19 +56,23 @@ export function CourseMaterials({ courses, title = '강의 자료', variant = 'd
     ]);
   }
 
-  // 강의가 둘 이상일 때만 필터 — 전체 / 강의 이름 (누르면 그 강의 자료만, 없으면 '준비 중')
+  // 강의가 둘 이상일 때만 필터 — 엑셀 필터처럼 펼쳐지는 목록 하나 (강의가 많아도 한 칸). 고르면 그 강의 자료만
   function Filter() {
-    const withMaterials = filterCourses(courses);
-    if (!withMaterials.length) return null;
-    const chip = (id, label) => el('button', { type: 'button', className: 'chip material-filter__chip', title: label, 'aria-pressed': String(view.filter === id), onClick: () => handleFilter(id), text: label });
-    return el('div', { className: 'material-filter', role: 'group', 'aria-label': '강의별로 보기 (옆으로 밀어 더 보기)' }, [chip('all', '전체'), ...withMaterials.map((course) => chip(course.id, course.title))]);
+    const filterList = filterCourses(courses);
+    if (!filterList.length) return null;
+    const count = (id) => filterMaterials(view.materials, id).length;
+    const option = (id, label) => el('option', { value: id, text: `${label} (${count(id)}개)`, ...(view.filter === id && { selected: '' }) });
+    const select = el('select', { id: 'material-filter', className: 'helper-input material-filter__select', onChange: handleFilter }, [
+      option('all', '전체'),
+      ...filterList.map((course) => option(course.id, course.title)),
+    ]);
+    return el('label', { className: 'material-filter', for: 'material-filter' }, [el('span', { className: 'material-filter__label', text: '강의 선택' }), select]);
   }
 
-  // 고른 칩이 보이도록 가로 스크롤 위치를 맞춘다 (다시 그린 뒤)
-  function handleFilter(id) {
-    view.filter = id;
+  function handleFilter(event) {
+    view.filter = event.currentTarget.value;
     render();
-    root.querySelector('.material-filter__chip[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    root.querySelector('#material-filter')?.focus(); // 다시 그려도 키보드 위치 유지
   }
 
   function render() {
