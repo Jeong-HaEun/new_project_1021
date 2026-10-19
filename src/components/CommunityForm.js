@@ -66,7 +66,8 @@ export function PostForm({ post, values, courses, authorName, error, busy, onSub
 }
 
 // 댓글 영역 — 목록(오래된 순) + 로그인했으면 쓰기 폼, 아니면 로그인 안내(loginNode)
-export function CommentSection({ comments, user, authorName, draft = '', error, busy, onSubmit, onDelete, loginNode }) {
+// canWrite가 false면(질문 글에 운영자·질문자가 아님) 폼 대신 답변 안내를 보여 준다
+export function CommentSection({ comments, user, canWrite = true, authorName, draft = '', error, busy, onSubmit, onDelete, loginNode }) {
   const item = (comment) => el('li', { className: 'community-comment' }, [
     el('p', { className: 'community-meta' }, [el('strong', { text: comment.authorName }), comment.official ? OfficialBadge() : null, el('span', { text: formatPostDate(comment.createdAt) })]),
     el('p', { className: 'community-comment__body', text: comment.body }),
@@ -75,7 +76,8 @@ export function CommentSection({ comments, user, authorName, draft = '', error, 
       : null,
   ]);
 
-  const form = user ? el('form', { className: 'community-comment-form', novalidate: '', onSubmit }, [
+  const answerNote = el('p', { className: 'helper-notice', text: '질문 글에는 운영자(취업메이트)가 답변해요. 같은 내용이 궁금하면 새 질문을 올려 주세요.' });
+  const form = user && !canWrite ? answerNote : user ? el('form', { className: 'community-comment-form', novalidate: '', onSubmit }, [
     Field('댓글', textarea('body', draft, LIMITS.comment.max, 3)),
     Field('닉네임', input('authorName', authorName, LIMITS.authorName.max, { autocomplete: 'nickname' })),
     el('p', { className: 'community-hint', text: RULES_NOTE }),

@@ -19,6 +19,10 @@ describe('서버가 거절한 이유 읽기', () => {
     expect(serverProblem({ code: 'P0001', message: 'community_rate_limited' })).toBe('rate-limited');
     expect(serverProblem({ code: 'P0001', message: 'community_personal_info' })).toBe('personal-info');
   });
+  it('질문 글에 운영자·질문자가 아닌 댓글은 answer-only', () => {
+    expect(serverProblem({ code: 'P0001', message: 'community_answer_only' })).toBe('answer-only');
+    expect(guardText('answer-only', 'comment')).toBe('질문 글에는 운영자와 질문한 분만 댓글을 달 수 있어요.');
+  });
   it('같은 글 두 번 신고(unique 위반)는 already-reported', () => {
     expect(serverProblem({ code: '23505', message: 'duplicate key value' })).toBe('already-reported');
   });

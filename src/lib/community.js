@@ -82,3 +82,9 @@ export function validateComment(input) {
 export function canManage(item, user) {
   return Boolean(user?.id) && item?.userId === user.id;
 }
+
+// 댓글 쓰기 폼을 보여 줄지 — 질문 글은 운영자와 질문한 본인만, 그 밖은 로그인한 누구나 (실제로 막는 건 DB: 20261019040000)
+export function canComment(post, user, isAdmin) {
+  if (!user?.id) return false;
+  return post?.category !== 'question' || post.userId === user.id || Boolean(isAdmin);
+}

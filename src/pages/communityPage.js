@@ -4,7 +4,8 @@
 import { el } from '../lib/dom.js';
 import { isServerConfigured } from '../lib/server.js';
 import { getCurrentUser, onAuthChange, signInWithKakao } from '../lib/account.js';
-import { canManage, validateComment, validatePost } from '../lib/community.js';
+import { canComment, canManage, validateComment, validatePost } from '../lib/community.js';
+import { fetchAdminRole } from '../lib/adminApi.js';
 import { getCommunityRoute, getCommunityState, normalizeComments, normalizePost, normalizePosts, problemText } from '../lib/communityView.js';
 import { guardText, serverProblem } from '../lib/communityGuard.js';
 import { rememberName, rememberReturn, savedName, takeReturn } from '../lib/communityStore.js';
@@ -25,7 +26,7 @@ const configured = isServerConfigured();
 const route = getCommunityRoute(window.location.search);
 const openCourses = COURSES.filter((course) => course.status === 'open');
 const body = el('div', { className: 'community-body' });
-const view = { user: undefined, status: 'loading', posts: [], post: null, comments: [], error: null, busy: false, draft: null };
+const view = { user: undefined, isAdmin: false, status: 'loading', posts: [], post: null, comments: [], error: null, busy: false, draft: null };
 const report = createReport({ postId: route.id, rerender: () => render() });
 const go = (search) => window.location.assign(`community.html${search}`);
 
@@ -131,7 +132,7 @@ function PostScreen() {
     Parts.BackLink(),
     Parts.PostView(view.post, { courses: COURSES, owner, onDelete: handlePostDelete, notice: owner && view.post.hidden ? HiddenNotice() : null, reportNode: report.Area({ user: view.user, post: view.post }) }),
     CommentSection({
-      comments: view.comments, user: view.user, authorName: savedName(), draft: view.draft?.body ?? '', error: view.error, busy: view.busy,
+      comments: view.comments, user: view.user, canWrite: canComment(view.post, view.user, view.isAdmin), authorName: savedName(), draft: view.draft?.body ?? '', error: view.error, busy: view.busy,
       onSubmit: handleCommentSubmit, onDelete: handleCommentDelete,
       loginNode: view.user === null ? Parts.LoginPrompt(handleLogin, '댓글을 쓰려면 로그인해 주세요') : null,
     }),
@@ -161,8 +162,11 @@ function render() {
 function setUser(user) {
   if ((user?.id ?? null) === (view.user?.id ?? null) && view.user !== undefined) return;
   view.user = user;
+  view.isAdmin = false;
   render();
   loadReport();
+  // 운영자면 질문 글에도 답변 폼을 연다 (확인 실패 시 일반 회원으로 둔다. 실제 권한은 DB가 확인)
+  if (user) fetchAdminRole().then((role) => { view.isAdmin = Boolean(role); render(); }).catch(() => {});
 }
 
 async function init() {

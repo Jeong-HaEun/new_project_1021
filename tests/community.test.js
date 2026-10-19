@@ -1,7 +1,7 @@
 // 커뮤니티 글·댓글 규칙 (SPEC.md '커뮤니티') — 입력 검사, 개인정보·과장 표현 막기, 본인 확인
 import { describe, it, expect } from 'vitest';
 import {
-  CATEGORIES, LIMITS, canManage, findPersonalInfo, validateComment, validatePost,
+  CATEGORIES, LIMITS, canComment, canManage, findPersonalInfo, validateComment, validatePost,
 } from '../src/lib/community.js';
 
 const COURSES = [{ id: 'c002', title: 'XLOOKUP' }, { id: 'c003', title: '보고서' }];
@@ -104,5 +104,22 @@ describe('본인 확인 (수정·삭제 버튼)', () => {
     expect(canManage(post, null)).toBe(false);
     expect(canManage(post, undefined)).toBe(false);
     expect(canManage({ userId: undefined }, { id: undefined })).toBe(false);
+  });
+});
+
+describe('질문 글 답변 (canComment)', () => {
+  const question = { category: 'question', userId: 'asker' };
+  it('질문 글은 운영자와 질문한 본인만 댓글을 단다', () => {
+    expect(canComment(question, { id: 'asker' }, false)).toBe(true);
+    expect(canComment(question, { id: 'staff' }, true)).toBe(true);
+    expect(canComment(question, { id: 'other' }, false)).toBe(false);
+  });
+  it('결과물 공유·자유 글은 로그인한 누구나', () => {
+    expect(canComment({ category: 'free', userId: 'a' }, { id: 'b' }, false)).toBe(true);
+    expect(canComment({ category: 'outcome', userId: 'a' }, { id: 'b' }, false)).toBe(true);
+  });
+  it('로그아웃·확인 중이면 false', () => {
+    expect(canComment(question, null, true)).toBe(false);
+    expect(canComment({ category: 'free' }, undefined, false)).toBe(false);
   });
 });
