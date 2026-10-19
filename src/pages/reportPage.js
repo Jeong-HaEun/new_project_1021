@@ -7,6 +7,7 @@ import { getCurrentUser, onAuthChange, signInWithKakao } from '../lib/account.js
 import { getReportPageState, REPORT_APP_PATH, REPORT_FRAME_PATH } from '../lib/report.js';
 import { renderPage } from '../components/PageLayout.js';
 import { showToast } from '../components/Toast.js';
+import { ReportExpandButton } from '../components/ReportExpand.js';
 import '../styles/courses.css';
 import '../styles/myclass.css';
 import '../styles/report-page.css';
@@ -54,12 +55,10 @@ const PANELS = {
       el('button', { type: 'button', className: 'button kakao-login', onClick: handleLogin, text: '카카오로 로그인' }),
     ]),
   ready: () => {
-    const openLink = el('a', {
-      href: REPORT_APP_PATH, target: '_blank', rel: 'noopener noreferrer', className: 'report-open button button--secondary',
-      text: '새 창에서 크게 보기 ↗', 'data-analytics': 'report-example-open',
-    });
     const hint = el('p', { className: 'report-frame-hint text-muted', text: '보고서를 연결하고 있어요…' });
     const wrapper = el('div', { className: 'report-frame-wrap' }, [hint]);
+    // 새 창(Adporter 단독 화면, 로고가 다름) 대신 지금 창에서 크게 보기
+    const openLink = ReportExpandButton(wrapper);
 
     // fetch 탐색: 같은 출처 요청이라 CORS 없이 확인 가능 (localhost 프록시·GitHub Pages 모두)
     fetch(REPORT_FRAME_PATH, { method: 'HEAD', cache: 'no-store' })

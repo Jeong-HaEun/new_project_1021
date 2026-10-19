@@ -49,3 +49,48 @@
 .report-open {
   justify-self: start;
 }
+
+/* 크게 보기 — 지금 창에서 보고서 틀을 화면 가득 (헤더·탭바 위, iframe은 다시 불러오지 않음) */
+.report-expand-bar {
+  display: none;
+}
+
+.report-frame-wrap--expanded {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg);
+}
+
+.report-frame-wrap--expanded .report-expand-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 8px var(--space-page);
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-surface);
+}
+
+.report-expand-bar__note {
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.report-expand-bar__close {
+  margin-left: auto;
+}
+
+.report-frame-wrap--expanded .report-frame {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+body.report-expanded {
+  overflow: hidden;
+}
