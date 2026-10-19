@@ -6,6 +6,7 @@ import { pageUrl } from '../lib/paths.js';
 import { CATEGORIES } from '../lib/community.js';
 import { formatPostDate } from '../lib/communityView.js';
 import { OfficialBadge } from './OfficialBadge.js';
+import { LoginButtons } from './LoginButtons.js';
 
 export const RULES_NOTE = '올린 글과 댓글은 로그인하지 않은 사람도 볼 수 있어요. 전화번호·이메일 같은 개인정보는 쓰지 마세요. 합격·취업을 약속하는 과장 표현과 광고 글은 올릴 수 없어요.';
 
@@ -46,7 +47,7 @@ export function NotFoundPanel() {
 export function LoginPrompt(onLogin, text = '글을 쓰려면 로그인해 주세요') {
   return el('div', { className: 'community-login' }, [
     el('p', { text }),
-    el('button', { type: 'button', className: 'button kakao-login', onClick: onLogin, text: '카카오로 로그인' }),
+    ...LoginButtons('community.html', onLogin),
   ]);
 }
 
@@ -120,10 +121,17 @@ export function PostView(post, { courses, owner, onDelete, notice = null, report
 }
 
 // 글쓰기 버튼 — 로그인 확인 중이면 숨기고, 로그아웃이면 로그인 버튼
-function WriteAction(user, onLogin) {
+// category: 지금 보는 분류 — 글쓰기 폼의 기본 분류가 된다 ('all'이면 기본값)
+function WriteAction(user, onLogin, category) {
   if (user === undefined) return null;
-  if (!user) return el('button', { type: 'button', className: 'button kakao-login', onClick: onLogin, text: '카카오로 로그인하고 글쓰기' });
-  return el('a', { href: 'community.html?write=1', className: 'button button--primary', text: '글쓰기' });
+  if (!user) {
+    return el('div', { className: 'community-login-actions' }, [
+      el('button', { type: 'button', className: 'button kakao-login', onClick: onLogin, text: '카카오로 로그인하고 글쓰기' }),
+      LoginButtons('community.html')[1],
+    ]);
+  }
+  const href = pageUrl('community.html', { write: '1', category });
+  return el('a', { href, className: 'button button--primary', text: '글쓰기' });
 }
 
 // 목록 화면 — 제목·글쓰기 버튼, 분류 칩, 안내, 글 목록
@@ -134,11 +142,11 @@ export function ListScreen({ user, posts, category, courses, onLogin }) {
         el('h1', { className: 'page-title', text: '커뮤니티' }),
         el('p', { className: 'page-desc text-muted', text: '강의에서 만든 결과물을 나누고, 막힌 부분을 함께 풀어요.' }),
       ]),
-      WriteAction(user, onLogin),
+      WriteAction(user, onLogin, category),
     ]),
     CategoryChips(category),
     el('p', { className: 'community-rules', text: RULES_NOTE }),
-    PostList(posts, { category, courses, writeAction: WriteAction(user, onLogin) }),
+    PostList(posts, { category, courses, writeAction: WriteAction(user, onLogin, category) }),
   ];
 }
 

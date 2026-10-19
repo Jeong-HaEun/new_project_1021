@@ -8,18 +8,19 @@ export function getCommunityRoute(search) {
   const params = new URLSearchParams(search);
   const postId = toId(params.get('post'));
   if (postId) return { name: 'post', id: postId };
-  if (params.get('write') === '1') return { name: 'write' };
+  const category = CATEGORIES.some((item) => item.id === params.get('category')) ? params.get('category') : null;
+  // 글쓰기: 목록에서 보던 분류를 기본 분류로 (?write=1&category=question)
+  if (params.get('write') === '1') return category ? { name: 'write', category } : { name: 'write' };
   const editId = toId(params.get('edit'));
   if (editId) return { name: 'edit', id: editId };
-  const category = params.get('category');
-  return { name: 'list', category: CATEGORIES.some((item) => item.id === category) ? category : 'all' };
+  return { name: 'list', category: category ?? 'all' };
 }
 
 // 로그인 뒤 돌아갈 주소 — 저장해 둔 값을 그대로 쓰지 않고, 알아본 화면만 다시 만든다 (다른 사이트·이상한 값 차단)
 export function safeReturnSearch(search) {
   const route = getCommunityRoute(typeof search === 'string' ? search : '');
   if (route.name === 'post' || route.name === 'edit') return `?${route.name}=${route.id}`;
-  if (route.name === 'write') return '?write=1';
+  if (route.name === 'write') return route.category ? `?write=1&category=${route.category}` : '?write=1';
   return route.category === 'all' ? '' : `?category=${route.category}`;
 }
 

@@ -1,0 +1,32 @@
+/* 로그인 — 카카오 버튼, 구분선, 이메일 로그인·가입 */
+.login-body {
+  display: grid;
+  gap: 16px;
+  max-width: 420px;
+}
+
+.login-kakao,
+.login-submit {
+  width: 100%;
+}
+
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--text-small);
+  color: var(--color-text-muted);
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--color-line);
+}
+
+.helper-tab[aria-pressed='true'] {
+  border-color: var(--color-text);
+  background: var(--color-text);
+  color: var(--color-surface);
+}

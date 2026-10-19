@@ -22,6 +22,7 @@ export default defineConfig({
         helper: 'helper.html',
         community: 'community.html',
         admin: 'admin.html',
+        login: 'login.html',
       },
     },
   },

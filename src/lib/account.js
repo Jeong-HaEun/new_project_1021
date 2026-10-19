@@ -1,5 +1,5 @@
-// 계정 — 카카오 로그인(Supabase Auth)·로그아웃·로그인 상태 알림
-// 비밀번호·카카오 토큰은 다루지 않는다. 로그인 처리는 카카오 → Supabase가 맡는다
+// 계정 — 카카오·이메일 로그인(Supabase Auth)·로그아웃·로그인 상태 알림
+// 비밀번호는 Supabase로 바로 보내고 저장·기록하지 않는다. 카카오 토큰은 다루지 않는다
 // ⚠ Supabase 대시보드에서 Kakao 제공자를 켜고, 돌아올 주소(myclass.html)를 Redirect URLs에 등록해야 동작한다
 import { getServerClient, isServerConfigured } from './server.js';
 
@@ -33,5 +33,22 @@ export async function signInWithKakao(returnPage = 'myclass.html') {
 export async function signOut() {
   const client = await getServerClient();
   const { error } = await client.auth.signOut();
+  if (error) throw error;
+}
+
+// 이메일·비밀번호 로그인. 실패하면 Supabase 오류를 그대로 던진다 (화면에서 authErrorText로 바꿔 보여 줌)
+export async function signInWithEmail(email, password) {
+  const client = await getServerClient();
+  const { data, error } = await client.auth.signInWithPassword({ email, password });
+  if (error) throw error;
+  return data.user;
+}
+
+// 이메일 가입 → 인증 메일의 링크를 누르면 returnPage로 돌아와 로그인된다 (Redirect URLs에 등록된 페이지만)
+// 이미 가입한 이메일이어도 Supabase는 같은 응답을 준다 (가입 여부가 드러나지 않게)
+export async function signUpWithEmail(email, password, returnPage = 'myclass.html') {
+  const client = await getServerClient();
+  const emailRedirectTo = new URL(`./${returnPage}`, window.location.href).href;
+  const { error } = await client.auth.signUp({ email, password, options: { emailRedirectTo } });
   if (error) throw error;
 }

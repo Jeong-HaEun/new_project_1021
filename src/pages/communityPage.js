@@ -146,7 +146,7 @@ function FormScreen() {
   if (route.name === 'edit' && !canManage(view.post, view.user)) return [Parts.BackLink(), el('p', { className: 'helper-notice', role: 'alert', text: '본인 글만 수정할 수 있어요.' })];
   return [
     Parts.BackLink(),
-    PostForm({ post: route.name === 'edit' ? view.post : null, values: view.draft, courses: openCourses, authorName: savedName(), error: view.error, busy: view.busy, onSubmit: handlePostSubmit }),
+    PostForm({ post: route.name === 'edit' ? view.post : null, values: view.draft ?? (route.category && { category: route.category }), courses: openCourses, authorName: savedName(), error: view.error, busy: view.busy, onSubmit: handlePostSubmit }),
   ];
 }
 

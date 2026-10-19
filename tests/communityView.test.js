@@ -17,6 +17,11 @@ describe('주소 → 화면', () => {
     expect(getCommunityRoute('?write=1')).toEqual({ name: 'write' });
     expect(getCommunityRoute('?edit=7')).toEqual({ name: 'edit', id: 7 });
   });
+  it('글쓰기에 분류가 오면 기본 분류로, 모르는 분류는 버린다', () => {
+    expect(getCommunityRoute('?write=1&category=question')).toEqual({ name: 'write', category: 'question' });
+    expect(getCommunityRoute('?write=1&category=free')).toEqual({ name: 'write', category: 'free' });
+    expect(getCommunityRoute('?write=1&category=hack')).toEqual({ name: 'write' });
+  });
   it('글 번호가 숫자가 아니면 목록', () => {
     expect(getCommunityRoute('?post=abc')).toEqual({ name: 'list', category: 'all' });
     expect(getCommunityRoute('?edit=-3')).toEqual({ name: 'list', category: 'all' });
@@ -26,6 +31,7 @@ describe('주소 → 화면', () => {
 describe('로그인 뒤 돌아갈 화면', () => {
   it('커뮤니티 안의 글쓰기·글·수정·분류 주소만 돌려준다', () => {
     expect(safeReturnSearch('?write=1')).toBe('?write=1');
+    expect(safeReturnSearch('?write=1&category=question')).toBe('?write=1&category=question');
     expect(safeReturnSearch('?post=12')).toBe('?post=12');
     expect(safeReturnSearch('?edit=3')).toBe('?edit=3');
     expect(safeReturnSearch('?category=outcome')).toBe('?category=outcome');

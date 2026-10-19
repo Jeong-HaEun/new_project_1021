@@ -115,3 +115,11 @@
   background: var(--color-primary);
   color: var(--color-on-primary);
 }
+
+/* 목록 머리글의 로그아웃 상태 — [카카오로 로그인하고 글쓰기] + 이메일 로그인 링크 */
+.community-login-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}

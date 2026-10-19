@@ -3,6 +3,7 @@
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { assetUrl } from '../lib/paths.js';
+import { LoginButtons } from './LoginButtons.js';
 
 export const DEMO_ENROLL_NOTE = '데모 수강 신청 기록이에요. 실제 구매가 아니며 유료 콘텐츠가 열리지 않아요.';
 
@@ -27,7 +28,7 @@ export function SignedOutPanel(onLogin) {
     icon('user', 32),
     el('strong', { text: '로그인하면 데모 수강 신청 기록을 계정에 저장해요' }),
     el('p', { className: 'text-muted', text: '다른 기기에서 같은 계정으로 들어와도 신청한 강의를 볼 수 있어요.' }),
-    el('button', { type: 'button', className: 'button kakao-login', onClick: onLogin, text: '카카오로 로그인' }),
+    ...LoginButtons('myclass.html', onLogin),
     el('p', { className: 'myclass-note', text: '이 브라우저의 데모 주문 기록은 계정으로 자동으로 옮겨지지 않아요.' }),
   ]);
 }

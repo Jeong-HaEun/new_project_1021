@@ -8,6 +8,7 @@ import { getReportPageState, REPORT_APP_PATH, REPORT_FRAME_PATH } from '../lib/r
 import { renderPage } from '../components/PageLayout.js';
 import { showToast } from '../components/Toast.js';
 import { ReportExpandButton } from '../components/ReportExpand.js';
+import { LoginButtons } from '../components/LoginButtons.js';
 import '../styles/courses.css';
 import '../styles/myclass.css';
 import '../styles/report-page.css';
@@ -50,9 +51,9 @@ const PANELS = {
   'signed-out': () =>
     Panel([
       icon('user', 32),
-      el('strong', { text: '카카오로 로그인하면 내 광고 보고서가 열려요' }),
+      el('strong', { text: '로그인하면 내 광고 보고서가 열려요' }),
       el('p', { className: 'text-muted', text: '올린 CSV는 내 계정에만 저장돼요. 다른 사람은 볼 수 없어요.' }),
-      el('button', { type: 'button', className: 'button kakao-login', onClick: handleLogin, text: '카카오로 로그인' }),
+      ...LoginButtons('report.html', handleLogin),
     ]),
   ready: () => {
     const hint = el('p', { className: 'report-frame-hint text-muted', text: '보고서를 연결하고 있어요…' });

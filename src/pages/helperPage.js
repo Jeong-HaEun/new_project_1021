@@ -2,7 +2,7 @@
 import { el } from '../lib/dom.js';
 import { pageUrl, readParam } from '../lib/paths.js';
 import { isServerConfigured } from '../lib/server.js';
-import { getCurrentUser, onAuthChange, signInWithKakao } from '../lib/account.js';
+import { getCurrentUser, onAuthChange } from '../lib/account.js';
 import { callDocHelper, fetchHelperStatus } from '../lib/docHelperApi.js';
 import { clearDrafts, loadDraft, saveDraft } from '../lib/docHelperDraft.js';
 import { browserStorage } from '../lib/experimentTracking.js';
@@ -13,6 +13,7 @@ import { HELPER_EXAMPLES } from '../data/helperExamples.js';
 import { renderPage } from '../components/PageLayout.js';
 import { errorText, ExperienceGuideSection, Field, MODE_INTRO, Notice, ResultBox, Tabs } from '../components/HelperParts.js';
 import { showToast } from '../components/Toast.js';
+import { LoginButtons } from '../components/LoginButtons.js';
 import '../styles/courses.css';
 import '../styles/myclass.css';
 import '../styles/helper.css';
@@ -103,14 +104,13 @@ async function handleExpSubmit() {
 
 // AI 길잡이를 쓸 수 없는 상태면 안내를 돌려준다 (쓸 수 있으면 null)
 function AiGate() {
-  const notReady = Notice('AI 답변 서버를 준비하고 있어요. 첨삭 길잡이는 지금 쓸 수 있어요.');
-  if (!configured) return notReady;
+  if (!configured) return Notice('AI 답변 서버를 준비하고 있어요. 첨삭 길잡이는 지금 쓸 수 있어요.');
   if (state.user === undefined) return Notice('로그인 상태를 확인하고 있어요…');
   if (state.user === null) {
     return el('div', { className: 'empty-state myclass-panel' }, [
-      el('strong', { text: '카카오로 로그인하면 하루 3번 AI 답변을 받을 수 있어요' }),
+      el('strong', { text: '로그인하면 하루 3번 AI 답변을 받을 수 있어요' }),
       el('p', { className: 'text-muted', text: '실습 기간 동안 무료예요. 첨삭 길잡이는 로그인 없이 쓸 수 있어요.' }),
-      el('button', { type: 'button', className: 'button kakao-login', onClick: () => signInWithKakao('helper.html'), text: '카카오로 로그인' }),
+      ...LoginButtons('helper.html'),
     ]);
   }
   if (!state.status) return el('div', {}, [Notice('이용 횟수를 확인하지 못했어요.', 'error'), el('button', { type: 'button', className: 'button button--ghost', onClick: refreshStatus, text: '다시 시도' })]);

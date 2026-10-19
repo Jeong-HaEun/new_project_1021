@@ -92,3 +92,12 @@
   margin-left: auto;
   flex-wrap: nowrap;
 }
+
+/* 로그인 안내의 이메일 로그인 링크 (LoginButtons) */
+.login-email-link {
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
