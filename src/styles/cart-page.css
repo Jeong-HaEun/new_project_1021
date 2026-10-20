@@ -76,8 +76,8 @@
 }
 
 .cart-item__remove:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+  border-color: var(--color-danger);
+  color: var(--color-danger);
 }
 
 /* 합계 상자 */
