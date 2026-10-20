@@ -4,6 +4,44 @@
   margin-top: 20px;
 }
 
+/* 브랜드 소개 — 강의 카드 위 (색은 토큰만 사용, 대표색 교체 시 자동으로 따라감) */
+.home-brand {
+  margin-bottom: 24px;
+}
+
+.home-brand__desc {
+  margin-top: 8px;
+  max-width: 640px;
+  color: var(--color-text-muted);
+  line-height: 1.65;
+}
+
+.home-brand__ways {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 14px;
+  font-size: var(--text-small);
+  font-weight: 700;
+}
+
+.home-brand__ways li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.home-brand__ways svg {
+  width: 16px;
+  height: 16px;
+  color: var(--color-primary);
+}
+
+.home-courses__title {
+  font-size: var(--text-card-title);
+  font-weight: 800;
+}
+
 /* 서류 도우미 소개 카드 */
 .home-helper {
   display: grid;
