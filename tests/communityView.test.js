@@ -65,7 +65,7 @@ describe('글 정리', () => {
   it('서버 행 → 화면용 글', () => {
     expect(normalizePost(row())).toEqual({
       id: 1, userId: 'u1', category: 'free', title: '제목', body: '본문입니다', authorName: '닉', courseId: null,
-      createdAt: '2026-10-18T01:00:00Z', edited: false, commentCount: 2, hidden: false, official: false,
+      createdAt: '2026-10-18T01:00:00Z', edited: false, commentCount: 2, hidden: false, official: false, pinned: false,
     });
   });
   it('숨김 표시는 true일 때만 true', () => {
@@ -89,6 +89,24 @@ describe('글 정리', () => {
     expect(list.map((post) => post.id)).toEqual([2, 1]);
     expect(list[0].commentCount).toBe(0);
     expect(normalizePosts('x')).toEqual([]);
+  });
+});
+
+describe('공지 고정', () => {
+  it('고정 표시는 true일 때만 true', () => {
+    expect(normalizePost(row({ is_pinned: true })).pinned).toBe(true);
+    expect(normalizePost(row({ is_pinned: 'yes' })).pinned).toBe(false);
+  });
+  it('고정 글이 맨 위(고정 글끼리는 최신순), 고정 목록과 최신 목록에 같은 글이 있으면 한 번만', () => {
+    const pinnedOld = row({ id: 1, created_at: '2026-10-10T00:00:00Z', is_pinned: true });
+    const list = normalizePosts([
+      pinnedOld,
+      row({ id: 4, created_at: '2026-10-19T00:00:00Z', is_pinned: true }),
+      row({ id: 2, created_at: '2026-10-18T00:00:00Z' }),
+      row({ id: 3, created_at: '2026-10-20T00:00:00Z' }),
+      pinnedOld,
+    ]);
+    expect(list.map((post) => post.id)).toEqual([4, 1, 3, 2]);
   });
 });
 

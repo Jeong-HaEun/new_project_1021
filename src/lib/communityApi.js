@@ -15,12 +15,17 @@ async function run(query) {
   return data;
 }
 
-// 최신 글 50개 (category: 'all' 또는 분류 id)
+const PINNED_MAX = 5;
+const inCategory = (query, category) => (category === 'all' ? query : query.eq('category', category));
+
+// 최신 글 50개 + 고정 공지(최신 50개 밖으로 밀려나도 맨 위에). category: 'all' 또는 분류 id
+// 고정 SQL(20261020000000) 적용 전이면 고정 칸이 없어 고정 목록만 빈 목록이 된다. 정렬·중복 정리는 normalizePosts
 export async function fetchPosts(category) {
   const client = await getServerClient();
-  let query = client.from(POSTS).select(POST_COLUMNS).order('created_at', { ascending: false }).limit(PAGE_SIZE);
-  if (category !== 'all') query = query.eq('category', category);
-  return run(query);
+  const latest = inCategory(client.from(POSTS).select(POST_COLUMNS).order('created_at', { ascending: false }).limit(PAGE_SIZE), category);
+  const pinned = inCategory(client.from(POSTS).select(POST_COLUMNS).eq('is_pinned', true).limit(PINNED_MAX), category);
+  const [rows, pinnedRows] = await Promise.all([run(latest), run(pinned).catch(() => [])]);
+  return [...pinnedRows, ...rows];
 }
 
 // 글 하나 (없으면 null)

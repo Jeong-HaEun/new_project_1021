@@ -71,6 +71,7 @@ function Meta(post, extra = []) {
 function CategoryBadge(post, courses) {
   const title = courseTitle(courses, post.courseId);
   return el('div', { className: 'community-badges' }, [
+    post.pinned ? el('span', { className: 'badge community-pinned', text: '공지' }) : null,
     el('span', { className: `badge community-badge community-badge--${post.category}`, text: categoryLabel(post.category) }),
     post.hidden ? el('span', { className: 'badge badge--soon', text: '숨김' }) : null,
     title ? el('span', { className: 'community-course', text: title }) : null,
@@ -92,7 +93,7 @@ export function PostList(posts, { category, courses, writeAction }) {
   if (posts.length === 0) return EmptyList(category, writeAction);
   return el('ul', { className: 'community-list' }, posts.map((post) =>
     el('li', {}, [
-      el('a', { href: pageUrl('community.html', { post: String(post.id) }), className: 'community-item' }, [
+      el('a', { href: pageUrl('community.html', { post: String(post.id) }), className: `community-item${post.pinned ? ' community-item--pinned' : ''}` }, [
         CategoryBadge(post, courses),
         el('strong', { className: 'community-item__title', text: post.title }),
         el('p', { className: 'community-item__preview', text: post.body }),

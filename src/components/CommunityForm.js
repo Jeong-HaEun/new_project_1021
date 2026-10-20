@@ -46,8 +46,16 @@ function CoursePicker(courses, current) {
   return Field('관련 강의', select, '결과물 공유는 결과물을 만든 강의를 꼭 골라 주세요.');
 }
 
-// post: 수정할 글(없으면 새 글). values: 저장 실패 뒤 다시 보여 줄 입력값. onSubmit(event)
-export function PostForm({ post, values, courses, authorName, error, busy, onSubmit }) {
+// 공지 고정 — 운영자에게만 보인다 (실제로 막는 건 DB: 20261020000000)
+function PinField(pinned) {
+  return el('label', { className: 'community-pin' }, [
+    el('input', { type: 'checkbox', name: 'pinned', ...(pinned && { checked: '' }) }),
+    el('span', {}, [el('strong', { text: '공지로 고정' }), el('span', { className: 'community-hint', text: '운영자에게만 보여요. 전체 목록과 같은 분류 목록 맨 위에 보여요.' })]),
+  ]);
+}
+
+// post: 수정할 글(없으면 새 글). values: 저장 실패 뒤 다시 보여 줄 입력값. canPin: 운영자면 공지 고정 체크. onSubmit(event)
+export function PostForm({ post, values, courses, authorName, canPin = false, error, busy, onSubmit }) {
   const v = values ?? post ?? {};
   return el('form', { className: 'helper-panel helper-form', novalidate: '', onSubmit }, [
     el('h1', { className: 'community-form__title', text: post ? '글 수정' : '글쓰기' }),
@@ -57,6 +65,7 @@ export function PostForm({ post, values, courses, authorName, error, busy, onSub
     Field('제목', input('title', v.title, LIMITS.title.max)),
     Field('내용', textarea('body', v.body, LIMITS.body.max, 8), `${LIMITS.body.max}자까지. 결과물 공유는 무엇을 만들었고, 어디서 막혔고, 어떻게 풀었는지 적어 보세요.`),
     Field('닉네임', input('authorName', v.authorName ?? authorName, LIMITS.authorName.max, { autocomplete: 'nickname' }), '실명 대신 닉네임을 써 주세요. 이 브라우저에 기억해 둬요.'),
+    canPin ? PinField(v.pinned === true || v.pinned === 'on') : null,
     ErrorText(error),
     el('div', { className: 'helper-actions' }, [
       el('button', { type: 'submit', className: 'button button--primary', ...(busy && { disabled: '' }), text: busy ? '저장하는 중…' : post ? '수정 저장' : '올리기' }),

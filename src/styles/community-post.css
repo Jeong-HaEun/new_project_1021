@@ -116,6 +116,27 @@
   margin-top: 4px;
 }
 
+/* 공지 고정 체크 — 운영자에게만 보인다 */
+.community-pin {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-control);
+  cursor: pointer;
+}
+
+.community-pin > span {
+  display: grid;
+}
+
+.community-pin input {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
 .community-panel strong {
   font-size: var(--text-card-title);
 }

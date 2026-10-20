@@ -110,6 +110,16 @@
   color: var(--color-text-muted);
 }
 
+/* 고정 공지 — 목록 맨 위, 배경으로 구분 */
+.community-item--pinned {
+  background: var(--color-surface-subtle);
+}
+
+.community-pinned {
+  background: var(--color-text);
+  color: var(--color-surface);
+}
+
 /* 운영자(취메 · 취업메이트) 표시 — DB가 운영자 글·댓글에만 붙인다 */
 .community-official {
   background: var(--color-primary);

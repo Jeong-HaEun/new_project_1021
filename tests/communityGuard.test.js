@@ -23,6 +23,10 @@ describe('서버가 거절한 이유 읽기', () => {
     expect(serverProblem({ code: 'P0001', message: 'community_answer_only' })).toBe('answer-only');
     expect(guardText('answer-only', 'comment')).toBe('질문 글에는 운영자와 질문한 분만 댓글을 달 수 있어요.');
   });
+  it('운영자가 아닌 공지 고정은 pin-admin-only', () => {
+    expect(serverProblem({ code: 'P0001', message: 'community_pin_admin_only' })).toBe('pin-admin-only');
+    expect(guardText('pin-admin-only', 'post')).toBe('공지 고정은 운영자만 할 수 있어요.');
+  });
   it('같은 글 두 번 신고(unique 위반)는 already-reported', () => {
     expect(serverProblem({ code: '23505', message: 'duplicate key value' })).toBe('already-reported');
   });

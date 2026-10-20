@@ -123,3 +123,14 @@ describe('질문 글 답변 (canComment)', () => {
     expect(canComment({ category: 'free' }, undefined, false)).toBe(false);
   });
 });
+
+describe('공지 고정 (운영자만)', () => {
+  it('운영자가 아니면 고정 값을 보내지 않는다 (체크를 흉내 내도)', () => {
+    expect(validatePost({ ...goodPost, pinned: 'on' }, COURSES).fields).not.toHaveProperty('is_pinned');
+    expect(validatePost({ ...goodPost, pinned: 'on' }, COURSES, { isAdmin: false }).fields).not.toHaveProperty('is_pinned');
+  });
+  it('운영자는 체크하면 true, 안 하면 false (수정 때 고정 해제)', () => {
+    expect(validatePost({ ...goodPost, pinned: 'on' }, COURSES, { isAdmin: true }).fields.is_pinned).toBe(true);
+    expect(validatePost(goodPost, COURSES, { isAdmin: true }).fields.is_pinned).toBe(false);
+  });
+});

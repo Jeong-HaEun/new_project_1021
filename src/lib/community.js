@@ -48,7 +48,8 @@ function firstProblem(checks) {
 
 // 글 → { ok: true, fields(서버로 보낼 값) } | { ok: false, field, reason }
 // 사용자 id는 보내지 않는다 (서버가 로그인 정보로 채우고 RLS가 검증)
-export function validatePost(input, courses) {
+// isAdmin: 운영자만 공지 고정 값(is_pinned)을 보낸다 — 고정 SQL 적용 전 일반 회원 글쓰기가 깨지지 않게. 실제로 막는 건 DB (20261020000000)
+export function validatePost(input, courses, { isAdmin = false } = {}) {
   const category = clean(input.category);
   if (!CATEGORIES.some((item) => item.id === category)) return { ok: false, field: 'category', reason: 'invalid' };
   const title = clean(input.title);
@@ -65,7 +66,9 @@ export function validatePost(input, courses) {
   if (!courseId && category === 'outcome') return { ok: false, field: 'courseId', reason: 'required' };
   if (courseId && !courses.some((course) => course.id === courseId)) return { ok: false, field: 'courseId', reason: 'invalid' };
 
-  return { ok: true, fields: { category, title, body, author_name: authorName, course_id: courseId || null } };
+  const fields = { category, title, body, author_name: authorName, course_id: courseId || null };
+  if (isAdmin) fields.is_pinned = input.pinned === 'on';
+  return { ok: true, fields };
 }
 
 export function validateComment(input) {

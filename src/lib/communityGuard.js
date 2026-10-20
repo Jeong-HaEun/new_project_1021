@@ -16,7 +16,7 @@ export const REPORT_REASONS = [
   { id: 'etc', label: '기타' },
 ];
 
-// 서버 오류 → 'rate-limited' | 'personal-info' | 'reserved-name' | 'answer-only' | 'already-reported' | 'not-owner' | 'unknown'
+// 서버 오류 → 'rate-limited' | 'personal-info' | 'reserved-name' | 'answer-only' | 'pin-admin-only' | 'already-reported' | 'not-owner' | 'unknown'
 // DB 보호 함수는 P0001 오류에 community_rate_limited / community_personal_info 표시를 담아 보낸다
 export function serverProblem(error) {
   const message = error?.message ?? '';
@@ -24,6 +24,7 @@ export function serverProblem(error) {
   if (message.includes('community_personal_info')) return 'personal-info';
   if (message.includes('community_reserved_name')) return 'reserved-name';
   if (message.includes('community_answer_only')) return 'answer-only';
+  if (message.includes('community_pin_admin_only')) return 'pin-admin-only';
   if (message === 'not-owner') return 'not-owner';
   if (error?.code === '23505') return 'already-reported';
   return 'unknown';
@@ -38,6 +39,7 @@ export function guardText(problem, kind = 'post') {
   if (problem === 'personal-info') return '전화번호·이메일처럼 보이는 내용이 있어요. 개인정보는 지우고 올려 주세요.';
   if (problem === 'reserved-name') return '운영자로 보일 수 있는 닉네임(취메·운영자·관리자 등)은 쓸 수 없어요. 다른 닉네임을 써 주세요.';
   if (problem === 'answer-only') return '질문 글에는 운영자와 질문한 분만 댓글을 달 수 있어요.';
+  if (problem === 'pin-admin-only') return '공지 고정은 운영자만 할 수 있어요.';
   if (problem === 'already-reported') return '이미 신고한 글이에요.';
   if (problem === 'not-owner') return '본인 글·댓글만 고치거나 지울 수 있어요.';
   if (kind === 'comment') return '댓글을 올리지 못했어요. 잠시 후 다시 시도해 주세요.';

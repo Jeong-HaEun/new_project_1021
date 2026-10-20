@@ -68,7 +68,7 @@ function showProblem(problem, field = problem.field) {
 async function handlePostSubmit(event) {
   event.preventDefault();
   view.draft = Object.fromEntries(new FormData(event.currentTarget));
-  const checked = validatePost(view.draft, openCourses);
+  const checked = validatePost(view.draft, openCourses, { isAdmin: view.isAdmin });
   if (!checked.ok) return showProblem(checked);
   Object.assign(view, { busy: true, error: null });
   render();
@@ -146,7 +146,7 @@ function FormScreen() {
   if (route.name === 'edit' && !canManage(view.post, view.user)) return [Parts.BackLink(), el('p', { className: 'helper-notice', role: 'alert', text: '본인 글만 수정할 수 있어요.' })];
   return [
     Parts.BackLink(),
-    PostForm({ post: route.name === 'edit' ? view.post : null, values: view.draft ?? (route.category && { category: route.category }), courses: openCourses, authorName: savedName(), error: view.error, busy: view.busy, onSubmit: handlePostSubmit }),
+    PostForm({ post: route.name === 'edit' ? view.post : null, values: view.draft ?? (route.category && { category: route.category }), courses: openCourses, authorName: savedName(), canPin: view.isAdmin, error: view.error, busy: view.busy, onSubmit: handlePostSubmit }),
   ];
 }
 

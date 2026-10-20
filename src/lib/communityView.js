@@ -51,13 +51,15 @@ export function normalizePost(row) {
     commentCount: Number(row.community_comments?.[0]?.count ?? 0) || 0,
     hidden: row.hidden === true, // 신고가 쌓여 숨긴 글 (글쓴이 본인에게만 내려온다)
     official: row.is_official === true, // 운영자(취메) 글 — DB가 채운다
+    pinned: row.is_pinned === true, // 운영자가 고정한 공지 — 목록 맨 위
   };
 }
 
-// 목록은 최신순
+// 목록은 고정 공지 먼저, 그다음 최신순. 고정 목록·최신 목록에 함께 온 글은 한 번만
 export function normalizePosts(rows) {
   if (!Array.isArray(rows)) return [];
-  return rows.map(normalizePost).filter(Boolean).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  const posts = new Map(rows.map(normalizePost).filter(Boolean).map((post) => [post.id, post]));
+  return [...posts.values()].sort((a, b) => Number(b.pinned) - Number(a.pinned) || b.createdAt.localeCompare(a.createdAt));
 }
 
 // 댓글은 오래된 순 (대화 순서)
