@@ -4,6 +4,7 @@
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { pageUrl } from '../lib/paths.js';
+import { SITE_NAME } from '../lib/site.js';
 import { sortByCategory } from '../lib/courseQuery.js';
 import { COURSES } from '../data/courses/index.js';
 import { CATEGORIES } from '../data/categories.js';
@@ -45,12 +46,15 @@ const BRAND_WAYS = ['처음 배우는 눈높이로 설명해요', '작은 실습
 
 function BrandIntro() {
   return el('div', { className: 'home-brand' }, [
-    el('h2', { className: 'section__title', text: '첫 실무를 준비하는 당신의 취업 메이트' }),
-    el('p', {
-      className: 'home-brand__desc',
-      text: '학교에서 배운 것과 회사에서 필요한 것 사이, 처음 실무를 시작하는 분의 길잡이가 되고 싶어요. 입사 전 엑셀·PPT를 연습하려는 취업 준비생과 업무에 바로 써야 하는 사회 초년생을 위해 강의를 한 강씩 준비하고 있어요.',
-    }),
-    el('ul', { className: 'home-brand__ways' }, BRAND_WAYS.map((text) => el('li', {}, [icon('check'), el('span', { text })]))),
+    el('div', {}, [
+      el('p', { className: 'home-brand__kicker', text: SITE_NAME }),
+      el('h2', { className: 'section__title', text: '첫 실무를 준비하는 당신의 취업 메이트' }),
+      el('p', {
+        className: 'home-brand__desc',
+        text: '학교에서 배운 것과 회사에서 필요한 것 사이, 처음 실무를 시작하는 분의 길잡이가 되고 싶어요. 입사 전 엑셀·PPT를 연습하려는 취업 준비생과 업무에 바로 써야 하는 사회 초년생을 위해 강의를 한 강씩 준비하고 있어요.',
+      }),
+    ]),
+    el('ul', { className: 'home-brand__ways' }, BRAND_WAYS.map((text) => el('li', {}, [icon('check', 18), el('span', { text })]))),
   ]);
 }
 
