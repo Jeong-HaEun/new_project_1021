@@ -55,6 +55,10 @@
   color: var(--color-hero-bg);
 }
 
+.home-hero .home-top__cta:hover {
+  background: var(--color-primary-soft);
+}
+
 .home-hero__caption {
   display: grid;
   gap: 2px;

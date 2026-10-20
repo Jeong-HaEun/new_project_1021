@@ -92,8 +92,8 @@
 }
 
 .badge--red {
-  background: var(--color-primary-soft);
-  color: var(--color-primary);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
 }
 
 .badge--preview {

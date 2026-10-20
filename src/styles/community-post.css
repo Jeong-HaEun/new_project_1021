@@ -51,7 +51,7 @@
 }
 
 .community-danger {
-  color: var(--color-primary);
+  color: var(--color-danger);
 }
 
 .community-comment-list {

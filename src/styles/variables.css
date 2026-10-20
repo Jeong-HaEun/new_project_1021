@@ -2,20 +2,24 @@
    값을 정한 이유는 DESIGN.md 참고 */
 :root {
   /* 배경 */
-  --color-bg: #f7f9fb;
+  --color-bg: #f8f7f3;
   --color-surface: #ffffff;
-  --color-surface-subtle: #f1f5f9;
+  --color-surface-subtle: #eef0fa;
 
   /* 글자 */
-  --color-text: #191c1e;
-  --color-text-muted: #475569;
+  --color-text: #23283d;
+  --color-text-muted: #555d73;
 
-  /* 포인트 — 빨강은 버튼·가격·선택 상태에만 */
-  --color-primary: #af2716;
-  --color-primary-strong: #d2402c;
-  --color-primary-soft: #ffdad4;
+  /* 브랜드 — 차분한 인디고, 버튼·가격·선택 상태에 사용 */
+  --color-primary: #4856b8;
+  --color-primary-strong: #384594;
+  --color-primary-soft: #eef0fa;
   --color-on-primary: #ffffff;
-  --color-on-primary-soft: rgba(255, 255, 255, 0.18); /* 빨강 배경 위 옅은 흰색 */
+  --color-on-primary-soft: rgba(255, 255, 255, 0.18); /* 브랜드 배경 위 옅은 흰색 */
+
+  /* 오류·삭제·마감: 대표색과 분리 */
+  --color-danger: #af2716;
+  --color-danger-soft: #ffebe7;
 
   /* 정보·완료 표시 */
   --color-info: #005ea3;
@@ -27,7 +31,7 @@
   --color-warning-strong: #92400e;
 
   /* 선 */
-  --color-line: #e2e8f0;
+  --color-line: #dfe2ee;
 
   /* 글꼴 — Pretendard(무료, OFL). 한글·영문·숫자 모두 */
   --font-base: 'Pretendard Variable', Pretendard, -apple-system, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
@@ -52,20 +56,22 @@
   --space-step-gap: 8px;
   --space-feature-padding: 24px;
 
+  --color-brand-line: #c9ceec;
+
   /* 그림자 — 한 단계만 */
   --shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06);
   --shadow-card-hover: 0 6px 16px rgba(15, 23, 42, 0.1); /* 카드 hover — 가볍게 떠오르는 정도 */
 
   /* 진한 선 (비활성 표시 점 등) */
-  --color-line-strong: #cbd5e1;
+  --color-line-strong: #c5cadc;
 
   /* 메인 A안(감성 몰입형) 큰 이미지 위 글자 — 이미지가 늦게 떠도 읽히도록 바탕색을 깐다 */
-  --color-hero-bg: #164e89;
+  --color-hero-bg: #303b83;
   --color-hero-text: #ffffff;
-  --color-hero-text-soft: #e8edf4;
-  --color-hero-accent: #f3cd73;
-  --color-hero-overlay: rgba(8, 36, 73, 0.4);
-  --color-hero-overlay-strong: rgba(8, 36, 73, 0.75);
+  --color-hero-text-soft: #eef0fa;
+  --color-hero-accent: #e0e4ff;
+  --color-hero-overlay: rgba(35, 40, 61, 0.55);
+  --color-hero-overlay-strong: rgba(35, 40, 61, 0.88);
 
   /* 카카오 로그인 버튼 — 카카오 디자인 가이드 색 */
   --color-kakao: #fee500;

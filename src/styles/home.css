@@ -11,10 +11,10 @@
   gap: 16px;
   margin-bottom: 28px;
   padding: 20px;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-brand-line);
   border-left: 4px solid var(--color-primary);
   border-radius: var(--radius-card);
-  background: var(--color-surface);
+  background: var(--color-primary-soft);
   box-shadow: var(--shadow-card);
   word-break: keep-all; /* 한국어를 단어 중간에서 끊지 않는다 */
 }
@@ -42,7 +42,7 @@
   align-content: center;
   padding: 14px 16px;
   border-radius: var(--radius-control);
-  background: var(--color-surface-subtle);
+  background: var(--color-surface);
   font-size: 14px;
   font-weight: 700;
 }
@@ -82,9 +82,9 @@
   gap: 12px;
   justify-items: start;
   padding: 20px;
-  border: 1px solid var(--color-line);
+  border: 1px solid var(--color-brand-line);
   border-radius: var(--radius-card);
-  background: var(--color-surface);
+  background: var(--color-primary-soft);
 }
 
 .home-helper__icon {

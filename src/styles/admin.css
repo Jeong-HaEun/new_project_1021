@@ -179,7 +179,7 @@
 
 .admin-error {
   font-size: var(--text-small);
-  color: var(--color-primary);
+  color: var(--color-danger);
 }
 
 .admin-video {
