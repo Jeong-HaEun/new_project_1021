@@ -3,12 +3,19 @@ import { el } from '../lib/dom.js';
 import { assetUrl } from '../lib/paths.js';
 import { formatPrice } from '../lib/price.js';
 import { getCategoryName, totalMinutes } from '../lib/courseQuery.js';
-import { getCourseBadge } from '../lib/enrollment.js';
+import { getCourseMark } from '../lib/purchase.js';
+import { bindOwnedState } from '../lib/cartStore.js';
 
-// 상태 배지 — 제작 예정 / 데모 체험 가능(초록, 상시 포함) / 모집 예정(노랑) / 모집 마감(빨강)
+// 상태 배지 — 구매한 강의(대표색) / 제작 예정 / 데모 체험 가능(초록, 상시 포함) / 모집 예정(노랑) / 모집 마감(빨강)
+// 구매 기록이 나중에 도착해도(로그인 계정 기록) 다시 그린다
 export function StatusBadge(course) {
-  const badge = getCourseBadge(course);
-  return badge ? el('span', { className: `badge badge--${badge.tone}`, text: badge.label }) : null;
+  const node = el('span', { className: 'badge' });
+  return bindOwnedState(node, (purchases) => {
+    const badge = getCourseMark(course, purchases);
+    node.className = badge ? `badge badge--${badge.tone}` : 'badge';
+    node.textContent = badge ? badge.label : '';
+    node.hidden = !badge;
+  });
 }
 
 export function CourseCard(course, categories) {

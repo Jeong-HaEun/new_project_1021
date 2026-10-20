@@ -2,7 +2,7 @@
 // 실제 결제는 하지 않는다. 구매 기록 [{ courseId, purchasedAt }]만 브라우저에 남긴다
 // 상태는 { cart, purchases } 묶음으로 받고, 원래 값을 바꾸지 않고 새 묶음을 돌려준다
 import { removeFromCart } from './cart.js';
-import { getEnrollmentStatus } from './enrollment.js';
+import { getCourseBadge, getEnrollmentStatus } from './enrollment.js';
 
 export function hasPurchased(courseId, purchases) {
   return purchases.some((purchase) => purchase.courseId === courseId);
@@ -45,6 +45,12 @@ export function checkoutCart(state, courses, purchasedAt, now = new Date()) {
 export function getLessonAccess(course, lesson, purchases) {
   if (hasPurchased(course.id, purchases)) return 'owned';
   return lesson.isPreview ? 'preview' : 'locked';
+}
+
+// 카드·상세 상태 배지 — 구매한 강의는 '구매한 강의', 아니면 제작·모집 상태 배지 (없으면 null)
+export function getCourseMark(course, purchases, now = new Date()) {
+  if (hasPurchased(course.id, purchases)) return { tone: 'owned', label: '구매한 강의' };
+  return getCourseBadge(course, now);
 }
 
 // 결과물 완성 체크 — 구매한 강의만, 강의당 1번

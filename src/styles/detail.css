@@ -159,6 +159,10 @@
   color: var(--color-text-muted);
 }
 
+.lesson__access {
+  display: inline-flex;
+}
+
 /* 구매 전 확인 */
 .info-list {
   display: grid;

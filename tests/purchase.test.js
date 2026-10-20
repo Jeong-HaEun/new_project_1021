@@ -4,6 +4,7 @@ import {
   buyNow,
   checkoutCart,
   cleanOutcomes,
+  getCourseMark,
   getLessonAccess,
   hasPurchased,
   markOutcomeDone,
@@ -126,5 +127,16 @@ describe('모집 기간 — 마감·모집 예정 강좌는 살 수 없다', () 
     const state = { cart: ['t201'], purchases: [] };
     expect(buyNow(state, closed, NOW, now)).toEqual(state);
     expect(checkoutCart(state, [closed], NOW, now)).toEqual({ cart: [], purchases: [], added: [] });
+  });
+});
+
+describe('getCourseMark — 카드·상세 상태 배지', () => {
+  it('구매한 강의는 상태와 상관없이 구매한 강의 배지', () => {
+    expect(getCourseMark(open1, [owned('t001')])).toEqual({ tone: 'owned', label: '구매한 강의' });
+  });
+
+  it('구매 안 한 강의는 원래 상태 배지', () => {
+    expect(getCourseMark(open1, [owned('t002')])).toEqual({ tone: 'green', label: '데모 체험 가능' });
+    expect(getCourseMark(planned, [])).toEqual({ tone: 'planned', label: '제작 예정' });
   });
 });

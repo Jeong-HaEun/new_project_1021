@@ -5,6 +5,8 @@ import { assetUrl } from '../lib/paths.js';
 import { getCategoryName, totalMinutes } from '../lib/courseQuery.js';
 import { StatusBadge } from './CourseCard.js';
 import { formatEnrollmentPeriod } from '../lib/enrollment.js';
+import { getLessonAccess } from '../lib/purchase.js';
+import { bindOwnedState } from '../lib/cartStore.js';
 
 const section = (title, children) =>
   el('section', { className: 'detail-section' }, [el('h2', { className: 'detail-section__title', text: title }), ...children]);
@@ -32,15 +34,25 @@ export function DetailHero(course, categories) {
   ]);
 }
 
+// 차시 열림 표시 — 구매함: '열림' / 맛보기 / 그 밖: 자물쇠
+function LessonAccessMark(course, lesson) {
+  const node = el('span', { className: 'lesson__access' });
+  return bindOwnedState(node, (purchases) => {
+    const access = getLessonAccess(course, lesson, purchases);
+    node.replaceChildren(
+      access === 'locked'
+        ? icon('lock', 16)
+        : el('span', { className: 'badge badge--preview', text: access === 'owned' ? '열림' : '맛보기' }),
+    );
+  });
+}
+
 export function Curriculum(course) {
   const lessons = course.lessons.map((lesson, index) =>
     el('li', { className: 'lesson' }, [
       el('span', { className: 'lesson__no', text: String(index + 1) }),
       el('span', { className: 'lesson__title', text: lesson.title }),
-      el('span', { className: 'lesson__meta' }, [
-        lesson.isPreview ? el('span', { className: 'badge badge--preview', text: '맛보기' }) : icon('lock', 16),
-        el('span', { text: `${lesson.minutes}분` }),
-      ]),
+      el('span', { className: 'lesson__meta' }, [LessonAccessMark(course, lesson), el('span', { text: `${lesson.minutes}분` })]),
     ]),
   );
   return section('커리큘럼', [

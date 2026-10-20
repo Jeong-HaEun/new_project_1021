@@ -114,6 +114,21 @@ export function resetDemo() {
   notify();
 }
 
+// 구매 상태에 따라 그리는 조각 — 지금 그리고, 구매 기록이 바뀌면(계정 기록 도착·다른 탭) 다시 그린다
+// 목록이 다시 그려져 화면에서 빠진 조각은 다음 변경 때 듣기를 멈춘다
+export function bindOwnedState(node, render) {
+  render(readOwnedState().purchases);
+  function handleOwnedChange() {
+    if (!node.isConnected) {
+      window.removeEventListener(CART_CHANGE_EVENT, handleOwnedChange);
+      return;
+    }
+    render(readOwnedState().purchases);
+  }
+  window.addEventListener(CART_CHANGE_EVENT, handleOwnedChange);
+  return node;
+}
+
 // 브라우저를 닫아도 장바구니가 남는지 (사생활 보호 모드 등에서는 false)
 export function isCartPersistent() {
   return storage.isPersistent();

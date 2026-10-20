@@ -65,6 +65,16 @@
   object-fit: cover;
 }
 
+/* 구매한 강의 배지 — 카드·상세 공통 (배지가 없는 강의는 숨김) */
+.badge--owned {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.badge[hidden] {
+  display: none;
+}
+
 .course-card__thumb .badge {
   position: absolute;
   top: 10px;
