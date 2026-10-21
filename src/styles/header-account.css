@@ -1,0 +1,39 @@
+/* 회원 아이콘과 별명 — 이름만 줄이고 ‘님’은 남긴다. */
+.header-account {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 40px;
+  min-width: 0;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+}
+.header-account:hover { background: var(--color-surface-subtle); }
+.header-account svg { flex: 0 0 22px; }
+.header-account__name {
+  min-width: 0;
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-small);
+}
+.header-account__suffix { flex: 0 0 auto; font-size: var(--text-small); }
+.site-header__actions { flex-shrink: 0; }
+.remember-login {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+.remember-login input { width: 18px; height: 18px; accent-color: var(--color-primary); }
+@media (max-width: 767px) {
+  .header-account__name { max-width: 76px; }
+  .site-header__inner { gap: 8px; }
+}
+@media (min-width: 768px) and (max-width: 1079px) {
+  .site-header__inner { gap: 12px; }
+  .header-account__name { max-width: 70px; }
+}

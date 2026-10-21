@@ -1,7 +1,7 @@
 // 계정 — 카카오·이메일 로그인(Supabase Auth)·로그아웃·로그인 상태 알림
 // 비밀번호는 Supabase로 바로 보내고 저장·기록하지 않는다. 카카오 토큰은 다루지 않는다
 // ⚠ Supabase 대시보드에서 Kakao 제공자를 켜고, 돌아올 주소(myclass.html)를 Redirect URLs에 등록해야 동작한다
-import { getServerClient, isServerConfigured } from './server.js';
+import { getServerClient, isServerConfigured, setRememberLogin } from './server.js';
 
 // 지금 로그인한 사용자 (없으면 null). 서버 연결 전이면 null
 export async function getCurrentUser() {
@@ -34,6 +34,7 @@ export async function signOut() {
   const client = await getServerClient();
   const { error } = await client.auth.signOut();
   if (error) throw error;
+  await setRememberLogin(false);
 }
 
 // 이메일·비밀번호 로그인. 실패하면 Supabase 오류를 그대로 던진다 (화면에서 authErrorText로 바꿔 보여 줌)

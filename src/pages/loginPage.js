@@ -3,7 +3,8 @@
 // 비밀번호 찾기: 재설정 메일 → 링크(login.html?reset=1) → 새 비밀번호 저장 → next로 이동
 import { el } from '../lib/dom.js';
 import { readParam } from '../lib/paths.js';
-import { isServerConfigured } from '../lib/server.js';
+import { RememberLogin } from '../components/RememberLogin.js';
+import { isServerConfigured, setRememberLogin } from '../lib/server.js';
 import { getCurrentUser, sendPasswordReset, signInWithEmail, signInWithKakao, signUpWithEmail, updatePassword } from '../lib/account.js';
 import { authErrorText, getRecoveryState, MIN_PASSWORD_LENGTH, safeNextPage, validateAuthForm } from '../lib/emailAuth.js';
 import { renderPage } from '../components/PageLayout.js';
@@ -17,7 +18,7 @@ const next = safeNextPage(readParam('next'));
 // 서버 라이브러리가 주소의 # 뒤를 지우기 전에 재설정 링크로 왔는지 먼저 읽어 둔다
 const recovery = getRecoveryState(window.location.search, window.location.hash);
 // mode: 'login' | 'signup' | 'forgot' | 'reset'. values: 입력값은 화면을 다시 그려도 남도록 메모리에만 둔다 (저장하지 않음)
-const state = { mode: recovery === 'none' ? 'login' : 'reset', busy: false, error: null, sent: false, done: false, user: undefined, values: {} };
+const state = { mode: recovery === 'none' ? 'login' : 'reset', busy: false, error: null, sent: false, done: false, user: undefined, values: {}, remember: false };
 const body = el('div', { className: 'login-body' });
 
 const NEW_PASSWORD = [['password', `새 비밀번호 (${MIN_PASSWORD_LENGTH}자 이상)`, 'password', 'new-password'], ['passwordConfirm', '새 비밀번호 확인', 'password', 'new-password']];
@@ -39,10 +40,16 @@ function handleMode(mode) {
 }
 
 async function handleKakao() {
+  if (state.busy) return;
+  state.busy = true;
+  render();
   try {
+    await setRememberLogin(state.remember);
     await signInWithKakao(next);
   } catch {
     state.error = '카카오 로그인을 시작하지 못했어요. 잠시 뒤 다시 시도해 주세요.';
+  } finally {
+    state.busy = false;
     render();
   }
 }
@@ -50,9 +57,11 @@ async function handleKakao() {
 // 모드별 서버 요청. 끝나면 화면 상태만 바꾼다 (로그인은 바로 이동)
 async function submit({ email, password }) {
   if (state.mode === 'login') {
+    await setRememberLogin(state.remember);
     await signInWithEmail(email, password);
     window.location.href = next;
   } else if (state.mode === 'signup') {
+    await setRememberLogin(state.remember);
     await signUpWithEmail(email, password, next);
     state.sent = true;
   } else if (state.mode === 'forgot') {
@@ -66,6 +75,7 @@ async function submit({ email, password }) {
 
 async function handleSubmit(event) {
   event.preventDefault();
+  if (state.busy) return;
   const checked = validateAuthForm(state.mode, Object.fromEntries(new FormData(event.currentTarget)));
   if (!checked.ok) {
     state.error = checked.message;
@@ -122,7 +132,9 @@ function ResetScreen() {
 function LoginScreen() {
   const tab = (mode, text) => el('button', { type: 'button', className: 'helper-tab', 'aria-pressed': String(state.mode === mode), onClick: () => handleMode(mode), text });
   return [
-    el('button', { type: 'button', className: 'button kakao-login login-kakao', onClick: handleKakao, text: '카카오로 로그인' }),
+    RememberLogin({ checked: state.remember, disabled: state.busy, onChange: (checked) => { state.remember = checked; } }),
+    el('p', { className: 'login-session-note text-muted', text: '해제하면 이 탭에서만 로그인해요. 공용 기기에서는 선택하지 마세요.' }),
+    el('button', { type: 'button', className: 'button kakao-login login-kakao', onClick: handleKakao, text: '카카오로 로그인', ...(state.busy && { disabled: '' }) }),
     el('p', { className: 'login-divider', text: '또는 이메일로' }),
     el('div', { className: 'helper-tabs', role: 'group', 'aria-label': '이메일 로그인 또는 가입' }, [tab('login', '로그인'), tab('signup', '회원가입')]),
     state.mode === 'forgot' ? el('p', { className: 'text-muted', text: '가입한 이메일을 적으면 비밀번호를 새로 정하는 링크를 보내 드려요.' }) : null,

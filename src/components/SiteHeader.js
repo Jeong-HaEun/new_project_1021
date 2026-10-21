@@ -2,6 +2,7 @@
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { SITE_NAME } from '../lib/site.js';
+import { HeaderAccount } from './HeaderAccount.js';
 import { CartLink } from './CartLink.js';
 
 export function SiteHeader({ active }) {
@@ -23,9 +24,7 @@ export function SiteHeader({ active }) {
       el('div', { className: 'site-header__actions' }, [
         el('a', { href: 'courses.html', className: 'icon-button', 'aria-label': '강의 검색' }, [icon('search')]),
         CartLink({ className: 'icon-button', active: active === 'cart' }),
-        el('a', { href: 'myclass.html', className: 'icon-button', 'aria-label': '내 강의실·로그인', ...(active === 'myclass' && { 'aria-current': 'page' }) }, [
-          icon('user'),
-        ]),
+        HeaderAccount({ active }),
       ]),
     ]),
   ]);
