@@ -55,7 +55,19 @@ export function PaymentMethods() {
   ]);
 }
 
-export function OrderComplete(courses) {
+// 할인 줄 — 서버가 확인한 쿠폰·포인트 (데모 할인)
+function DiscountSummary(rewards) {
+  if (!rewards) return null;
+  const won = (amount) => `${amount.toLocaleString('ko-KR')}원`;
+  return el('p', { className: 'order-complete__total' }, [
+    el('span', { text: `쿠폰 -${won(rewards.coupon_discount)} · 포인트 -${won(rewards.points_used)} → 최종 ` }),
+    el('strong', { className: 'price', text: won(rewards.final_total) }),
+    el('span', { className: 'order-note', text: ` (남은 포인트 ${rewards.balance.toLocaleString('ko-KR')}P, 데모 할인)` }),
+  ]);
+}
+
+// rewards: 포인트·쿠폰을 썼으면 서버 응답(hanclass_use_order_rewards), 안 썼으면 없음
+export function OrderComplete(courses, rewards = null) {
   const total = courses.reduce((sum, course) => sum + course.price, 0);
   return el('div', { className: 'order-complete' }, [
     el('span', { className: 'order-complete__icon' }, [icon('check', 32)]),
@@ -63,6 +75,7 @@ export function OrderComplete(courses) {
     el('p', { className: 'text-muted', text: '실제로 결제되지 않았어요. 구매 기록은 이 브라우저에만 남아요.' }),
     el('ul', { className: 'cart-list' }, courses.map((course) => OrderItem(course, { learnLink: true }))),
     el('p', { className: 'order-complete__total' }, [el('span', { text: '합계 ' }), el('strong', { className: 'price', text: formatPrice(total) })]),
+    DiscountSummary(rewards),
     ServerSaveStatus(courses.map((course) => course.id)),
     el('div', { className: 'order-complete__actions' }, [
       el('a', { href: 'courses.html', className: 'button button--ghost', text: '강의 더 둘러보기' }),
