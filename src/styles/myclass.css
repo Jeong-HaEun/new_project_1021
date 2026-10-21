@@ -55,14 +55,45 @@
   color: var(--color-success-strong);
 }
 
-/* 좁은 화면: [수강 화면]을 정보 아래 한 줄로 */
+/* [수강 화면]·[데모 수강 취소] 묶음 */
+.myclass-item__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* 취소는 눈에 덜 띄게, 한 번 누르면(확인 대기) 경고색 */
+.myclass-item__cancel {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-control);
+  background: var(--color-surface);
+  color: var(--color-text-muted);
+  font-size: var(--text-small);
+  cursor: pointer;
+}
+
+.myclass-item__cancel:hover,
+.myclass-item__cancel[data-armed="true"] {
+  border-color: var(--color-danger);
+  background: var(--color-danger-soft);
+  color: var(--color-danger);
+}
+
+/* 좁은 화면: 버튼 묶음을 정보 아래 한 줄로 */
 @media (max-width: 479px) {
   .myclass-item {
     grid-template-columns: 96px 1fr;
   }
 
-  .myclass-item__learn {
+  .myclass-item__actions {
     grid-column: 1 / -1;
+    flex-direction: row;
+  }
+
+  .myclass-item__actions > * {
+    flex: 1;
   }
 }
 

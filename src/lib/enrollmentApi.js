@@ -49,3 +49,14 @@ export async function removeOutcome(courseId) {
   const { error } = await client.from(OUTCOME_TABLE).delete().eq('course_id', courseId);
   if (error) throw error;
 }
+
+// 데모 수강 취소 — 완성 체크를 먼저 지우고 신청 기록을 지운다 (본인 행만, RLS)
+// 실제로 지워진 행이 없으면(삭제 권한 SQL 적용 전 등) 오류를 던진다 → 화면은 기록을 그대로 둔다
+export async function cancelDemoEnrollment(courseId) {
+  const client = await getServerClient();
+  const outcome = await client.from(OUTCOME_TABLE).delete().eq('course_id', courseId);
+  if (outcome.error) throw outcome.error;
+  const { data, error } = await client.from(TABLE).delete().eq('course_id', courseId).select('course_id');
+  if (error) throw error;
+  if (!data?.length) throw new Error('not_canceled');
+}

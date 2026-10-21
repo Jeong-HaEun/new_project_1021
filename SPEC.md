@@ -241,7 +241,14 @@ export const course = {
 - 정의: `supabase/migrations/20261019050000_hanclass_materials.sql`(영상 SQL 다음). 되돌리기 `supabase/rollback/20261019050000_hanclass_materials_down.sql` — 정책·테이블. 버킷·파일은 대시보드 Storage에서 지운다
 - SQL 적용 전: 운영자 화면은 "강의 자료 저장소가 아직 서버에 없어요" + [올리기] 비활성, 수강생 화면은 자료 영역을 숨긴다
 
-### 출석 포인트·회원 등급·월 쿠폰 (myclass.html·order.html, src/lib/rewards.js·rewardsApi.js, components/RewardsPanel.js·OrderRewards.js) — 구현, DB 적용 대기
+### 데모 수강 취소 (myclass.html, src/lib/demoCancel.js, enrollmentApi.cancelDemoEnrollment) — 구현, DB 적용 대기
+- 내 강의실의 강의마다 [데모 수강 취소] — 4초 안에 두 번 눌러야 실행(실수 방지). 실제 결제가 없어 돈을 돌려주는 환불이 아니라 기록만 지운다
+- 계정 기록: 결과물 완성 체크(demo_outcomes) → 신청 기록(demo_enrollments) 순으로 본인 것만 지운다. 같은 강의가 이 브라우저 기록에도 있으면 함께 지운다. 지워진 행이 없으면(SQL 적용 전 등) 오류 안내하고 기록은 그대로
+- 이 브라우저의 데모 주문: 구매 기록·완성 체크에서 뺀다 (localStorage)
+- 주문에서 쓴 포인트·쿠폰은 돌려주지 않는다(화면에 안내). 장부 되돌리기는 다음 단계
+- DB: `supabase/migrations/20261021010000_demo_enrollments_cancel.sql` — authenticated에 delete 권한 + "본인 데모 수강 기록만 취소" 정책. 되돌리기 SQL 있음. 운영자 통계의 데모 신청 수는 취소만큼 줄어든다
+
+### 출석 포인트·회원 등급·월 쿠폰 (myclass.html·order.html, src/lib/rewards.js·rewardsApi.js, components/RewardsPanel.js·OrderRewards.js) — 구현, DB 적용 완료 (2026-10-21, 실제 로그인으로 출석·중복 방지·헤더 표시 확인)
 - 목적: 리텐션(다시 방문). 로그인한 회원만. **데모 할인이며 실제 돈이 아니다**(화면에 늘 표시)
 - 출석: 하루 한 번(한국 날짜) [출석 체크] → 10P. 같은 날 두 번 눌러도 포인트는 그대로("오늘은 이미 출석했어요")
 - 등급(이번 달 출석일 수, 한국 날짜): 새싹 0~4일 / 성장 5~9일 / 실무 10~19일 / 마스터 20일 이상. 달이 바뀌면 0일부터

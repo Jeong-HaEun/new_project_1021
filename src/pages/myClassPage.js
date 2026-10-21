@@ -3,10 +3,10 @@
 import { el } from '../lib/dom.js';
 import { isServerConfigured } from '../lib/server.js';
 import { getCurrentUser, onAuthChange, signInWithKakao, signOut } from '../lib/account.js';
-import { fetchMyEnrollments, fetchMyOutcomes } from '../lib/enrollmentApi.js';
+import { cancelDemoEnrollment, fetchMyEnrollments, fetchMyOutcomes } from '../lib/enrollmentApi.js';
 import { fetchAdminRole } from '../lib/adminApi.js';
 import { getClassroomState, normalizeEnrollments, normalizeOutcomeRows, toPurchaseRecords } from '../lib/myClassroom.js';
-import { readCartState, setAccountRecords } from '../lib/cartStore.js';
+import { cancelBrowserPurchase, readCartState, setAccountRecords } from '../lib/cartStore.js';
 import { COURSES } from '../data/courses/index.js';
 import { renderPage } from '../components/PageLayout.js';
 import * as Parts from '../components/MyClassParts.js';
@@ -94,18 +94,38 @@ async function init() {
   }
 }
 
+// 데모 수강 취소 — 계정 기록(서버)을 지우고, 같은 강의가 이 브라우저 기록에도 있으면 함께 지운다
+async function handleAccountCancel(course) {
+  try {
+    await cancelDemoEnrollment(course.id);
+  } catch {
+    showToast('취소하지 못했어요. 잠시 후 다시 시도해 주세요.');
+    render(); // 버튼을 처음 상태로
+    return;
+  }
+  cancelBrowserPurchase(course.id);
+  showToast('데모 수강을 취소했어요. 다시 신청할 수 있어요.');
+  loadEnrollments();
+}
+
+function handleBrowserCancel(course) {
+  cancelBrowserPurchase(course.id);
+  showToast('이 브라우저의 데모 주문을 취소했어요.');
+  render();
+}
+
 function handleRetry() {
   if (view.user) loadEnrollments();
   else init();
 }
 
 const PANELS = {
-  unavailable: () => [Parts.UnavailablePanel(), Parts.BrowserOrders(browserOrderCourses())],
-  'signed-out': () => [Parts.SignedOutPanel(handleLogin), view.rewards, Parts.BrowserOrders(browserOrderCourses())],
+  unavailable: () => [Parts.UnavailablePanel(), Parts.BrowserOrders(browserOrderCourses(), handleBrowserCancel)],
+  'signed-out': () => [Parts.SignedOutPanel(handleLogin), view.rewards, Parts.BrowserOrders(browserOrderCourses(), handleBrowserCancel)],
   loading: () => [Parts.LoadingPanel()],
   error: () => [Parts.ErrorPanel(handleRetry)],
   empty: () => [Parts.AccountBar(handleLogout, view.isAdmin), view.rewards, Parts.EmptyPanel()],
-  list: () => [Parts.AccountBar(handleLogout, view.isAdmin), view.rewards, Parts.EnrollmentList(view.enrollments, view.outcomes), view.materials],
+  list: () => [Parts.AccountBar(handleLogout, view.isAdmin), view.rewards, Parts.EnrollmentList(view.enrollments, view.outcomes, handleAccountCancel), view.materials],
 };
 
 function render() {

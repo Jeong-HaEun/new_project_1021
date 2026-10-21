@@ -20,6 +20,7 @@ import { getOutcomeTarget, mergeOutcomes, mergePurchases } from './myClassroom.j
 import { unmarkOutcome } from './purchase.js';
 import { removeOutcome, saveOutcome } from './enrollmentApi.js';
 import { placeDemoOrder } from './order.js';
+import { cancelLocalPurchase } from './demoCancel.js';
 
 export const CART_CHANGE_EVENT = 'hanclass:cart-change';
 
@@ -105,6 +106,14 @@ export async function toggleCourseOutcome(course) {
   } else {
     saveOutcomes(storage, toggleOutcome(readLocalOutcomes(), course, readOwnedState().purchases));
   }
+  notify();
+}
+
+// 이 브라우저의 데모 주문 한 강의 취소 — 구매 기록·완성 체크에서 뺀다 (계정 기록은 enrollmentApi에서 따로)
+export function cancelBrowserPurchase(courseId) {
+  const next = cancelLocalPurchase({ purchases: readCartState().purchases, outcomes: readLocalOutcomes() }, courseId);
+  savePurchases(storage, next.purchases);
+  saveOutcomes(storage, next.outcomes);
   notify();
 }
 

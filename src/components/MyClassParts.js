@@ -4,6 +4,7 @@ import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { assetUrl } from '../lib/paths.js';
 import { LoginButtons } from './LoginButtons.js';
+import { CANCEL_NOTE } from '../lib/demoCancel.js';
 
 export const DEMO_ENROLL_NOTE = '데모 수강 신청 기록이에요. 실제 구매가 아니며 유료 콘텐츠가 열리지 않아요.';
 
@@ -54,8 +55,37 @@ export function EmptyPanel() {
   ]);
 }
 
-// 강의 한 줄 — 썸네일·제목·결과물·날짜·[수강 화면]
-function ClassItem({ course, enrolledAt }, label, done = false) {
+const CANCEL_CONFIRM_MS = 4000;
+
+// [데모 수강 취소] — 실수로 지우지 않도록 4초 안에 두 번 눌러야 실행된다
+function CancelButton(course, onCancel) {
+  let timer = null;
+  const button = el('button', { type: 'button', className: 'myclass-item__cancel', text: '데모 수강 취소' });
+  const disarm = () => {
+    button.dataset.armed = '';
+    button.textContent = '데모 수강 취소';
+  };
+  function handleCancelClick() {
+    if (button.dataset.armed === 'true') {
+      clearTimeout(timer);
+      button.disabled = true;
+      button.textContent = '취소하는 중…';
+      onCancel(course);
+      return;
+    }
+    button.dataset.armed = 'true';
+    button.textContent = '한 번 더 누르면 취소돼요';
+    timer = setTimeout(disarm, CANCEL_CONFIRM_MS);
+  }
+  button.addEventListener('click', handleCancelClick);
+  button.setAttribute('aria-label', course.title + ' 데모 수강 취소');
+  return button;
+}
+
+const cancelNote = () => el('p', { className: 'myclass-note', text: CANCEL_NOTE });
+
+// 강의 한 줄 — 썸네일·제목·결과물·날짜·[수강 화면]·[데모 수강 취소]
+function ClassItem({ course, enrolledAt }, label, done = false, onCancel = null) {
   return el('li', { className: 'cart-item myclass-item' }, [
     el('a', { href: `course.html?id=${course.id}`, className: 'cart-item__thumb' }, [
       el('img', { src: assetUrl(course.thumbnail), alt: `${course.title} 임시 이미지`, width: '640', height: '400' }),
@@ -69,25 +99,30 @@ function ClassItem({ course, enrolledAt }, label, done = false) {
       el('p', { className: 'cart-item__outcome', text: `결과물 · ${course.outcome}` }),
       enrolledAt ? el('p', { className: 'myclass-date', text: `${formatDate(enrolledAt)} 신청` }) : null,
     ]),
-    el('a', { href: `learn.html?id=${course.id}`, className: 'button button--ghost myclass-item__learn', text: '수강 화면' }),
+    el('div', { className: 'myclass-item__actions' }, [
+      el('a', { href: `learn.html?id=${course.id}`, className: 'button button--ghost myclass-item__learn', text: '수강 화면' }),
+      onCancel ? CancelButton(course, onCancel) : null,
+    ]),
   ]);
 }
 
 // outcomes: 결과물 완성 체크한 강의 id
-export function EnrollmentList(enrollments, outcomes = []) {
+export function EnrollmentList(enrollments, outcomes = [], onCancel = null) {
   return el('section', { className: 'myclass-section' }, [
     el('h2', { className: 'myclass-section__title', text: `데모 수강 신청 ${enrollments.length}개` }),
-    el('ul', { className: 'cart-list' }, enrollments.map((item) => ClassItem(item, '데모 신청', outcomes.includes(item.course.id)))),
+    el('ul', { className: 'cart-list' }, enrollments.map((item) => ClassItem(item, '데모 신청', outcomes.includes(item.course.id), onCancel))),
+    onCancel ? cancelNote() : null,
   ]);
 }
 
 // 이 브라우저에만 있는 데모 주문 — 계정 기록과 섞지 않고 따로 보여 준다
-export function BrowserOrders(courses) {
+export function BrowserOrders(courses, onCancel = null) {
   if (courses.length === 0) return null;
   return el('section', { className: 'myclass-section' }, [
     el('h2', { className: 'myclass-section__title', text: '이 브라우저의 데모 주문' }),
     el('p', { className: 'myclass-note', text: '계정에 저장되지 않은 기록이에요. 브라우저 기록을 지우면 사라져요.' }),
-    el('ul', { className: 'cart-list' }, courses.map((course) => ClassItem({ course }, '이 브라우저'))),
+    el('ul', { className: 'cart-list' }, courses.map((course) => ClassItem({ course }, '이 브라우저', false, onCancel))),
+    onCancel ? cancelNote() : null,
   ]);
 }
 
