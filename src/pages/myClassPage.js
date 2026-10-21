@@ -11,18 +11,22 @@ import { COURSES } from '../data/courses/index.js';
 import { renderPage } from '../components/PageLayout.js';
 import * as Parts from '../components/MyClassParts.js';
 import { CourseMaterials } from '../components/CourseMaterials.js';
+import { RewardsPanel } from '../components/RewardsPanel.js';
+import { isRewardsMock } from '../lib/rewardsApi.js';
 import { showToast } from '../components/Toast.js';
 import '../styles/courses.css';
 import '../styles/cart-page.css';
 import '../styles/myclass.css';
 import '../styles/materials.css';
+import '../styles/rewards.css';
 
 const configured = isServerConfigured();
 const body = el('div', { className: 'myclass-body' });
 // user: undefined(확인 중) | null | 사용자. 로그아웃하면 기록을 바로 비워 이전 사용자 정보가 남지 않게 한다
 // isAdmin: 운영자면 계정 줄에 [운영자 페이지] (확인 실패·운영자 SQL 적용 전이면 false)
 // materials: 신청한 강의의 자료 목록 조각 — 불러올 때 한 번 만들어 다시 그려도 유지한다
-const view = { user: undefined, status: 'loading', enrollments: [], outcomes: [], isAdmin: false, materials: null };
+// rewards: 출석 포인트·등급 조각 — 로그인한 사용자마다 한 번 만든다 (개발용 ?rewards_mock=1이면 로그아웃이어도 가짜 값으로 보임)
+const view = { user: undefined, status: 'loading', enrollments: [], outcomes: [], isAdmin: false, materials: null, rewards: null };
 let requestId = 0;
 
 function browserOrderCourses() {
@@ -70,6 +74,7 @@ async function loadEnrollments() {
 function setUser(user) {
   requestId += 1;
   Object.assign(view, { user, enrollments: [], outcomes: [], isAdmin: false, materials: null, status: user ? 'loading' : 'ready' });
+  view.rewards = user || isRewardsMock() ? RewardsPanel() : null;
   setAccountRecords();
   if (user) loadEnrollments();
   else render();
@@ -96,11 +101,11 @@ function handleRetry() {
 
 const PANELS = {
   unavailable: () => [Parts.UnavailablePanel(), Parts.BrowserOrders(browserOrderCourses())],
-  'signed-out': () => [Parts.SignedOutPanel(handleLogin), Parts.BrowserOrders(browserOrderCourses())],
+  'signed-out': () => [Parts.SignedOutPanel(handleLogin), view.rewards, Parts.BrowserOrders(browserOrderCourses())],
   loading: () => [Parts.LoadingPanel()],
   error: () => [Parts.ErrorPanel(handleRetry)],
-  empty: () => [Parts.AccountBar(handleLogout, view.isAdmin), Parts.EmptyPanel()],
-  list: () => [Parts.AccountBar(handleLogout, view.isAdmin), Parts.EnrollmentList(view.enrollments, view.outcomes), view.materials],
+  empty: () => [Parts.AccountBar(handleLogout, view.isAdmin), view.rewards, Parts.EmptyPanel()],
+  list: () => [Parts.AccountBar(handleLogout, view.isAdmin), view.rewards, Parts.EnrollmentList(view.enrollments, view.outcomes), view.materials],
 };
 
 function render() {
