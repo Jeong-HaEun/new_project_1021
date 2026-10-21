@@ -76,6 +76,7 @@ export const course = {
 | 광고 성과 보고서 | `report.html` | 서버 연결 전 → 준비 중 안내. 로그아웃 → 카카오·이메일 로그인 안내 |
 | 내 강의실 | `myclass.html` | 서버 연결 전 → "서버 연결 준비 중" + 이 브라우저의 데모 주문 |
 | 커뮤니티 | `community.html?category=question` · `?post=12` · `?write=1`(`&category=question`이면 그 분류가 기본값) · `?edit=12` | 모르는 분류는 '전체', 숫자가 아닌 글 번호는 목록. 없는 글 → "글을 찾을 수 없어요" + 목록 링크 |
+| 회원 등급 안내 | `tiers.html` | 누구나(로그인·서버 없이) 볼 수 있다. 내 강의실 등급 박스의 [등급·쿠폰 안내 자세히 보기]에서 연다 |
 
 - 목록에서 검색어·분야를 바꾸면 주소도 함께 바뀐다 (새로고침·공유해도 같은 결과)
 - 장바구니: 상세의 [장바구니 담기] → 헤더·탭바 개수 즉시 반영 → cart.html에서 빼기·합계 → [주문하기]
@@ -262,6 +263,7 @@ export const course = {
 - RLS: 세 표 모두 본인 것만 조회. 추가·수정·삭제 권한 없음, anon 없음. 쓰기는 security definer 함수로만: `hanclass_get_rewards()`(요약), `hanclass_check_in()`(하루 1회 + 10P), `hanclass_use_order_rewards(강의 id 목록, 포인트, 쿠폰 사용)`. 같은 사람 요청은 잠금으로 하나씩 처리, 하나라도 거절되면 전부 취소
 - 주문 금액은 브라우저가 보낸 값을 믿지 않고 SQL의 가격표(열린 강의 c002 1,000원·c003 2,000원)로 다시 계산한다. 강의를 열거나 가격을 바꾸면 새 SQL 필요 → 다르면 tests/rewardsDb.test.js 실패
 - 정의: `supabase/migrations/20261021000000_hanclass_rewards.sql`. 되돌리기 `supabase/rollback/20261021000000_hanclass_rewards_down.sql`(출석·포인트·쿠폰 기록 삭제)
+- 등급 안내 페이지(tiers.html, src/pages/tiersPage.js): 등급 4개 카드(출석일 범위·매달 쿠폰), 출석 포인트·등급과 매달 쿠폰·주문할 때 쓰는 법, 데모 안내, [내 강의실에서 출석하기]. 숫자는 rewards.js(TIERS·getTierRange)에서 가져와 기준과 어긋나지 않는다. 하단 탭은 내 강의실로 표시
 - SQL 적용 전: 내 강의실은 "출석 포인트는 서버 준비 중", 주문은 "할인 없이 주문할 수 있어요". 개발 서버에서만 주소 끝 `?rewards_mock=1`로 가짜 응답 화면 확인(배포 빌드에는 들어가지 않음)
 - 헤더에 잔액을 보여 줄 때는 `fetchRewards()`(rewardsApi.js)를 쓰면 된다 — 헤더는 다른 작업 중이라 이번에는 붙이지 않음
 - 다음 단계: 헤더 포인트 표시, 서류 도우미 추가 횟수·광고 보고서 사용처, 취업 인증 축하 포인트, 운영자 통계에 출석 수, 데모 결제 실패 시 쓴 포인트 되돌리기(지금은 서버 차감 직후 브라우저 주문이라 실패 가능성 낮음)

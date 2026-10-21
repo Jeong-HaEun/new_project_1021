@@ -115,6 +115,14 @@
   font-size: 12px;
 }
 
+/* 내 강의실 등급 박스의 '자세히' 링크 */
+.rewards-tiers-link {
+  justify-self: start;
+  font-size: var(--text-small);
+  color: var(--color-primary);
+  text-decoration: underline;
+}
+
 /* 주문 화면 — 포인트·쿠폰 적용 */
 .order-rewards {
   display: grid;
