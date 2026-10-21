@@ -3,6 +3,7 @@ import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { SITE_NAME } from '../lib/site.js';
 import { HeaderAccount } from './HeaderAccount.js';
+import { HeaderRewards } from './HeaderRewards.js';
 import { CartLink } from './CartLink.js';
 
 export function SiteHeader({ active }) {
@@ -25,6 +26,7 @@ export function SiteHeader({ active }) {
         el('a', { href: 'courses.html', className: 'icon-button', 'aria-label': '강의 검색' }, [icon('search')]),
         CartLink({ className: 'icon-button', active: active === 'cart' }),
         HeaderAccount({ active }),
+        HeaderRewards(),
       ]),
     ]),
   ]);

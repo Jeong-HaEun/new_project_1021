@@ -7,6 +7,10 @@ import { normalizeRewards } from './rewards.js';
 // DB 함수가 아직 서버에 없을 때(SQL 적용 전) PostgREST가 주는 표시
 const MISSING_CODES = ['PGRST202', '42883'];
 
+// 출석·주문 할인으로 잔액이 바뀌면 알린다 (헤더 등급·포인트 표시가 다시 읽음)
+export const REWARDS_CHANGE_EVENT = 'hanclass:rewards-change';
+const notifyRewards = () => window.dispatchEvent(new CustomEvent(REWARDS_CHANGE_EVENT));
+
 export function isRewardsMissing(error) {
   return MISSING_CODES.includes(error?.code);
 }
@@ -31,10 +35,14 @@ export async function fetchRewards() {
 
 // 출석 체크 — 오늘 이미 했으면 checkedIn: false (포인트 그대로)
 export async function checkIn() {
-  return normalizeRewards(await rpc('hanclass_check_in'));
+  const rewards = normalizeRewards(await rpc('hanclass_check_in'));
+  notifyRewards();
+  return rewards;
 }
 
 // 데모 주문 할인 — 서버가 가격표로 다시 계산해 { total, coupon_discount, points_used, final_total, balance }를 돌려준다
 export async function applyOrderRewards(courseIds, points, useCoupon) {
-  return rpc('hanclass_use_order_rewards', { p_course_ids: courseIds, p_points: points, p_use_coupon: useCoupon });
+  const result = await rpc('hanclass_use_order_rewards', { p_course_ids: courseIds, p_points: points, p_use_coupon: useCoupon });
+  notifyRewards();
+  return result;
 }

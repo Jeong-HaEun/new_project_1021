@@ -37,3 +37,19 @@
   .site-header__inner { gap: 12px; }
   .header-account__name { max-width: 70px; }
 }
+
+/* 등급·포인트 — 넓은 화면에서만 (모바일 375px 헤더가 넘치지 않게 숨김) */
+.header-rewards {
+  display: none;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-subtle);
+  color: var(--color-text-muted);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.header-rewards:hover { color: var(--color-primary); }
+@media (min-width: 1080px) {
+  .header-rewards:not([hidden]) { display: inline-flex; align-items: center; }
+}

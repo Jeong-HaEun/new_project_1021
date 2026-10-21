@@ -135,3 +135,16 @@ describe('rewardErrorText — 서버 거절을 쉬운 말로', () => {
     expect(text).toContain('다시 시도');
   });
 });
+
+describe('formatHeaderRewards — 헤더 등급·포인트 문구', () => {
+  it('등급 이름과 잔액을 함께 보여 준다', async () => {
+    const { formatHeaderRewards } = await import('../src/lib/rewards.js');
+    expect(formatHeaderRewards({ tier: 'grow', balance: 40 })).toBe('성장 · 40P');
+    expect(formatHeaderRewards({ tier: 'master', balance: 1250 })).toBe('마스터 · 1,250P');
+  });
+
+  it('모르는 등급은 새싹, 잔액이 이상하면 0P', async () => {
+    const { formatHeaderRewards } = await import('../src/lib/rewards.js');
+    expect(formatHeaderRewards({ tier: 'unknown', balance: -5 })).toBe('새싹 · 0P');
+  });
+});

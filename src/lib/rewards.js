@@ -74,3 +74,9 @@ export function rewardErrorText(error) {
   const code = Object.keys(ERROR_TEXTS).find((key) => message.includes(key));
   return code ? ERROR_TEXTS[code] : '포인트·쿠폰을 적용하지 못했어요. 잠시 후 다시 시도해 주세요.';
 }
+
+// 헤더 문구 — '성장 · 40P'. 모르는 등급은 새싹, 잔액이 이상하면 0P
+export function formatHeaderRewards({ tier, balance }) {
+  const label = (TIERS.find((item) => item.id === tier) ?? TIERS[0]).label;
+  return `${label} · ${toCount(balance).toLocaleString('ko-KR')}P`;
+}
