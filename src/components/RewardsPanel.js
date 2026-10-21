@@ -65,6 +65,7 @@ export function RewardsPanel() {
         el('p', { className: 'myclass-note', text: `하루 한 번(한국 날짜) ${ATTENDANCE_POINTS}P. 포인트는 1P = 1원으로 데모 주문에서 할인에 써요.` }),
       ]),
       TierGuide(rewards.tier),
+      el('a', { href: 'tiers.html', className: 'rewards-tiers-link', text: '등급·쿠폰 안내 자세히 보기' }),
       el('p', { className: 'rewards-demo', text: REWARDS_DEMO_NOTE }),
       el('p', { className: 'myclass-note', text: REWARDS_MORE_NOTE }),
     ]);

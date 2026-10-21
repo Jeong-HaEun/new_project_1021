@@ -29,6 +29,12 @@ export function getNextTier(days) {
   return tier ? { tier, daysLeft: tier.minDays - count } : null;
 }
 
+// 등급 안내용 출석일 범위 — '5~9일', 가장 높은 등급은 '20일 이상'
+export function getTierRange(tier) {
+  const next = TIERS[TIERS.findIndex((item) => item.id === tier.id) + 1];
+  return next ? `${tier.minDays}~${next.minDays - 1}일` : `${tier.minDays}일 이상`;
+}
+
 // 한국 날짜 'YYYY-MM-DD' (한국은 서머타임이 없어 +9시간 고정)
 export function toKstDate(date = new Date()) {
   return new Date(date.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);

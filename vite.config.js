@@ -23,6 +23,7 @@ export default defineConfig({
         community: 'community.html',
         admin: 'admin.html',
         login: 'login.html',
+        tiers: 'tiers.html',
       },
     },
   },

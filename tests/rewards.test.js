@@ -4,6 +4,7 @@ import {
   ATTENDANCE_POINTS,
   calcOrderDiscount,
   getNextTier,
+  getTierRange,
   getTier,
   normalizeRewards,
   rewardErrorText,
@@ -39,6 +40,17 @@ describe('getTier — 이번 달 출석일 수로 등급', () => {
 
   it('등급은 4단계, 출석일 기준이 커지는 순서', () => {
     expect(TIERS.map((tier) => tier.minDays)).toEqual([0, 5, 10, 20]);
+  });
+});
+
+describe('getTierRange — 등급 안내의 출석일 범위', () => {
+  it.each([
+    ['sprout', '0~4일'],
+    ['grow', '5~9일'],
+    ['pro', '10~19일'],
+    ['master', '20일 이상'],
+  ])('%s → %s', (id, text) => {
+    expect(getTierRange(TIERS.find((tier) => tier.id === id))).toBe(text);
   });
 });
 
