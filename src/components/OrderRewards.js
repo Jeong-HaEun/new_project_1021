@@ -11,15 +11,19 @@ const NO_DISCOUNT = { coupon: 0, points: 0, useCoupon: false };
 
 // 요약 상자의 할인 줄 — update(discount, total)로 바꾼다
 export function DiscountRows(total) {
+  const couponLabel = el('dt', { text: '쿠폰 할인' });
   const coupon = el('dd', { text: '-0원' });
   const points = el('dd', { text: '-0원' });
   const final = el('dd', { className: 'price cart-summary__total', text: won(total) });
   const node = el('dl', { className: 'cart-summary__rows' }, [
-    el('dt', { text: '쿠폰 할인' }), coupon,
+    couponLabel, coupon,
     el('dt', { text: '포인트 사용' }), points,
     el('dt', { text: '최종 금액 (데모)' }), final,
   ]);
+  couponLabel.hidden = coupon.hidden = true; // 쿠폰을 고르기 전에는 숨김
   function update(discount) {
+    // 쿠폰을 쓰지 않으면 '쿠폰 할인 -0원' 줄을 숨긴다 (새싹 등급·쿠폰 사용 후 등)
+    couponLabel.hidden = coupon.hidden = discount.coupon === 0;
     coupon.textContent = `-${won(discount.coupon)}`;
     points.textContent = `-${won(discount.points)}`;
     final.textContent = won(total - discount.coupon - discount.points);
