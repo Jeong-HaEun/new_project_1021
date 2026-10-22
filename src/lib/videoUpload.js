@@ -51,6 +51,17 @@ export function normalizeVideos(folders, courses) {
     .sort((a, b) => a.path.localeCompare(b.path));
 }
 
+// 수강 화면용: 한 강의 폴더 목록 → Map(차시id → 경로). 차시에 없는 파일은 뺀다
+export function lessonVideoPaths(course, files) {
+  const lessonIds = new Set(course.lessons.map((lesson) => lesson.id));
+  const paths = new Map();
+  (Array.isArray(files) ? files : []).forEach((file) => {
+    const lessonId = typeof file?.name === 'string' && file.id ? file.name.replace(/\.[^.]+$/, '') : null;
+    if (lessonIds.has(lessonId)) paths.set(lessonId, `${course.id}/${file.name}`);
+  });
+  return paths;
+}
+
 export function formatBytes(bytes) {
   if (bytes >= 1024 * 1024) return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
   return `${Math.max(1, Math.round(bytes / 1024))}KB`;

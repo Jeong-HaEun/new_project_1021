@@ -123,3 +123,29 @@
   color: var(--color-warning-strong);
   font-size: var(--text-small);
 }
+
+/* 차시 [재생] — 영상이 있고 수강 신청한 계정일 때만 */
+.learn-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 32px;
+  padding: 4px 12px;
+  font-size: var(--text-small);
+}
+
+/* .learn-section의 grid가 hidden을 덮지 않게 — 첫 재생 전에는 숨긴다 */
+.learn-player[hidden] {
+  display: none;
+}
+
+.learn-player__caption {
+  font-weight: 700;
+}
+
+.learn-player__video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-control);
+  background: var(--color-text);
+}

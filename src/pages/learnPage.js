@@ -1,5 +1,5 @@
 // 수강 화면 — learn.html?id=c002. 구매 전이면 맛보기만, 구매 후 모든 차시와 결과물 완성 체크 (SPEC.md 5절)
-// 영상·실습 파일은 준비 중. 유료 본문은 서버 권한 검증 전까지 사이트에 올리지 않는다
+// 영상은 그 강의를 계정으로 데모 수강 신청한 사람만 (가상 시연용). 실습 파일은 준비 중
 import { el } from '../lib/dom.js';
 import { icon } from '../lib/icons.js';
 import { readParam } from '../lib/paths.js';
@@ -7,9 +7,14 @@ import { findCourse } from '../lib/courseQuery.js';
 import { getLearnView } from '../lib/learn.js';
 import { CART_CHANGE_EVENT, readOwnedState, readOutcomes, resetDemo, toggleCourseOutcome } from '../lib/cartStore.js';
 import { getAccountSyncStatus, syncAccountEnrollments } from '../lib/accountSync.js';
+import { getCurrentUser } from '../lib/account.js';
+import { fetchMyEnrollments } from '../lib/enrollmentApi.js';
+import { listVideos } from '../lib/videoApi.js';
+import { lessonVideoPaths } from '../lib/videoUpload.js';
 import { COURSES } from '../data/courses/index.js';
 import { renderPage } from '../components/PageLayout.js';
 import { DemoReset, LearnStatus, LessonList, OutcomeCheck } from '../components/LearnParts.js';
+import { LessonPlayer } from '../components/LessonPlayer.js';
 import { showToast } from '../components/Toast.js';
 import '../styles/courses.css';
 import '../styles/detail.css';
@@ -18,6 +23,27 @@ import '../styles/learn-page.css';
 
 const course = findCourse(COURSES, readParam('id'));
 const body = el('div', { className: 'learn-body' });
+const player = LessonPlayer(); // 다시 그려도 재생 중인 영상이 끊기지 않게 한 번만 만든다
+const videos = { paths: new Map(), onPlay: handlePlay };
+
+function handlePlay(lesson) {
+  const index = course.lessons.findIndex((item) => item.id === lesson.id);
+  player.play(videos.paths.get(lesson.id), `${index + 1}차시 · ${lesson.title}`);
+}
+
+// 로그인했고 이 강의를 계정으로 신청했을 때만 영상 목록을 읽는다. 실패하면 조용히 준비 중으로 둔다
+async function loadVideos() {
+  try {
+    if (!(await getCurrentUser())) return;
+    const enrolled = (await fetchMyEnrollments()).some((row) => row.course_id === course.id);
+    if (!enrolled) return;
+    const [folder] = await listVideos([course.id]);
+    videos.paths = lessonVideoPaths(course, folder?.files);
+    if (videos.paths.size) render();
+  } catch {
+    // 영상 저장소 정책 적용 전이거나 연결 실패 — 재생 버튼은 준비 중으로 남는다
+  }
+}
 
 function BackLink() {
   const href = course ? `course.html?id=${course.id}` : 'courses.html';
@@ -65,7 +91,8 @@ function render() {
   body.replaceChildren(
     ...[AccountSyncNote()].filter(Boolean),
     LearnStatus(course, view),
-    LessonList(view),
+    LessonList(view, videos),
+    player.root,
     OutcomeCheck(course, view, handleOutcomeToggle),
     DemoReset(handleReset),
   );
@@ -84,4 +111,5 @@ renderPage({
 if (course) {
   render();
   window.addEventListener(CART_CHANGE_EVENT, render);
+  loadVideos();
 }
